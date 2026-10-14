@@ -1,0 +1,23 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,props,csproj,slnx,xml}]
+indent_size = 2
+
+[*.cs]
+# Library code awaits with ConfigureAwait(false) only where it matters; ASP.NET Core has no sync context.
+dotnet_diagnostic.CA2007.severity = none
+# Test method names use underscores for readability.
+dotnet_diagnostic.CA1707.severity = none
+
+# EF Core migrations are generated code.
+[**/Migrations/*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
