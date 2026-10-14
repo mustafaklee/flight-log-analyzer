@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FlightLog.Api/FlightLog.Api.csproj" />
+    <Project Path="src/FlightLog.Application/FlightLog.Application.csproj" />
+    <Project Path="src/FlightLog.Domain/FlightLog.Domain.csproj" />
+    <Project Path="src/FlightLog.Infrastructure/FlightLog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FlightLog.IntegrationTests/FlightLog.IntegrationTests.csproj" />
+    <Project Path="tests/FlightLog.UnitTests/FlightLog.UnitTests.csproj" />
+  </Folder>
+</Solution>
