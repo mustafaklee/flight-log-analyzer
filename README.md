@@ -55,6 +55,25 @@ curl -s -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
   -d '{"name":"Flight Test"}' $B/api/v1/teams
 ```
 
+### Windows + Docker Desktop
+
+PowerShell'de repo klasöründe:
+
+```powershell
+Copy-Item .env.example .env      # parolaları değiştirin
+docker compose up --build -d
+Invoke-RestMethod http://127.0.0.1:8080/health/ready   # "Healthy"
+```
+
+Durdurmak için `docker compose down`, veritabanını da silmek için `docker compose down -v`.
+
+### Visual Studio
+
+`FlightLog.slnx` dosyasını açın (.NET 10 SDK ve onu destekleyen bir Visual Studio sürümü, ör. Visual Studio 2026, gerekir).
+API'yi Visual Studio'dan çalıştırmak için önce yalnızca veritabanını başlatın: `docker compose up -d postgres`, ardından `FlightLog.Api` projesini başlangıç projesi yapıp F5. Swagger UI: http://localhost:5177/swagger.
+`appsettings.Development.json` içindeki bağlantı dizesi `.env.example` varsayılanlarıyla eşleşir; `.env` içinde `POSTGRES_PASSWORD`'u değiştirdiyseniz aynı değeri User Secrets ile verin (`dotnet user-secrets set "ConnectionStrings:Postgres" "Host=localhost;Port=5432;Database=flightlog;Username=flightlog;Password=..." --project src/FlightLog.Api`).
+Testler Test Explorer'da görünür; entegrasyon testleri için Docker Desktop açık olmalıdır.
+
 ## Yerel geliştirme (Docker'sız API)
 
 Gereksinim: .NET SDK 10.0.1xx, çalışan bir PostgreSQL (ör. `docker compose up -d postgres`).
