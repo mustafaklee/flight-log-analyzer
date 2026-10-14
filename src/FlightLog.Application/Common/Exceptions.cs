@@ -14,7 +14,18 @@ public sealed class NotFoundException(string resource, object id)
 public sealed class ForbiddenException(string message) : Exception(message);
 
 /// <summary>The request conflicts with the current state (e.g. stale version, duplicate name).</summary>
-public sealed class ConflictException(string code, string message) : Exception(message)
+public sealed class ConflictException(string code, string message, IReadOnlyDictionary<string, object?>? details = null)
+    : Exception(message)
 {
     public string Code { get; } = code;
+
+    /// <summary>Extra, client-safe facts about the conflict (e.g. the id of the existing resource).</summary>
+    public IReadOnlyDictionary<string, object?> Details { get; } = details ?? new Dictionary<string, object?>();
+}
+
+/// <summary>The uploaded content is larger than the configured limit.</summary>
+public sealed class PayloadTooLargeException(long limitBytes)
+    : Exception($"The file exceeds the maximum allowed size of {limitBytes} bytes.")
+{
+    public long LimitBytes { get; } = limitBytes;
 }

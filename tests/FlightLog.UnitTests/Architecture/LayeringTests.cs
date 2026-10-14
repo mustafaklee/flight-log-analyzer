@@ -42,10 +42,14 @@ public sealed class LayeringTests
         var violations = Domain.GetExportedTypes()
             .Where(t => t.IsClass && !typeof(Exception).IsAssignableFrom(t))
             .SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.SetMethod?.IsPublic == true)
+                .Where(p => p.SetMethod?.IsPublic == true && !IsInitOnly(p))
                 .Select(p => $"{t.Name}.{p.Name}"))
             .ToList();
 
         violations.Should().BeEmpty("domain state changes go through methods that enforce invariants");
     }
+
+    // Init-only setters belong to immutable value records (for example AircraftDetails), which cannot change after creation.
+    private static bool IsInitOnly(PropertyInfo property) =>
+        property.SetMethod!.ReturnParameter.GetRequiredCustomModifiers().Contains(typeof(System.Runtime.CompilerServices.IsExternalInit));
 }

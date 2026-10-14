@@ -37,6 +37,19 @@ internal sealed class TeamAccessService(IApplicationDbContext db, ICurrentUser c
         return role;
     }
 
+    public async Task<TeamRole> EnsureResourceRoleAsync(Guid teamId, TeamRole required, string resource, Guid resourceId, CancellationToken cancellationToken)
+    {
+        var role = await GetRoleAsync(teamId, cancellationToken)
+            ?? throw new NotFoundException(resource, resourceId);
+
+        if (!role.Includes(required))
+        {
+            throw new ForbiddenException($"This operation requires the {required} role in the team.");
+        }
+
+        return role;
+    }
+
     public async Task<IReadOnlyCollection<Guid>?> GetReadableTeamIdsAsync(CancellationToken cancellationToken)
     {
         if (currentUser.IsAdministrator)

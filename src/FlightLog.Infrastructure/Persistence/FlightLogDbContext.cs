@@ -1,4 +1,6 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Domain.Fleet;
+using FlightLog.Domain.Flights;
 using FlightLog.Domain.Projects;
 using FlightLog.Domain.Teams;
 using FlightLog.Infrastructure.Identity;
@@ -17,6 +19,12 @@ public sealed class FlightLogDbContext(DbContextOptions<FlightLogDbContext> opti
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     public DbSet<Project> Projects => Set<Project>();
+
+    public DbSet<Aircraft> Aircraft => Set<Aircraft>();
+
+    public DbSet<Flight> Flights => Set<Flight>();
+
+    public DbSet<FlightLogFile> FlightLogFiles => Set<FlightLogFile>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

@@ -93,7 +93,8 @@ public sealed class AuthController(
 
         if (ticket?.Properties.ExpiresUtc is not { } expiresUtc
             || clock.GetUtcNow() >= expiresUtc
-            || await signInManager.ValidateSecurityStampAsync(ticket.Principal) is not { } user)
+            || await signInManager.ValidateSecurityStampAsync(ticket.Principal) is not { } user
+            || await signInManager.UserManager.IsLockedOutAsync(user))
         {
             return Unauthorized();
         }

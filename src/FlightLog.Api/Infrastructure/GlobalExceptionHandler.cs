@@ -28,7 +28,9 @@ internal sealed partial class GlobalExceptionHandler(
             ValidationException validation => ToValidationProblem(validation),
             NotFoundException notFound => Problem(StatusCodes.Status404NotFound, "Resource not found", $"The requested {notFound.Resource.ToLowerInvariant()} was not found.", "not_found"),
             ForbiddenException forbidden => Problem(StatusCodes.Status403Forbidden, "Forbidden", forbidden.Message, "forbidden"),
-            ConflictException conflict => Problem(StatusCodes.Status409Conflict, "Conflict", conflict.Message, conflict.Code),
+            ConflictException conflict => WithDetails(Problem(StatusCodes.Status409Conflict, "Conflict", conflict.Message, conflict.Code), conflict.Details),
+            PayloadTooLargeException tooLarge => Problem(StatusCodes.Status413PayloadTooLarge, "File too large", tooLarge.Message, "upload.too_large"),
+            BadHttpRequestException { StatusCode: StatusCodes.Status413PayloadTooLarge } => Problem(StatusCodes.Status413PayloadTooLarge, "Request too large", "The request body exceeds the allowed size.", "upload.too_large"),
             DomainRuleViolationException rule => Problem(StatusCodes.Status422UnprocessableEntity, "Business rule violated", rule.Message, rule.Code),
             _ => null,
         };
@@ -52,6 +54,16 @@ internal sealed partial class GlobalExceptionHandler(
     {
         var problem = new ProblemDetails { Status = status, Title = title, Detail = detail };
         problem.Extensions["code"] = code;
+        return problem;
+    }
+
+    private static ProblemDetails WithDetails(ProblemDetails problem, IReadOnlyDictionary<string, object?> details)
+    {
+        foreach (var (key, value) in details)
+        {
+            problem.Extensions[key] = value;
+        }
+
         return problem;
     }
 
