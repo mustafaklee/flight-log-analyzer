@@ -18,6 +18,12 @@ public interface ITeamAccessService
     /// </summary>
     Task<TeamRole> EnsureRoleAsync(Guid teamId, TeamRole required, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Like <see cref="EnsureRoleAsync"/> for a resource owned by the team, but reports a non-member as
+    /// "resource not found" so that resource ids cannot be probed across teams.
+    /// </summary>
+    Task<TeamRole> EnsureResourceRoleAsync(Guid teamId, TeamRole required, string resource, Guid resourceId, CancellationToken cancellationToken);
+
     /// <summary>Ids of all teams the current user can read. Administrators get null, meaning "all teams".</summary>
     Task<IReadOnlyCollection<Guid>?> GetReadableTeamIdsAsync(CancellationToken cancellationToken);
 }

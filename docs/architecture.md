@@ -22,7 +22,7 @@ flowchart LR
     Api --> Infra
     Worker --> Infra
     Infra --> PG[(PostgreSQL)]
-    Infra --> S3[(MinIO / S3)]
+    Infra --> S3[(S3 uyumlu nesne depolama<br/>SeaweedFS)]
     Infra --> MQ[[RabbitMQ]]
     Infra --> Redis[(Redis)]
     Infra --> LLM[Bulut LLM API]
@@ -83,7 +83,9 @@ Henüz işlevi olmayan projeler boş iskelet olarak eklenmez; ilgili aşamada ol
 | Sinyal kataloğu, blok indeksi, özet istatistikler | PostgreSQL | Hangi sinyal var, hangi zaman aralığı hangi blokta, min/max/ortalama |
 | Olaylar, mod geçişleri, parametreler | PostgreSQL | Sayıları küçük (yüzler-binler), filtrelenir ve birleştirilir |
 
-Gerekçe ve alternatifler (tek büyük tablo, TimescaleDB, Parquet): [ADR-0005](adr/0005-time-series-storage.md).
+Gerekçe ve alternatifler (tek büyük tablo, TimescaleDB, Parquet): [ADR-0005](adr/0005-time-series-storage.md). Nesne depolama sunucusu: [ADR-0009](adr/0009-object-storage-server.md).
+
+Ham dosyalar içerik adreslidir: aynı içerik farklı ekiplerce yüklenirse tek nesne saklanır, ama her ekibin kendi `FlightLogFile` kaydı vardır. Nesne, ona başvuran son kayıt silindiğinde silinir.
 
 ### 4.2 ERD (hedef v1 şeması)
 
@@ -164,13 +166,15 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Kaynak | Endpoint'ler | Aşama |
 |---|---|---|
 | Auth | `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `POST /api/v1/auth/refresh`, `GET /api/v1/auth/me` | 1 |
+| Admin users | `GET/POST /api/v1/admin/users`, `POST /api/v1/admin/users/{id}/disable`, `POST /api/v1/admin/users/{id}/enable` (yalnızca Administrator) | 2 |
 | Teams | `GET/POST /api/v1/teams`, `GET /api/v1/teams/{id}` | 1 |
 | Team members | `GET/POST /api/v1/teams/{id}/members`, `PUT/DELETE /api/v1/teams/{id}/members/{userId}` | 1 |
 | Projects | `GET/POST /api/v1/teams/{teamId}/projects`, `GET/PUT/DELETE /api/v1/projects/{id}` | 1 |
 | Aircraft | `GET/POST /api/v1/teams/{teamId}/aircraft`, `GET/PUT/DELETE /api/v1/aircraft/{id}` | 2 |
-| Flights | `GET /api/v1/flights?projectId&aircraftId&from&to&status&q&sort&page`, `GET/PUT/DELETE /api/v1/flights/{id}` | 2 |
-| Uploads | `POST /api/v1/projects/{id}/logs` (multipart, yeni uçuş oluşturur), `GET /api/v1/log-files/{id}` | 2 |
-| Processing jobs | `GET /api/v1/log-files/{id}/jobs`, `POST /api/v1/log-files/{id}/retry`, `POST /api/v1/jobs/{id}/cancel` | 4 |
+| Flights | `GET /api/v1/flights?teamId&projectId&aircraftId&autopilot&status&firmware&from&to&search&sort&page&pageSize`, `GET/PUT/DELETE /api/v1/flights/{id}` | 2 |
+| Uploads | `POST /api/v1/projects/{id}/logs?aircraftId&name` (multipart, alan `file`; yeni uçuş oluşturur), `GET /api/v1/log-files/{id}`, `GET /api/v1/log-files/{id}/content` | 2 |
+| Processing state | `POST /api/v1/log-files/{id}/cancel`, `POST /api/v1/log-files/{id}/retry` | 2 |
+| Processing jobs | `GET /api/v1/log-files/{id}/jobs` (deneme geçmişi) | 4 |
 | Signals | `GET /api/v1/flights/{id}/signals`, `GET /api/v1/flights/{id}/signals/data?names&from&to&maxPoints` | 3/5 |
 | Events | `GET /api/v1/flights/{id}/events?from&to&kind` | 3 |
 | Analysis | `POST /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings` | 4/6 |
@@ -211,10 +215,11 @@ stateDiagram-v2
     Analyzing --> Completed
     Analyzing --> Failed
     Failed --> Queued: yeniden dene
+    Cancelled --> Queued: yeniden dene
     Completed --> AnalysisPending: yeniden analiz
 ```
 
-Geçersiz geçişler domain katmanında reddedilir ve unit testlerle doğrulanır (Aşama 2).
+Geçiş tablosu `ProcessingStatusTransitions` içindedir (`src/FlightLog.Domain/Flights/ProcessingStatus.cs`); tüm durum çiftleri unit testle doğrulanır. `Failed` yalnızca hata kodu ve mesajıyla (`Fail`) girilebilir. Aşama 2'de yükleme `Uploaded → Validating → Queued` adımlarını aynı istekte tamamlar; `Processing` ve sonrası Aşama 3–4'te worker tarafından yürütülür.
 
 ## 9. Güvenlik özeti
 
@@ -228,4 +233,4 @@ Geçersiz geçişler domain katmanında reddedilir ve unit testlerle doğrulanı
 
 - Serilog: JSON çıktısı, istek logları, korelasyon kimliği (`X-Correlation-Id`).
 - OpenTelemetry (Aşama 8): ASP.NET Core, HttpClient, EF Core, RabbitMQ izleri; parser süresi, bellek, kuyruk bekleme süresi metrikleri.
-- Sağlık: `/health/live` (süreç) ve `/health/ready` (PostgreSQL; sonraki aşamalarda RabbitMQ, MinIO, Redis).
+- Sağlık: `/health/live` (süreç) ve `/health/ready` (PostgreSQL ve nesne depolama; sonraki aşamalarda RabbitMQ, Redis).

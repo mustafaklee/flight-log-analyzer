@@ -1,7 +1,9 @@
 using FlightLog.Infrastructure.Identity;
+using FlightLog.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FlightLog.Infrastructure.Persistence;
 
@@ -21,5 +23,10 @@ public static class DatabaseInitializer
         }
 
         await scope.ServiceProvider.GetRequiredService<AdministratorSeeder>().SeedAsync();
+
+        if (scope.ServiceProvider.GetRequiredService<IOptions<StorageOptions>>().Value.CreateBucketIfMissing)
+        {
+            await scope.ServiceProvider.GetRequiredService<S3FileStorage>().EnsureBucketAsync(CancellationToken.None);
+        }
     }
 }

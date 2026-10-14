@@ -1,4 +1,7 @@
 using FlightLog.Application.Authorization;
+using FlightLog.Application.Fleet;
+using FlightLog.Application.Flights;
+using FlightLog.Application.Logs;
 using FlightLog.Application.Projects;
 using FlightLog.Application.Teams;
 using FluentValidation;
@@ -14,6 +17,9 @@ public static class DependencyInjection
         services.AddScoped<ITeamAccessService, TeamAccessService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IAircraftService, AircraftService>();
+        services.AddScoped<IFlightService, FlightService>();
+        services.AddScoped<ILogFileService, LogFileService>();
         return services;
     }
 }

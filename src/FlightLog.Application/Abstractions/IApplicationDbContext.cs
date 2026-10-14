@@ -1,3 +1,5 @@
+using FlightLog.Domain.Fleet;
+using FlightLog.Domain.Flights;
 using FlightLog.Domain.Projects;
 using FlightLog.Domain.Teams;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,12 @@ public interface IApplicationDbContext
     DbSet<TeamMember> TeamMembers { get; }
 
     DbSet<Project> Projects { get; }
+
+    DbSet<Aircraft> Aircraft { get; }
+
+    DbSet<Flight> Flights { get; }
+
+    DbSet<FlightLogFile> FlightLogFiles { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

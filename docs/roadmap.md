@@ -5,9 +5,9 @@ Süreler yaklaşık planlama aralığıdır; bir aşamanın bitişini kabul krit
 | Aşama | Konu | Durum |
 |---|---|---|
 | 0 | Repository incelemesi ve ürün tasarımı | Tamamlandı |
-| 1 | Temel backend ve altyapı | Tamamlandı; CI'ın GitHub'da ilk çalışması bekleniyor |
-| 2 | Araç, uçuş ve dosya yönetimi | Sırada |
-| 3 | PX4 ve ArduPilot parser entegrasyonu | Planlandı |
+| 1 | Temel backend ve altyapı | Tamamlandı |
+| 2 | Araç, uçuş ve dosya yönetimi | Tamamlandı (PR incelemesinde) |
+| 3 | PX4 ve ArduPilot parser entegrasyonu | Sırada |
 | 4 | Asenkron işleme ve teknik analiz | Planlandı |
 | 5 | Uçuş analiz arayüzü (React) | Planlandı |
 | 6 | Yapay zekâ analizi | Planlandı |
@@ -35,22 +35,23 @@ Hedef: Uygulama yerel ortamda çalışır, kullanıcılar yalnızca yetkili oldu
 - [x] Sağlık kontrolleri (`/health/live`, `/health/ready`)
 - [x] Docker Compose (PostgreSQL + API), Dockerfile; `docker compose up` sonrası `/health/ready` Healthy, kayıt/giriş/ekip/proje akışı ve yeniden başlatma sonrası token geçerliliği elle doğrulandı
 - [x] Unit testleri (37) ve Testcontainers ile entegrasyon testleri (28)
-- [ ] GitHub Actions CI (restore, build, format, güvenlik açığı kontrolü, testler, Docker build + compose smoke test) — workflow yazıldı, adımlar yerelde çalıştırıldı; GitHub'da ilk çalıştırma push sonrası doğrulanacak
+- [x] GitHub Actions CI (restore, build, format, güvenlik açığı kontrolü, testler, Docker build + compose smoke test); PR #1'de GitHub üzerinde yeşil
 
-## Aşama 2 — Araç, uçuş ve dosya yönetimi (sıradaki sprint)
+## Aşama 2 — Araç, uçuş ve dosya yönetimi
 
-Başlangıç noktası ve backlog:
+Hedef: Bir dosya güvenli biçimde yüklenebilir, kaydı veritabanında tutulur ve işlem durumu takip edilebilir.
 
-0. Yönetici için kullanıcı oluşturma/devre dışı bırakma endpoint'leri (kendi kendine kayıt kapalıyken hesap açmanın yolu).
-1. `Aircraft` entity, CRUD servisleri ve endpoint'leri, yetki testleri.
-2. `Flight` ve `FlightLogFile` entity'leri; `ProcessingStatus` durum makinesi (domain'de geçiş tablosu + unit testler).
-3. `IFileStorage` arayüzü; MinIO adaptörü (AWSSDK.S3 veya Minio paketi lisans/uyumluluk kontrolüyle), Docker Compose'a MinIO.
-4. Upload endpoint'i: stream olarak SHA-256 hesaplama, boyut sınırı (Kestrel + uygulama), içerik başlık doğrulaması (sihirli baytlar), sunucu tarafı depolama anahtarı.
-5. Ekip içi hash tekilleştirmesi (unique (TeamId, Sha256)), farklı ekipler için ayrı kayıt.
-6. Uçuş listesi: filtre, arama, sıralama, sayfalama + indeksler.
-7. Entegrasyon testleri: yükleme, tekrar yükleme, başka ekibin dosyasına erişim, aşırı boyut, sahte uzantı.
+- [x] Yönetici için kullanıcı oluşturma, devre dışı bırakma ve etkinleştirme endpoint'leri
+- [x] `Aircraft` entity, CRUD servisleri ve endpoint'leri; ekip içi tekil kimlik; etiketler; yetki testleri
+- [x] `Flight` ve `FlightLogFile` entity'leri; `ProcessingStatus` durum makinesi (domain'de geçiş tablosu + tüm durum çiftleri için unit test)
+- [x] `IFileStorage` arayüzü, S3 adaptörü (AWSSDK.S3), Docker Compose'a SeaweedFS (MinIO yerine, [ADR-0009](adr/0009-object-storage-server.md)); hazırlık kontrolüne depolama eklendi
+- [x] Upload endpoint'i: body stream olarak okunur, SHA-256 aynı anda hesaplanır, boyut sınırı (Kestrel + uygulama, 413), içerik başlık doğrulaması (ULog sihirli baytları, DataFlash FMT başlığı), uzantı/içerik uyumu, sunucu tarafı içerik adresli depolama anahtarı
+- [x] Ekip içi hash tekilleştirmesi (unique (TeamId, Sha256)), farklı ekipler için ayrı kayıt ve paylaşılan nesne; son kayıt silinince nesnenin silinmesi
+- [x] Uçuş listesi: ekip/proje/araç/otopilot/durum/firmware/tarih filtreleri, arama, sıralama, sayfalama + indeksler
+- [x] Entegrasyon testleri: yükleme (gerçek PX4 örneği), tekrar yükleme, başka ekibin dosyasına erişim, aşırı boyut, sahte uzantı, iptal/yeniden deneme
+- [x] `docker compose up` ile uçtan uca: gerçek PX4 dosyası yüklendi, indirilen içeriğin SHA-256'sı aynı, yeniden başlatma sonrası dosya korunuyor
 
-Kabul kriteri: Bir dosya güvenli biçimde yüklenebilir, kaydı veritabanında tutulur ve işlem durumu takip edilebilir.
+Ertelenenler: gerçek ArduPilot örnek dosyası (Aşama 3), uçuş listesinde bulgu sayısı ve sağlık göstergesi (Aşama 4), çoklu dosya yükleme arayüzü (Aşama 5), denetim kaydı (Aşama 7).
 
 ## Aşama 3 — Parser entegrasyonu
 

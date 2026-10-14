@@ -101,6 +101,11 @@ internal sealed class ProjectService(
     public async Task DeleteAsync(Guid projectId, CancellationToken cancellationToken)
     {
         var project = await LoadAuthorizedAsync(projectId, TeamRole.ProjectManager, cancellationToken);
+        if (await db.Flights.AnyAsync(f => f.ProjectId == projectId, cancellationToken))
+        {
+            throw new ConflictException("project.has_flights", "The project still has flights. Delete or move them first.");
+        }
+
         db.Projects.Remove(project);
         await db.SaveChangesAsync(cancellationToken);
     }
@@ -111,14 +116,7 @@ internal sealed class ProjectService(
             ?? throw new NotFoundException("Project", projectId);
 
         // A user outside the owning team gets the same 404 as for a missing project.
-        var role = await access.GetRoleAsync(project.TeamId, cancellationToken)
-            ?? throw new NotFoundException("Project", projectId);
-
-        if (!role.Includes(required))
-        {
-            throw new ForbiddenException($"This operation requires the {required} role in the team.");
-        }
-
+        await access.EnsureResourceRoleAsync(project.TeamId, required, "Project", projectId, cancellationToken);
         return project;
     }
 

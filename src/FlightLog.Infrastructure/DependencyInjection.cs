@@ -1,11 +1,16 @@
+using Amazon.Runtime;
+using Amazon.S3;
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Logs;
 using FlightLog.Infrastructure.Identity;
 using FlightLog.Infrastructure.Persistence;
+using FlightLog.Infrastructure.Storage;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FlightLog.Infrastructure;
 
@@ -46,9 +51,44 @@ public static class DependencyInjection
         services.AddScoped<IUserDirectory, UserDirectory>();
         services.AddSingleton(TimeProvider.System);
 
+        services.Configure<UploadOptions>(configuration.GetSection(UploadOptions.SectionName));
+        AddStorage(services, configuration);
+
         services.AddHealthChecks()
-            .AddDbContextCheck<FlightLogDbContext>("postgres", tags: ["ready"]);
+            .AddDbContextCheck<FlightLogDbContext>("postgres", tags: ["ready"])
+            .AddCheck<StorageHealthCheck>("object-storage", tags: ["ready"]);
 
         return services;
+    }
+
+    private static void AddStorage(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<StorageOptions>(configuration.GetSection(StorageOptions.SectionName));
+        services.AddSingleton<IAmazonS3>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
+            var config = new AmazonS3Config
+            {
+                ForcePathStyle = options.ForcePathStyle,
+                // S3 compatible stores do not all support the SDK v4 default flexible checksums.
+                RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED,
+                ResponseChecksumValidation = ResponseChecksumValidation.WHEN_REQUIRED,
+            };
+            if (!string.IsNullOrWhiteSpace(options.ServiceUrl))
+            {
+                config.ServiceURL = options.ServiceUrl;
+                config.AuthenticationRegion = options.Region;
+            }
+            else
+            {
+                config.RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(options.Region);
+            }
+
+            return string.IsNullOrWhiteSpace(options.AccessKey)
+                ? new AmazonS3Client(config)
+                : new AmazonS3Client(new BasicAWSCredentials(options.AccessKey, options.SecretKey), config);
+        });
+        services.AddSingleton<S3FileStorage>();
+        services.AddSingleton<IFileStorage>(sp => sp.GetRequiredService<S3FileStorage>());
     }
 }

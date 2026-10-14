@@ -1,5 +1,5 @@
 # Local development environment. Usage: cp .env.example .env && docker compose up --build
-# Services for later stages (RabbitMQ, MinIO, Redis, worker, web) are added when they are used.
+# Services for later stages (RabbitMQ, Redis, worker, web) are added when they are used.
 
 name: flightlog
 
@@ -21,6 +21,25 @@ services:
       timeout: 5s
       retries: 10
 
+  # S3 compatible object storage for raw log files (SeaweedFS, see docs/adr/0009-object-storage-server.md).
+  storage:
+    image: chrislusf/seaweedfs:4.48
+    restart: unless-stopped
+    command: ["mini", "-dir=/data", "-master.telemetry=false"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${STORAGE_ACCESS_KEY:?set STORAGE_ACCESS_KEY in .env}
+      AWS_SECRET_ACCESS_KEY: ${STORAGE_SECRET_KEY:?set STORAGE_SECRET_KEY in .env}
+    volumes:
+      - storage-data:/data
+    ports:
+      - "127.0.0.1:8333:8333"
+    healthcheck:
+      # Anonymous requests are refused (403), which still proves the S3 endpoint is serving.
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8333/ | grep -q 403"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   api:
     build:
       context: .
@@ -29,6 +48,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      storage:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
@@ -36,6 +57,12 @@ services:
       Auth__AllowSelfRegistration: ${ALLOW_SELF_REGISTRATION:-false}
       Auth__BootstrapAdministrator__Email: ${ADMIN_EMAIL:-}
       Auth__BootstrapAdministrator__Password: ${ADMIN_PASSWORD:-}
+      Storage__ServiceUrl: http://storage:8333
+      Storage__Bucket: flightlog
+      Storage__AccessKey: ${STORAGE_ACCESS_KEY}
+      Storage__SecretKey: ${STORAGE_SECRET_KEY}
+      Storage__CreateBucketIfMissing: "true"
+      Uploads__MaxFileSizeBytes: ${UPLOAD_MAX_BYTES:-536870912}
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     healthcheck:
@@ -48,3 +75,4 @@ services:
 
 volumes:
   postgres-data:
+  storage-data:
