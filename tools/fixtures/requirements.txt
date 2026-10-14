@@ -1,0 +1,4 @@
+# Test oracle only; not used by the application.
+pyulog==1.2.4
+pymavlink==2.4.50
+numpy
