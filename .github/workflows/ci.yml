@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (warnings are errors)
+        run: dotnet build --no-restore -c Release
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Check for vulnerable packages
+        run: |
+          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
+          ! grep -q -i "has the following vulnerable packages" vulnerable.txt
+
+      - name: Unit tests
+        run: dotnet test --project tests/FlightLog.UnitTests -c Release --no-build
+
+      # Testcontainers starts PostgreSQL through the Docker daemon available on the runner.
+      - name: Integration tests
+        run: dotnet test --project tests/FlightLog.IntegrationTests -c Release --no-build
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -f src/FlightLog.Api/Dockerfile -t flightlog-api:ci .
+
+      - name: Smoke test with Docker Compose
+        run: |
+          cp .env.example .env
+          docker compose up -d --wait --wait-timeout 120
+          curl --fail --silent http://127.0.0.1:8080/health/ready
+          docker compose down -v
