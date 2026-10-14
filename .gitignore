@@ -1,0 +1,26 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+*.trx
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Secrets and local environment
+.env
+*.env.local
+appsettings.*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (frontend, from stage 5)
+node_modules/
+dist/
