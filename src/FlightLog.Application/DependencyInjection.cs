@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddSingleton<RuleEngine>();
         services.AddScoped<IAnalysisService, AnalysisService>();
         services.AddScoped<IAnalysisRunService, AnalysisRunService>();
+        services.AddScoped<Dashboard.IDashboardService, Dashboard.DashboardService>();
         return services;
     }
 }

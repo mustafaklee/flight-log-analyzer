@@ -41,7 +41,7 @@ Bağımlılık yönü: `Api/Worker → Infrastructure → Application → Domain
 | `FlightLog.Contracts` | Kuyruk mesajları ve worker/API arasında paylaşılan sözleşmeler (sürümlü) | Yok |
 | `FlightLog.Api` | HTTP endpoint'leri, kimlik doğrulama, Problem Details, OpenAPI, sağlık kontrolleri | Application, Infrastructure |
 | `FlightLog.Worker` | Log işleme, normalizasyon, kural analizi, AI analizi (Aşama 3+) | Application, Infrastructure, Contracts |
-| `FlightLog.Web` | React + TypeScript arayüzü (Aşama 5) | API |
+| `web/` | React + TypeScript arayüzü (ADR-0010); OpenAPI'den üretilen tiplerle API'yi çağırır, iş mantığı içermez | API (HTTP, SignalR) |
 
 Application katmanı EF Core `DbSet`'lerine `IApplicationDbContext` üzerinden erişir; genel amaçlı repository/unit-of-work katmanı eklenmez ([ADR-0002](adr/0002-dotnet-postgres-efcore.md)). Kuyruk, depolama ve LLM gibi gerçekten değiştirilebilir dış bağımlılıklar arayüz arkasındadır.
 
@@ -56,7 +56,7 @@ flightlog-intelligence/
 │   ├── FlightLog.Contracts/        (Aşama 2-4)
 │   ├── FlightLog.Api/
 │   ├── FlightLog.Worker/           (Aşama 3-4)
-│   └── FlightLog.Web/              (Aşama 5)
+web/                              React arayüzü, nginx, Playwright testleri
 ├── tests/
 │   ├── FlightLog.UnitTests/
 │   ├── FlightLog.IntegrationTests/
@@ -206,6 +206,8 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Parameters | `GET /api/v1/flights/{id}/parameters?search&changedOnly` | 3 |
 | Analysis | `POST/GET /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings?minSeverity&category&ruleId&page&pageSize`, `GET /api/v1/analysis-rules` | 4 (AI: 6) |
 | Processing stats | `GET /api/v1/admin/processing/stats?hours` (yalnızca Administrator) | 4 |
+| Dashboard | `GET /api/v1/teams/{teamId}/dashboard` | 5 |
+| Realtime | SignalR `/hubs/processing` (`StatusChanged`; ekip grupları, yöneticiler için ayrı grup) | 5 |
 | Findings | `PATCH /api/v1/findings/{id}` (durum), `POST /api/v1/findings/{id}/assignments` | 7 |
 | Comparisons | `POST /api/v1/flights/compare` | 7 |
 | Comments, Tags | `GET/POST /api/v1/flights/{id}/comments`, `PUT /api/v1/flights/{id}/tags` | 7 |
@@ -310,6 +312,10 @@ Kod: `src/FlightLog.Application/Analysis`. Motor sürümü `rules-1`; her kural�
 
 Kuralların tam açıklaması, gereken veriler ve uygulanamadığı durumlar `GET /api/v1/analysis-rules` ile okunur. Aynı girdi aynı bulguları üretir (entegrasyon testiyle doğrulandı).
 
+### 8.2 Canlı durum güncellemeleri (ADR-0011)
+
+Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı commit edildikten sonra `pg_notify('flightlog_status', ...)` gönderilir (`StatusNotificationInterceptor`). Bildirim worker'dan da gelse API'ye ulaşır: API'deki `StatusNotificationListener` PostgreSQL'i `LISTEN` ile dinler ve bildirimi SignalR hub'ında yalnızca ilgili ekibin grubuna (ve yöneticilere) iletir. Bildirim yalnızca neyin değiştiğini söyler (tür, kimlik, durum, hata kodu); arayüz ayrıntıyı API'den yeniden okur. Bağlantı koparsa arayüz etkin işleri 15 saniyede bir yoklar, yeniden bağlanınca listeleri yeniler. Ayrı bir broker veya Redis backplane gerekmez; birden çok API örneği aynı kanalı dinler.
+
 ## 9. Güvenlik özeti
 
 - ASP.NET Core Identity, bearer token + refresh token; parola politikası; giriş endpoint'lerinde rate limiting ve hesap kilitleme.
@@ -317,6 +323,7 @@ Kuralların tam açıklaması, gereken veriler ve uygulanamadığı durumlar `GE
 - Ham log güvenilmeyen girdi: içerik doğrulama, boyut sınırı, parser zaman/bellek sınırı, depolama anahtarı sunucuda üretilir.
 - Gizli bilgiler environment variable / secret store; `.env` dosyası git dışında.
 - LLM'e giden veri minimize edilir; log içindeki metinler talimat olarak yorumlanmaz.
+- Arayüz: access token yalnızca bellekte, refresh token `localStorage`'da (ADR-0010). nginx CSP ile satır içi script'i yasaklar, yalnızca aynı origin'e bağlantıya ve yapılandırılan harita karo sunucusuna izin verir. SignalR WebSocket'i token'ı sorgu dizesinde taşıdığı için nginx sorgu dizesini loglamaz. Log içindeki metinler (mesajlar, parametre adları) arayüzde düz metin olarak gösterilir, HTML olarak işlenmez.
 
 ## 10. Gözlemlenebilirlik
 

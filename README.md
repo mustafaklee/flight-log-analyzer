@@ -6,7 +6,7 @@ PX4 ve ArduPilot tabanlı İHA'ların uçuş loglarını yüklemek, arşivlemek,
 
 ## Durum
 
-Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–4: temel backend, araç/uçuş yönetimi, log yükleme, PX4/ArduPilot log işleme, RabbitMQ ile asenkron işleme ve kural tabanlı teknik analiz**:
+Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–5: temel backend, araç/uçuş yönetimi, log yükleme, PX4/ArduPilot log işleme, RabbitMQ ile asenkron işleme, kural tabanlı teknik analiz ve web arayüzü**:
 
 | Özellik | Durum |
 |---|---|
@@ -25,14 +25,16 @@ Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çal�
 | RabbitMQ ile kuyruk: transactional outbox, dead-letter kuyruğu, idempotent tüketici, geçici hatalarda otomatik deneme | Çalışıyor; gerçek RabbitMQ ile test edildi |
 | Kural tabanlı teknik analiz: 13 kural (GPS, EKF, titreşim, batarya, failsafe, hatalar, mod geçişleri, parametre değişiklikleri, veri boşlukları); bulgularda zaman aralığı, ölçülen değer, eşik ve eşiğin kaynağı | Çalışıyor; gerçek PX4 ve ArduPilot loglarıyla testli |
 | Yönetici için işleme istatistikleri ve işleme metrikleri | Çalışıyor, testli |
-| React arayüzü | Aşama 5 |
+| Web arayüzü: dashboard, uçuş geçmişi, log yükleme, filo, projeler, ekip, yönetici ekranları | Çalışıyor; uçtan uca tarayıcı testli |
+| Uçuş inceleme: senkron grafikler, olay işaretleri, bulgu aralıkları, zaman çizelgesi, olay listesi, bulgular, sinyal kataloğu, parametreler, GPS haritası (konum verisi varsa) | Çalışıyor; gerçek PX4 ve ArduPilot loglarıyla testli |
+| Canlı işleme durumu (SignalR) | Çalışıyor, testli |
 | Yapay zekâ analizi | Aşama 6 |
 
 Henüz yapılmamış özellikler çalışıyormuş gibi gösterilmez.
 
 ## Teknoloji
 
-.NET 10 (LTS) · ASP.NET Core Web API · EF Core 10 + PostgreSQL 17 · ASP.NET Core Identity (bearer token) · S3 uyumlu nesne depolama (SeaweedFS, AWSSDK.S3) · FluentValidation · Serilog · OpenAPI/Swagger UI · xUnit v3 · Testcontainers · Docker Compose · GitHub Actions.
+.NET 10 (LTS) · ASP.NET Core Web API + SignalR · EF Core 10 + PostgreSQL 17 · ASP.NET Core Identity (bearer token) · S3 uyumlu nesne depolama (SeaweedFS, AWSSDK.S3) · FluentValidation · Serilog · OpenAPI/Swagger UI · xUnit v3 · Testcontainers · React 19 + TypeScript + Vite, Mantine, uPlot, TanStack Query, Leaflet · Vitest, Playwright · Docker Compose · GitHub Actions.
 
 Kararlar ve gerekçeler: [docs/adr](docs/adr/). Mimari: [docs/architecture.md](docs/architecture.md). Gereksinimler: [docs/requirements.md](docs/requirements.md).
 
@@ -46,6 +48,7 @@ docker compose up --build -d
 curl http://127.0.0.1:8080/health/ready   # "Healthy"
 ```
 
+- **Arayüz: http://127.0.0.1:8081** (`.env` içindeki `ADMIN_EMAIL` / `ADMIN_PASSWORD` ile ya da "Kayıt olun" ile giriş)
 - Swagger UI: http://127.0.0.1:8080/swagger (Development ortamında)
 - OpenAPI belgesi: http://127.0.0.1:8080/openapi/v1.json
 - İlk yönetici: `.env` içindeki `ADMIN_EMAIL` / `ADMIN_PASSWORD`
@@ -71,7 +74,7 @@ curl -s -H "authorization: Bearer $TOKEN" "$B/api/v1/flights/<flightId>/analysis
 curl -s -H "authorization: Bearer $TOKEN" "$B/api/v1/analysis-runs/<runId>/findings?minSeverity=Warning"
 ```
 
-Docker Compose beş servis başlatır: `postgres`, `storage` (SeaweedFS, S3 API `127.0.0.1:8333`), `rabbitmq` (yönetim arayüzü `127.0.0.1:15672`), `api` ve yüklenen logları işleyip analiz eden `worker`. Yükledikten birkaç saniye sonra dosya `Completed` olur; uçtan uca deneme için `scripts/smoke-test.sh`. Yükleme sınırı `.env` içindeki `UPLOAD_MAX_BYTES` ile ayarlanır (varsayılan 512 MiB).
+Docker Compose altı servis başlatır: `postgres`, `storage` (SeaweedFS, S3 API `127.0.0.1:8333`), `rabbitmq` (yönetim arayüzü `127.0.0.1:15672`), `api`, yüklenen logları işleyip analiz eden `worker` ve arayüzü sunan `web` (nginx, `127.0.0.1:8081`; `/api` ve `/hubs` isteklerini API'ye iletir). Yükledikten birkaç saniye sonra dosya `Completed` olur; uçtan uca deneme için `scripts/smoke-test.sh`. Yükleme sınırı `.env` içindeki `UPLOAD_MAX_BYTES` ile ayarlanır (varsayılan 512 MiB).
 
 ### Windows + Docker Desktop
 
@@ -81,6 +84,7 @@ PowerShell'de repo klasöründe:
 Copy-Item .env.example .env      # parolaları değiştirin
 docker compose up --build -d
 Invoke-RestMethod http://127.0.0.1:8080/health/ready   # "Healthy"
+Start-Process http://127.0.0.1:8081                     # arayüz
 ```
 
 Durdurmak için `docker compose down`, veritabanını da silmek için `docker compose down -v`.
@@ -103,6 +107,21 @@ dotnet run --project src/FlightLog.Api   # Development ayarları: appsettings.De
 
 Development ortamı açılışta migration'ları uygular ve kendi kendine kaydı açar. Üretimde ikisi de kapalıdır.
 
+Arayüz geliştirme (Node.js 22): API 8080'de çalışırken
+
+```bash
+cd web
+npm ci
+npm run dev        # http://localhost:5173; /api ve /hubs 127.0.0.1:8080'e yönlendirilir
+```
+
+API değiştiğinde sözleşmeyi ve tipleri güncelleyin:
+
+```bash
+UPDATE_OPENAPI_SNAPSHOT=1 dotnet test --project tests/FlightLog.IntegrationTests -- --filter-class "*OpenApiContractTests"
+cd web && npm run api:types
+```
+
 Yeni migration:
 
 ```bash
@@ -115,6 +134,14 @@ dotnet ef migrations add <Ad> -p src/FlightLog.Infrastructure -s src/FlightLog.A
 dotnet test --project tests/FlightLog.UnitTests          # Docker gerekmez
 dotnet test --project tests/FlightLog.ParserTests        # Docker gerekmez; gerçek loglar, oracle karşılaştırması
 dotnet test --project tests/FlightLog.IntegrationTests   # Docker gerekir (Testcontainers: PostgreSQL + SeaweedFS + RabbitMQ)
+```
+
+Arayüz:
+
+```bash
+cd web
+npm run typecheck && npm run lint && npm test   # Docker gerekmez
+npm run e2e                                     # docker compose up ile çalışan ortama karşı (http://127.0.0.1:8081)
 ```
 
 Ayrıntı: [docs/testing.md](docs/testing.md).
@@ -130,6 +157,7 @@ src/
   FlightLog.Infrastructure  EF Core, PostgreSQL, Identity, migration'lar, S3 depolama, outbox ve RabbitMQ, worker döngüsü
   FlightLog.Api             HTTP API, kimlik doğrulama, hata yönetimi, OpenAPI
   FlightLog.Worker          Log işleme ve analiz servisi (Docker'da ayrı konteyner)
+web/                        React arayüzü (Vite), nginx yapılandırması, Playwright testleri (e2e/)
 tests/
   FlightLog.UnitTests        Domain, doğrulama, mimari katman testleri
   FlightLog.ParserTests      Parser'lar ve normalizasyon, pyulog/pymavlink oracle'ına karşı
@@ -173,6 +201,8 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | GET | `/api/v1/analysis-runs/{id}/findings` | Bulgular (`minSeverity`, `category`, `ruleId`, sayfalama): zaman aralığı, ölçülen değerler, eşik ve kaynağı, güven |
 | GET | `/api/v1/analysis-rules` | Kurallar: ne kontrol ettikleri, gereken veri, uygulanamadıkları durumlar |
 | GET | `/api/v1/admin/processing/stats?hours=` | İşleme istatistikleri (Administrator) |
+| GET | `/api/v1/teams/{id}/dashboard` | Ekip özeti: sayılar, uçuş süresi, işleme durumu, son analizlerdeki bulgular, son uçuşlar |
+| WS | `/hubs/processing` | SignalR: dosya ve analiz durum değişiklikleri (`StatusChanged`), yalnızca kullanıcının ekipleri için |
 | GET | `/health/live`, `/health/ready` | Sağlık kontrolleri (hazırlık: veritabanı, depolama, RabbitMQ) |
 
 Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`, `analysis_run.already_pending`).
@@ -188,7 +218,10 @@ Sunucu kurulumu, migration, gizli bilgi yönetimi, yedekleme ve log saklama: [do
 - GPS UTC zamanı olmayan loglarda uçuşun başlangıç tarihi bilinemez ve boş kalır (tahmin edilmez); liste tarihi yükleme zamanıdır.
 - Normalize sinyaller v1 yalnızca tutum, GPS ve batarya içerir; titreşim ve barometrik irtifa formatlar arasında farklı anlam taşıdığı için şimdilik ham sinyal olarak okunur ([mimari](docs/architecture.md#51-sinyaller-ve-normalizasyon-v1)).
 - Sinyal blok formatı ile Parquet'in ölçümlü karşılaştırması Aşama 8'e ertelendi ([ADR-0005](docs/adr/0005-time-series-storage.md)).
-- Tek istekte tek dosya yüklenir; çoklu yükleme istemci tarafında (Aşama 5) ardışık isteklerle yapılacak.
+- Tek istekte tek dosya yüklenir; arayüz çoklu seçimi ardışık isteklerle yükler.
+- Kural başlıkları ve açıklamaları backend'de İngilizce üretiliyor; arayüzde olduğu gibi gösteriliyor.
+- Refresh token tarayıcıda `localStorage`'da tutuluyor (ADR-0010); HttpOnly çerezli oturum Aşama 8'deki güvenlik sertleştirmesinde değerlendirilecek.
+- Harita karoları varsayılan olarak OpenStreetMap'ten çekilir; yoğun kullanımda kendi karo sunucunuzu `MAP_TILE_URL` ile verin.
 - Devre dışı bırakılan kullanıcının daha önce aldığı access token süresi dolana kadar (`Auth:AccessTokenMinutes`) geçerli kalır; refresh ve giriş hemen engellenir.
 - Yönetici davet akışı ve e-posta doğrulama yok.
 - Denetim kaydı (audit log) Aşama 7'de eklenecek.

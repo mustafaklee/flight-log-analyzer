@@ -27,9 +27,10 @@ public static class DependencyInjection
 
         services.Configure<MessagingOptions>(configuration.GetSection(MessagingOptions.SectionName));
         services.AddSingleton<OutboxInterceptor>();
+        services.AddSingleton<StatusNotificationInterceptor>();
         services.AddDbContext<FlightLogDbContext>((sp, options) => options
             .UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(typeof(FlightLogDbContext).Assembly.FullName))
-            .AddInterceptors(sp.GetRequiredService<OutboxInterceptor>()));
+            .AddInterceptors(sp.GetRequiredService<OutboxInterceptor>(), sp.GetRequiredService<StatusNotificationInterceptor>()));
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<FlightLogDbContext>());
 
         services.AddIdentityCore<ApplicationUser>(options =>

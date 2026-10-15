@@ -9,6 +9,23 @@ internal static class OpenApiConfiguration
     {
         services.AddOpenApi("v1", options =>
         {
+            // Shared enum schemas are referenced by nullable and non-nullable properties alike; nullability is
+            // already expressed at the property ("oneOf: null | enum"), so the enum itself lists only real values.
+            options.AddSchemaTransformer((schema, _, _) =>
+            {
+                if (schema.Enum is { Count: > 0 } values)
+                {
+                    for (var i = values.Count - 1; i >= 0; i--)
+                    {
+                        if (values[i] is null)
+                        {
+                            values.RemoveAt(i);
+                        }
+                    }
+                }
+
+                return Task.CompletedTask;
+            });
             options.AddDocumentTransformer((document, _, _) =>
             {
                 document.Info = new OpenApiInfo
@@ -35,5 +52,23 @@ internal static class OpenApiConfiguration
             });
         });
         return services;
+    }
+}
+
+/// <summary>
+/// Documents the success response of actions that only declare error responses. ApiExplorer infers the response
+/// body from the return type only for actions without any [ProducesResponseType]; the class-level error
+/// attributes would otherwise hide the 200 response and its schema from the OpenAPI document (and the web client).
+/// </summary>
+internal sealed class SuccessResponseConvention : Microsoft.AspNetCore.Mvc.ApplicationModels.IActionModelConvention
+{
+    public void Apply(Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action)
+    {
+        var declared = action.Filters.OfType<Microsoft.AspNetCore.Mvc.ApiExplorer.IApiResponseMetadataProvider>()
+            .Concat(action.Controller.Filters.OfType<Microsoft.AspNetCore.Mvc.ApiExplorer.IApiResponseMetadataProvider>());
+        if (!declared.Any(d => d.StatusCode is >= 200 and < 300))
+        {
+            action.Filters.Add(new Microsoft.AspNetCore.Mvc.ProducesResponseTypeAttribute(StatusCodes.Status200OK));
+        }
     }
 }

@@ -1,5 +1,6 @@
 # Local development environment. Usage: cp .env.example .env && docker compose up --build
-# Services for later stages (Redis, web) are added when they are used.
+# The web client is served on http://localhost:${WEB_PORT:-8081} (nginx, proxies /api and /hubs to the API).
+# Services for later stages (Redis) are added when they are used.
 
 name: flightlog
 
@@ -122,6 +123,23 @@ services:
       RabbitMq__HostName: rabbitmq
       RabbitMq__UserName: ${RABBITMQ_USER}
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
+
+  # React client (ADR-0010): static build behind nginx, which proxies /api and /hubs so the browser sees one origin.
+  web:
+    build:
+      context: web
+      args:
+        VITE_MAP_TILE_URL: ${MAP_TILE_URL:-}
+        VITE_MAP_TILE_ATTRIBUTION: ${MAP_TILE_ATTRIBUTION:-}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_UPSTREAM: http://api:8080
+      MAP_TILE_ORIGIN: ${MAP_TILE_ORIGIN:-https://tile.openstreetmap.org}
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8081}:8080"
 
 volumes:
   postgres-data:

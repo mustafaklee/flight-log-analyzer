@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using FlightLog.Api.Auth;
 using FlightLog.Api.Infrastructure;
+using FlightLog.Api.Realtime;
 using FlightLog.Application;
 using FlightLog.Application.Abstractions;
 using FlightLog.Infrastructure;
@@ -40,6 +41,19 @@ try
         {
             options.BearerTokenExpiration = TimeSpan.FromMinutes(authOptions.AccessTokenMinutes);
             options.RefreshTokenExpiration = TimeSpan.FromDays(authOptions.RefreshTokenDays);
+
+            // Browsers cannot set headers on WebSocket and server-sent event requests: SignalR sends the token in
+            // the query string, which is accepted on the hub path only.
+            options.Events.OnMessageReceived = context =>
+            {
+                if (context.HttpContext.Request.Path.StartsWithSegments(ProcessingHub.Path)
+                    && context.Request.Query["access_token"] is { Count: 1 } token)
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            };
         });
     builder.Services.AddAuthorization();
 
@@ -65,9 +79,20 @@ try
             context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier);
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-    builder.Services.AddControllers()
+    builder.Services.AddControllers(options => options.Conventions.Add(new SuccessResponseConvention()))
         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+    // The OpenAPI generator reads the minimal-API JSON options: enums are documented as the strings MVC sends.
+    // Numbers are documented as numbers (the web defaults would also allow numeric strings).
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+    });
     builder.Services.AddFlightLogOpenApi();
+    builder.Services.AddSignalR()
+        .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+    builder.Services.AddHostedService<StatusNotificationListener>();
 
     var app = builder.Build();
 
@@ -78,7 +103,7 @@ try
     app.UseExceptionHandler();
     app.UseStatusCodePages();
 
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
     {
         app.MapOpenApi();
         app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "FlightLog API v1"));
@@ -89,6 +114,7 @@ try
     app.UseAuthorization();
 
     app.MapControllers();
+    app.MapHub<ProcessingHub>(ProcessingHub.Path);
     app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
     app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = check => check.Tags.Contains("ready") });
 
