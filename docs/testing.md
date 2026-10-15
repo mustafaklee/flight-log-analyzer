@@ -4,8 +4,8 @@
 
 | Proje | Kapsam | Bağımlılık |
 |---|---|---|
-| `FlightLog.UnitTests` | Domain kuralları (ekip üyelik değişmezleri, rol sıralaması, proje doğrulaması, araç ve etiket kuralları, işleme durum makinesinin tüm durum çiftleri, log dosyası ve uçuş kuralları), format algılama, dosya adı temizleme, FluentValidation kuralları, sayfalama, Clean Architecture katman bağımlılıkları | Yok |
-| `FlightLog.IntegrationTests` | Gerçek API (`WebApplicationFactory`) + gerçek PostgreSQL 17 ve SeaweedFS (Testcontainers); migration'lar her test sınıfı için temiz bir veritabanında, dosyalar her fabrika için ayrı bucket'ta | Docker |
+| `FlightLog.UnitTests` | Domain kuralları (ekip üyelik değişmezleri, rol sıralaması, proje doğrulaması, araç ve etiket kuralları, işleme durum makinesinin tüm durum çiftleri, log dosyası ve uçuş kuralları, analiz run'ı ve otomatik deneme), analiz kuralları ve kural motoru, zaman serisi aralık hesapları, outbox mesajları ve teslim kararları, geçici hata sınıflandırması, format algılama, dosya adı temizleme, FluentValidation kuralları, sayfalama, Clean Architecture katman bağımlılıkları | Yok |
+| `FlightLog.IntegrationTests` | Gerçek API (`WebApplicationFactory`) + gerçek PostgreSQL 17, SeaweedFS ve RabbitMQ 4.1 (Testcontainers); migration'lar her test sınıfı için temiz bir veritabanında, dosyalar her fabrika için ayrı bucket'ta, mesajlar ayrı virtual host'ta | Docker |
 | `FlightLog.ParserTests` | ULog ve DataFlash parser'larının pyulog/pymavlink çıktısıyla birebir karşılaştırılması (her seri, her alan), bozuk/kesik/rastgele girdi, sınırlar, zaman aşımı, iptal; yorumlayıcılar (firmware, modlar, arm, UTC zamanı); normalizasyon kuralları; blok formatı ve bloklardan geri okunan değerlerin oracle ile eşleşmesi | Yok |
 
 ## Çalıştırma
@@ -57,6 +57,12 @@ Beklenen JSON'lar elle düzenlenmez. Parser bir oracle'dan bilerek farklı davra
 - Uçuş listesi: ekip, proje, otopilot, durum, tarih, arama filtreleri, sıralama, sayfalama; başka ekibin uçuşu ve dosyası 404.
 - Yönetici kullanıcı yönetimi: hesap oluşturma, devre dışı bırakılan hesabın giriş ve refresh yapamaması, kendini devre dışı bırakamama, yönetici olmayanın 403 alması.
 - **Log işleme (worker döngüsü testte doğrudan çalıştırılır)**: gerçek PX4 ve ArduPilot logu yüklenir ve işlenir; uçuşun firmware, araç tipi, UTC başlangıç ve süre değerleri, sinyal kataloğu, tam çözünürlüklü ve downsample edilmiş veri, zaman penceresi, beyan edilen çarpanın uygulanması, olaylar ve parametreler doğrulanır. Bozuk dosya kararlı bir kodla `Failed` olur ve yeniden denenebilir; işlem sırasında iptal ve worker kapanışı veri bırakmaz; takılı iş `processing.interrupted` olur; uçuş silinince sinyal blokları silinir; ekip dışı kullanıcı tüm uçlarda 404 alır.
+
+- **Analiz (worker adımları testte doğrudan çalıştırılır)**: ArduPilot SITL ve PX4 logları işlendikten sonra otomatik analiz `Succeeded` olur; 13 kuralın sonucu, uygulanamayan kuralların gerekçesi, bilinen veri boşluğu ve mod geçişi bulguları, filtreler ve sayfa sınırı doğrulanır. Elle yeniden analiz 202 döner, beklerken ikinci istek 409 alır ve sonuç ilk analizle birebir aynıdır. Tekrar gelen işleme ve analiz mesajları iş yapmaz. Viewer analiz isteyemez (403), ekip dışı kullanıcı 404 alır. İşleme istatistikleri yalnızca yöneticiye açıktır.
+- **Geçici hata**: nesne depolama okuması yapay olarak hata verdirilir; bir hatadan sonra dosya otomatik denenip tamamlanır, sürekli hatada 4 denemeden sonra `processing.retries_exhausted` ile `Failed` olur ve elle yeniden deneme çalışır.
+- **RabbitMQ (Testcontainers ile gerçek broker, her test sınıfı kendi virtual host'unda)**: yükleme outbox → RabbitMQ → arka plan worker'ı yoluyla işlenip analiz edilir; outbox satırları bir kez yayınlanır; okunamayan mesajlar DLQ'ya gider; tekrar gelen mesajlar ack'lenir ve yeni iş açmaz; hazır olma kontrolü broker'ı içerir.
+
+Kural mantığı unit testlerde sahte sinyal kaynağıyla (`RuleTestContext`) test edilir: eşik kaynağı, aralık birleştirme, arm pencereleri, uygulanamama gerekçeleri.
 
 Docker Compose ile uçtan uca kontrol (CI'daki `docker` işi de bunu çalıştırır):
 

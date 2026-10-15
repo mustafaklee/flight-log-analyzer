@@ -9,6 +9,7 @@ WORKDIR /src
 COPY global.json Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/FlightLog.Domain/FlightLog.Domain.csproj src/FlightLog.Domain/
 COPY src/FlightLog.LogParsing/FlightLog.LogParsing.csproj src/FlightLog.LogParsing/
+COPY src/FlightLog.Contracts/FlightLog.Contracts.csproj src/FlightLog.Contracts/
 COPY src/FlightLog.Application/FlightLog.Application.csproj src/FlightLog.Application/
 COPY src/FlightLog.Infrastructure/FlightLog.Infrastructure.csproj src/FlightLog.Infrastructure/
 COPY src/FlightLog.Worker/FlightLog.Worker.csproj src/FlightLog.Worker/

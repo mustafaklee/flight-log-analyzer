@@ -29,6 +29,13 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Processing__PollInterval`, `Processing__CancellationCheckInterval` | Kuyruk yoklama aralığı (2 s) ve çalışan işin iptal kontrolü (5 s) |
 | `Processing__ParserTimeout`, `Processing__StaleAfter` | Dosya başına parse süresi sınırı (15 dk); bu süreden uzun `Processing` kalan dosya çöken worker sayılıp `Failed` olur (30 dk) |
 | `Processing__TempDirectory`, `Processing__MaxParallelUploads` | Worker'ın ham dosyayı ve blokları koyduğu geçici dizin (en büyük log + blokları kadar alan); blok yükleme paralelliği (8) |
+| `Messaging__Transport` | `RabbitMq` (Compose ve üretim) veya `Database` (broker'sız tek makine; worker veritabanını yoklar) |
+| `RabbitMq__HostName`, `RabbitMq__Port`, `RabbitMq__VirtualHost` | Broker adresi (Compose içinde `rabbitmq:5672`, `/`) |
+| `RabbitMq__UserName` / `RabbitMq__Password` | Broker kimlik bilgileri (`.env`: `RABBITMQ_USER`, `RABBITMQ_PASSWORD`) |
+| `RabbitMq__PrefetchCount` | Worker başına aynı anda alınan mesaj (1; bellek kullanımını dosya başına sınırlar) |
+| `Processing__MaxAutomaticRetries`, `Processing__RetryBaseDelay`, `Processing__RetryMaxDelay` | Geçici hatalarda otomatik deneme sayısı (3) ve üstel bekleme (30 s'den başlar, en fazla 10 dk) |
+| `Processing__AnalysisStaleAfter` | Bu süreden uzun `Running` kalan analiz çöken worker sayılır (10 dk) |
+| `Messaging__OrphanAfter`, `Messaging__OutboxRetention` | Bu süreden uzun kuyrukta bekleyen iş için mesaj yeniden yazılır (30 dk); yayınlanmış outbox satırlarının saklama süresi (7 gün) |
 
 Data Protection anahtarları (bearer token şifreleme) PostgreSQL'deki `DataProtectionKeys` tablosunda saklanır; böylece token'lar yeniden başlatmada ve birden fazla API örneğinde geçerli kalır. Bu anahtarlar şu an şifrelenmeden saklanır (log uyarısı bunu belirtir); üretimde bir sertifika veya KMS ile `ProtectKeysWith...` yapılandırması Aşama 8'de eklenecek.
 
@@ -73,4 +80,11 @@ API JSON (Compact) formatında stdout'a log yazar. Docker log sürücüsünde bo
 ## Sağlık kontrolleri
 
 - `GET /health/live`: süreç ayakta mı.
-- `GET /health/ready`: PostgreSQL ve nesne depolama erişilebilir mi. Reverse proxy ve orkestratör hazır olma kontrolü için bunu kullanın.
+- `GET /health/ready`: PostgreSQL, nesne depolama ve (RabbitMQ taşımasında) RabbitMQ erişilebilir mi. Broker geçici olarak kapalıyken API yükleme kabul etmeye devam eder; mesajlar outbox'ta bekler ve broker dönünce iletilir. Reverse proxy ve orkestratör hazır olma kontrolü için bunu kullanın.
+
+## RabbitMQ
+
+- Kuyruklar ve exchange'ler uygulama tarafından açılışta tanımlanır (dayanıklı, kalıcı mesaj): `flightlog.work` → `flightlog.processing`, reddedilenler `flightlog.dead-letter` → `flightlog.processing.dlq`.
+- DLQ'daki mesajlar okunamayan veya otomatik denemeleri tükenen işlerdir; ilgili dosya zaten `Failed` durumundadır ve kullanıcı API'den yeniden deneyebilir. DLQ'yu yönetim arayüzünden (Compose'da `127.0.0.1:15672`) izleyin ve inceledikten sonra boşaltın.
+- Broker verisi (`rabbitmq-data` volume) kaybolursa iş kaybolmaz: kuyrukta 30 dakikadan uzun bekleyen işler için mesaj yeniden yazılır.
+- Kuyruk derinliği ve bekleyen outbox sayısı `GET /api/v1/admin/processing/stats` ile görülür.
