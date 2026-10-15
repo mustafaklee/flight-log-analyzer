@@ -1,5 +1,5 @@
 # Local development environment. Usage: cp .env.example .env && docker compose up --build
-# Services for later stages (RabbitMQ, Redis, worker, web) are added when they are used.
+# Services for later stages (RabbitMQ, Redis, web) are added when they are used.
 
 name: flightlog
 
@@ -63,6 +63,8 @@ services:
       Storage__SecretKey: ${STORAGE_SECRET_KEY}
       Storage__CreateBucketIfMissing: "true"
       Uploads__MaxFileSizeBytes: ${UPLOAD_MAX_BYTES:-536870912}
+      # Logs are processed by the worker service below, not inside the API.
+      Processing__Enabled: "false"
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     healthcheck:
@@ -72,6 +74,24 @@ services:
       timeout: 5s
       retries: 10
       start_period: 15s
+
+  # Parses queued logs into signals, events and parameters (polls the database; RabbitMQ arrives in stage 4).
+  worker:
+    build:
+      context: .
+      dockerfile: src/FlightLog.Worker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      # The API applies the migrations and creates the bucket.
+      api:
+        condition: service_healthy
+    environment:
+      DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
+      Storage__ServiceUrl: http://storage:8333
+      Storage__Bucket: flightlog
+      Storage__AccessKey: ${STORAGE_ACCESS_KEY}
+      Storage__SecretKey: ${STORAGE_SECRET_KEY}
 
 volumes:
   postgres-data:

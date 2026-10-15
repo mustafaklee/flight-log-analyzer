@@ -7,6 +7,7 @@ WORKDIR /src
 # Restore first so the layer is cached while only source files change.
 COPY global.json Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/FlightLog.Domain/FlightLog.Domain.csproj src/FlightLog.Domain/
+COPY src/FlightLog.LogParsing/FlightLog.LogParsing.csproj src/FlightLog.LogParsing/
 COPY src/FlightLog.Application/FlightLog.Application.csproj src/FlightLog.Application/
 COPY src/FlightLog.Infrastructure/FlightLog.Infrastructure.csproj src/FlightLog.Infrastructure/
 COPY src/FlightLog.Api/FlightLog.Api.csproj src/FlightLog.Api/

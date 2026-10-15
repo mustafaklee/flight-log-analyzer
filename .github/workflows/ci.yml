@@ -39,6 +39,9 @@ jobs:
       - name: Unit tests
         run: dotnet test --project tests/FlightLog.UnitTests -c Release --no-build
 
+      - name: Parser tests (real PX4 and ArduPilot logs against pyulog/pymavlink results)
+        run: dotnet test --project tests/FlightLog.ParserTests -c Release --no-build
+
       # Testcontainers starts PostgreSQL through the Docker daemon available on the runner.
       - name: Integration tests
         run: dotnet test --project tests/FlightLog.IntegrationTests -c Release --no-build
@@ -49,12 +52,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build API image
-        run: docker build -f src/FlightLog.Api/Dockerfile -t flightlog-api:ci .
-
-      - name: Smoke test with Docker Compose
+      - name: Build images
         run: |
           cp .env.example .env
-          docker compose up -d --wait --wait-timeout 120
+          docker compose build
+
+      - name: Smoke test with Docker Compose (upload a log, wait for the worker)
+        run: |
+          docker compose up -d --wait --wait-timeout 180
           curl --fail --silent http://127.0.0.1:8080/health/ready
-          docker compose down -v
+          scripts/smoke-test.sh
+
+      - name: Service logs
+        if: always()
+        run: docker compose logs --no-color api worker | tail -n 200
+
+      - name: Stop
+        if: always()
+        run: docker compose down -v
