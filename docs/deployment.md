@@ -16,7 +16,7 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Database__MigrateOnStartup` | Açılışta migration uygulansın mı (üretimde `false` önerilir) |
 | `Auth__AllowSelfRegistration` | Kendi kendine kayıt (üretimde `false`) |
 | `Auth__AccessTokenMinutes`, `Auth__RefreshTokenDays` | Token süreleri |
-| `Auth__RateLimitPerMinute` | Kimlik doğrulama endpoint'lerinde IP başına dakikalık istek sınırı |
+| `Auth__RateLimitPerMinute` | Kimlik doğrulama endpoint'lerinde IP başına dakikalık istek sınırı (`.env`: `AUTH_RATE_LIMIT_PER_MINUTE`, varsayılan 10) |
 | `Auth__BootstrapAdministrator__Email` / `__Password` | İlk yönetici; hesap varsa değiştirilmez. İlk açılıştan sonra parolayı değiştirip değişkeni kaldırın |
 | `Storage__ServiceUrl` | S3 uyumlu servis adresi (Compose içinde `http://storage:8333`; AWS S3 için boş bırakılıp `Storage__Region` verilir) |
 | `Storage__Bucket`, `Storage__Region`, `Storage__ForcePathStyle` | Bucket adı, bölge, path-style adresleme (SeaweedFS/MinIO için `true`) |
@@ -48,6 +48,7 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Ai__MaxAutomaticRetries`, `Ai__RetryBaseDelay`, `Ai__RetryMaxDelay`, `Ai__StaleAfter` | 429/5xx/ağ hatasında worker'ın yeniden kuyruğa alma sayısı (2) ve bekleme (1 dk'dan başlar, en fazla 15 dk); takılı sayılma süresi (30 dk) |
 | `Ai__MaxContextCharacters` | Modele gönderilen bağlamın üst sınırı (60000 karakter); aşılırsa olaylar, parametreler, istatistikler ve bulgular kırpılır |
 | `Ai__Prices__<model>__InputPerMillion` vb. | Maliyet tahmini için fiyat tablosu (USD / milyon token); fiyatı olmayan modelin maliyeti boş kalır |
+| `Audit__RetentionDays` | Denetim kaydı saklama süresi, gün (`worker`; `.env`: `AUDIT_RETENTION_DAYS`, varsayılan 730; 0 = süresiz). Daha eski kayıtlar worker bakımında silinir |
 
 Data Protection anahtarları (bearer token şifreleme) PostgreSQL'deki `DataProtectionKeys` tablosunda saklanır; böylece token'lar yeniden başlatmada ve birden fazla API örneğinde geçerli kalır. Bu anahtarlar şu an şifrelenmeden saklanır (log uyarısı bunu belirtir); üretimde bir sertifika veya KMS ile `ProtectKeysWith...` yapılandırması Aşama 8'de eklenecek.
 
@@ -113,3 +114,9 @@ Varsayılan olarak kapalıdır. Açmak için `.env` içinde `AI_ENABLED=true` ve
 - Maliyet ve kullanım: yönetici ekranında "AI kullanımı" sekmesi veya `GET /api/v1/admin/ai/usage?days=30`. Metrikler `flightlog.ai.*` adıyla `FlightLog.Processing` meter'ında.
 - Model değiştirirken fiyat tablosuna (`Ai__Prices__...`) girdi ekleyin; aksi hâlde maliyet "fiyatsız" olarak sayılır.
 - Anahtarı döndürmek için `.env` değerini değiştirip `docker compose up -d worker` yeterlidir.
+
+## Denetim kaydı
+
+Kim neyi ne zaman değiştirdi bilgisi `AuditEntries` tablosundadır ([ADR-0012](adr/0012-collaboration-audit-comparison.md)). Ekip kaydını proje yöneticileri arayüzdeki "Denetim kaydı" sayfasından, yöneticiler tüm ekiplerinkini yönetici ekranından görür. Kayıtlar uçuş veya üye silindikten sonra da kalır ve `AUDIT_RETENTION_DAYS` süresi dolunca worker tarafından silinir. Hukuki saklama yükümlülüğünüz daha uzunsa süreyi artırın veya `0` yapın ve tabloyu yedekleme planına dahil edin (PostgreSQL yedeği zaten kapsar).
+
+Dışa aktarılan dosyalar (JSON rapor, CSV) istekte üretilir, sunucuda saklanmaz. Her indirme `data.exported` olarak kaydedilir.

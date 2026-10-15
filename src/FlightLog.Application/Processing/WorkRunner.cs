@@ -126,6 +126,11 @@ public sealed class WorkRunner(IServiceScopeFactory scopes, IOptions<ProcessingO
             await scope.ServiceProvider.GetRequiredService<IOutboxMaintenance>().RunAsync(stoppingToken);
         }
 
+        await using (var scope = scopes.CreateAsyncScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<Collaboration.IAuditRetention>().PurgeAsync(stoppingToken);
+        }
+
         _nextMaintenance = clock.GetUtcNow() + TimeSpan.FromMinutes(1);
     }
 

@@ -11,7 +11,7 @@ internal static class OpenApiConfiguration
         {
             // Shared enum schemas are referenced by nullable and non-nullable properties alike; nullability is
             // already expressed at the property ("oneOf: null | enum"), so the enum itself lists only real values.
-            options.AddSchemaTransformer((schema, _, _) =>
+            options.AddSchemaTransformer((schema, context, _) =>
             {
                 if (schema.Enum is { Count: > 0 } values)
                 {
@@ -24,6 +24,7 @@ internal static class OpenApiConfiguration
                     }
                 }
 
+                MarkNullableItems(schema, context);
                 return Task.CompletedTask;
             });
             options.AddDocumentTransformer((document, _, _) =>
@@ -52,6 +53,35 @@ internal static class OpenApiConfiguration
             });
         });
         return services;
+    }
+
+    /// <summary>
+    /// Lists whose elements may be null (<c>IReadOnlyList&lt;T?&gt;</c>, e.g. one value per compared flight) are not
+    /// described as such by default; the element schema becomes "null or T" so that clients handle the gaps.
+    /// </summary>
+    private static void MarkNullableItems(OpenApiSchema schema, OpenApiSchemaTransformerContext context)
+    {
+        if (schema.Items is null || context.JsonPropertyInfo?.AttributeProvider is not System.Reflection.PropertyInfo property)
+        {
+            return;
+        }
+
+        // Elements typed by a generic parameter (PagedResult<T>.Items) carry no nullability of their own.
+        if (property.DeclaringType is { IsGenericType: true } declaring
+            && declaring.GetGenericTypeDefinition().GetProperty(property.Name)?.PropertyType is { } open
+            && (open.IsArray ? open.GetElementType()! : open.GenericTypeArguments.FirstOrDefault())?.IsGenericParameter == true)
+        {
+            return;
+        }
+
+        var nullability = new System.Reflection.NullabilityInfoContext().Create(property);
+        var element = nullability.ElementType ?? (nullability.GenericTypeArguments is [var only] ? only : null);
+        if (element?.ReadState != System.Reflection.NullabilityState.Nullable || schema.Items.OneOf is { Count: > 0 })
+        {
+            return;
+        }
+
+        schema.Items = new OpenApiSchema { OneOf = [new OpenApiSchema { Type = JsonSchemaType.Null }, schema.Items] };
     }
 }
 

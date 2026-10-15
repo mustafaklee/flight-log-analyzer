@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Collaboration;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Application.Flights;
@@ -33,6 +34,7 @@ internal sealed class LogFileService(
     ITeamAccessService access,
     ICurrentUser currentUser,
     IFileStorage storage,
+    IAuditTrail audit,
     TimeProvider clock,
     IOptions<UploadOptions> options) : ILogFileService
 {
@@ -92,6 +94,8 @@ internal sealed class LogFileService(
 
             db.Flights.Add(flight);
             db.FlightLogFiles.Add(logFile);
+            audit.Record(project.TeamId, AuditActions.LogUploaded, AuditEntities.LogFile, logFile.Id, flight.Id, $"{fileName} → {project.Name}",
+                new Dictionary<string, string?> { ["sha256"] = staged.Sha256, ["sizeBytes"] = staged.Size.ToString(System.Globalization.CultureInfo.InvariantCulture) });
             try
             {
                 await db.SaveChangesAsync(cancellationToken);
@@ -101,6 +105,11 @@ internal sealed class LogFileService(
                 // A concurrent upload of the same content may have won the unique (team, sha256) race.
                 db.Flights.Entry(flight).State = EntityState.Detached;
                 db.FlightLogFiles.Entry(logFile).State = EntityState.Detached;
+                foreach (var entry in db.ChangeTracker.Entries<Domain.Collaboration.AuditEntry>().ToList())
+                {
+                    entry.State = EntityState.Detached;
+                }
+
                 await EnsureNotAlreadyUploadedAsync(project.TeamId, staged.Sha256, cancellationToken);
                 throw;
             }
@@ -130,6 +139,7 @@ internal sealed class LogFileService(
     {
         var file = await LoadAuthorizedAsync(logFileId, TeamRole.Engineer, cancellationToken);
         file.Cancel(clock.GetUtcNow());
+        audit.Record(file.TeamId, AuditActions.LogCancelled, AuditEntities.LogFile, file.Id, file.FlightId, file.OriginalFileName);
         await SaveStatusChangeAsync(cancellationToken);
         return FlightMapping.ToDto(file);
     }
@@ -138,6 +148,7 @@ internal sealed class LogFileService(
     {
         var file = await LoadAuthorizedAsync(logFileId, TeamRole.Engineer, cancellationToken);
         file.Retry(clock.GetUtcNow());
+        audit.Record(file.TeamId, AuditActions.LogRetried, AuditEntities.LogFile, file.Id, file.FlightId, file.OriginalFileName);
         await SaveStatusChangeAsync(cancellationToken);
         return FlightMapping.ToDto(file);
     }

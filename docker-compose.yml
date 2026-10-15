@@ -77,6 +77,7 @@ services:
       ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable
       Database__MigrateOnStartup: "true"
       Auth__AllowSelfRegistration: ${ALLOW_SELF_REGISTRATION:-false}
+      Auth__RateLimitPerMinute: ${AUTH_RATE_LIMIT_PER_MINUTE:-10}
       Auth__BootstrapAdministrator__Email: ${ADMIN_EMAIL:-}
       Auth__BootstrapAdministrator__Password: ${ADMIN_PASSWORD:-}
       Storage__ServiceUrl: http://storage:8333
@@ -131,6 +132,8 @@ services:
       Ai__Model: ${AI_MODEL:-claude-opus-5-5}
       Ai__Effort: ${AI_EFFORT:-high}
       Ai__ApiKey: ${ANTHROPIC_API_KEY:-}
+      # Audit entries older than this are purged by the worker's maintenance (ADR-0012).
+      Audit__RetentionDays: ${AUDIT_RETENTION_DAYS:-730}
 
   # React client (ADR-0010): static build behind nginx, which proxies /api and /hubs so the browser sees one origin.
   web:

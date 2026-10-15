@@ -2,6 +2,7 @@ using FlightLog.Application.Abstractions;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Application.Analysis;
+using FlightLog.Application.Collaboration;
 using FlightLog.Domain.Analysis;
 using FlightLog.Domain.Flights;
 using FlightLog.Domain.Teams;
@@ -19,6 +20,11 @@ public interface IFlightService
     Task<FlightDto> UpdateAsync(Guid flightId, UpdateFlightRequest request, CancellationToken cancellationToken);
 
     Task DeleteAsync(Guid flightId, CancellationToken cancellationToken);
+
+    Task<FlightDto> SetTagsAsync(Guid flightId, SetFlightTagsRequest request, CancellationToken cancellationToken);
+
+    /// <summary>Tags used on the team's flights, most used first.</summary>
+    Task<IReadOnlyList<TagCountDto>> ListTagsAsync(Guid teamId, CancellationToken cancellationToken);
 }
 
 internal sealed class FlightService(
@@ -26,8 +32,10 @@ internal sealed class FlightService(
     ITeamAccessService access,
     IFileStorage storage,
     TimeProvider clock,
+    IAuditTrail audit,
     IValidator<FlightQuery> queryValidator,
-    IValidator<UpdateFlightRequest> updateValidator) : IFlightService
+    IValidator<UpdateFlightRequest> updateValidator,
+    IValidator<SetFlightTagsRequest> tagsValidator) : IFlightService
 {
     public async Task<PagedResult<FlightListItemDto>> ListAsync(FlightQuery query, CancellationToken cancellationToken)
     {
@@ -77,6 +85,12 @@ internal sealed class FlightService(
             flights = flights.Where(f => f.OccurredAt <= to);
         }
 
+        if (!string.IsNullOrWhiteSpace(query.Tag))
+        {
+            var tag = query.Tag.Trim();
+            flights = flights.Where(f => f.Tags.Contains(tag));
+        }
+
         if (query.Status is { } status)
         {
             flights = flights.Where(f => db.FlightLogFiles.Any(l => l.FlightId == f.Id && l.Status == status));
@@ -124,7 +138,8 @@ internal sealed class FlightService(
                 r.Flight.Name, r.Flight.Autopilot, r.Flight.FirmwareVersion, r.Flight.StartedAt, r.Flight.OccurredAt,
                 FlightMapping.ToSeconds(r.Flight.DurationUs), r.File?.Status, r.File?.Id, r.File?.OriginalFileName,
                 r.File?.SizeBytes, r.Flight.CreatedAt,
-                r.Analysis is null ? null : new AnalysisSummaryDto(r.Analysis.Id, r.Analysis.FinishedAt, r.Analysis.FindingCount, r.Analysis.InfoCount, r.Analysis.WarningCount, r.Analysis.CriticalCount)))
+                r.Analysis is null ? null : new AnalysisSummaryDto(r.Analysis.Id, r.Analysis.FinishedAt, r.Analysis.FindingCount, r.Analysis.InfoCount, r.Analysis.WarningCount, r.Analysis.CriticalCount),
+                r.Flight.Tags))
             .ToList();
 
         return new PagedResult<FlightListItemDto>(items, paging.SafePage, paging.SafePageSize, total);
@@ -150,7 +165,30 @@ internal sealed class FlightService(
             await EnsureAircraftInTeamAsync(db, flight.TeamId, aircraftId, cancellationToken);
         }
 
+        var changed = new Dictionary<string, string?>(StringComparer.Ordinal);
+        if (flight.Name != request.Name.Trim())
+        {
+            changed["name"] = request.Name.Trim();
+        }
+
+        if ((flight.Notes ?? "") != (request.Notes?.Trim() ?? ""))
+        {
+            changed["notes"] = request.Notes?.Trim();
+        }
+
+        var aircraft = request.AircraftId == Guid.Empty ? null : request.AircraftId;
+        if (flight.AircraftId != aircraft)
+        {
+            changed["aircraftId"] = aircraft?.ToString();
+        }
+
         flight.Update(request.Name, request.Notes, request.AircraftId, clock.GetUtcNow());
+        if (changed.Count > 0)
+        {
+            audit.Record(flight.TeamId, AuditActions.FlightUpdated, AuditEntities.Flight, flight.Id, flight.Id,
+                $"{flight.Name}: {string.Join(", ", changed.Keys)}", changed);
+        }
+
         try
         {
             await db.SaveChangesAsync(cancellationToken);
@@ -170,6 +208,8 @@ internal sealed class FlightService(
 
         db.FlightLogFiles.RemoveRange(files);
         db.Flights.Remove(flight);
+        audit.Record(flight.TeamId, AuditActions.FlightDeleted, AuditEntities.Flight, flight.Id, flight.Id, flight.Name,
+            new Dictionary<string, string?> { ["files"] = string.Join(", ", files.Select(f => f.OriginalFileName)) });
         await db.SaveChangesAsync(cancellationToken);
 
         // Derived data (signal chunks) belongs to this flight only; the catalog rows went with the flight.
@@ -183,6 +223,36 @@ internal sealed class FlightService(
                 await storage.DeleteAsync(key, cancellationToken);
             }
         }
+    }
+
+    public async Task<FlightDto> SetTagsAsync(Guid flightId, SetFlightTagsRequest request, CancellationToken cancellationToken)
+    {
+        await tagsValidator.EnsureValidAsync(request, cancellationToken);
+        var flight = await LoadAuthorizedAsync(flightId, TeamRole.Engineer, cancellationToken);
+        var before = flight.Tags.ToList();
+        if (flight.SetTags(request.Tags, clock.GetUtcNow()))
+        {
+            audit.Record(flight.TeamId, AuditActions.FlightTagsChanged, AuditEntities.Flight, flight.Id, flight.Id,
+                $"{flight.Name}: {string.Join(", ", flight.Tags)}",
+                new Dictionary<string, string?> { ["from"] = string.Join(", ", before), ["to"] = string.Join(", ", flight.Tags) });
+            await db.SaveChangesAsync(cancellationToken);
+        }
+
+        return await ToDtoAsync(flight, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<TagCountDto>> ListTagsAsync(Guid teamId, CancellationToken cancellationToken)
+    {
+        await access.EnsureRoleAsync(teamId, TeamRole.Viewer, cancellationToken);
+        // Grouping over an unnested array column is not translated by EF; only the tag arrays are loaded.
+        var tagLists = await db.Flights.AsNoTracking().Where(f => f.TeamId == teamId && f.Tags.Any())
+            .Select(f => f.Tags)
+            .ToListAsync(cancellationToken);
+        return [.. tagLists.SelectMany(t => t)
+            .GroupBy(t => t, StringComparer.Ordinal)
+            .Select(g => new TagCountDto(g.Key, g.Count()))
+            .OrderByDescending(t => t.Flights).ThenBy(t => t.Tag, StringComparer.OrdinalIgnoreCase)
+            .Take(200)];
     }
 
     internal static async Task EnsureAircraftInTeamAsync(IApplicationDbContext db, Guid teamId, Guid aircraftId, CancellationToken cancellationToken)

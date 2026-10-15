@@ -15,5 +15,6 @@ Her ADR bir kararı, alternatiflerini ve sonuçlarını kaydeder. Durumlar: Öne
 | [0009](0009-object-storage-server.md) | Nesne depolama: S3 API (AWSSDK.S3) + SeaweedFS | Kabul edildi |
 | [0010](0010-frontend-stack.md) | Frontend: React + TypeScript + Vite, Mantine, uPlot, TanStack Query | Kabul edildi |
 | [0011](0011-realtime-status-updates.md) | İşlem durumu bildirimleri: PostgreSQL LISTEN/NOTIFY + SignalR | Kabul edildi |
+| [0012](0012-collaboration-audit-comparison.md) | Bulgu incelemesi, yorumlar, transactional denetim kaydı, karşılaştırma ve dışa aktarma | Kabul edildi |
 
 Şablon: Bağlam → Karar → Alternatifler → Sonuçlar.

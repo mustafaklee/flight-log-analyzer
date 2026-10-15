@@ -4,18 +4,26 @@ import { notifications } from '@mantine/notifications';
 import { useMemo, useState } from 'react';
 import { errorMessage } from '../api/client';
 import { useAnalysisRun, useRequestAnalysis, useRules } from '../api/queries';
-import type { AnalysisRun, Finding, FindingSeverity } from '../api/types';
+import type { AnalysisRun, Finding, FindingReviewStatus, FindingSeverity } from '../api/types';
+import { useAuth } from '../auth/AuthContext';
 import { useTeam } from '../auth/TeamContext';
 import { SeverityBadge } from '../components/StatusBadge';
 import { EmptyState, ErrorState, LoadingState } from '../components/States';
 import { formatDateTime, formatLogTime, formatNumber } from '../lib/format';
-import { confidenceLabels, severityLabels } from '../lib/labels';
+import { confidenceLabels, reviewStatusLabels, severityLabels } from '../lib/labels';
+import { FindingReviewPanel, ReviewBadge } from './FindingReviewPanel';
 
 const runStatusLabels: Record<AnalysisRun['status'], string> = { Queued: 'Kuyrukta', Running: 'Çalışıyor', Succeeded: 'Tamamlandı', Failed: 'Başarısız' };
 const runStatusColors: Record<AnalysisRun['status'], string> = { Queued: 'blue', Running: 'cyan', Succeeded: 'green', Failed: 'red' };
 const ruleStatusLabels = { Applied: 'Uygulandı', NotApplicable: 'Uygulanamadı', Failed: 'Hata' } as const;
 const ruleStatusColors = { Applied: 'green', NotApplicable: 'gray', Failed: 'red' } as const;
 const SEVERITY_ORDER: FindingSeverity[] = ['Critical', 'Warning', 'Info'];
+const REVIEW_FILTERS = [
+  { value: 'open', label: 'İncelenmemiş / açık' },
+  ...(['Investigating', 'Confirmed', 'Dismissed', 'Resolved'] as FindingReviewStatus[]).map((s) => ({ value: s, label: reviewStatusLabels[s] })),
+  { value: 'flagged', label: 'İşaretliler' },
+  { value: 'mine', label: 'Bana atananlar' },
+];
 
 function Values({ values }: { values: Record<string, number> }) {
   const entries = Object.entries(values);
@@ -40,6 +48,7 @@ function Values({ values }: { values: Record<string, number> }) {
  */
 export function FindingsPanel({
   flightId,
+  teamId,
   runs,
   findings,
   findingsLoading,
@@ -49,6 +58,7 @@ export function FindingsPanel({
   onShowOnChart,
 }: {
   flightId: string;
+  teamId: string;
   runs: AnalysisRun[];
   findings: Finding[];
   findingsLoading: boolean;
@@ -63,14 +73,31 @@ export function FindingsPanel({
   const detail = useAnalysisRun(lastSucceeded?.id);
   const rules = useRules();
   const request = useRequestAnalysis(flightId);
+  const { user } = useAuth();
   const [severity, setSeverity] = useState<FindingSeverity | null>(null);
+  const [reviewFilter, setReviewFilter] = useState<string | null>(null);
 
   const sorted = useMemo(
     () =>
       findings
         .filter((f) => !severity || f.severity === severity)
+        .filter((f) => {
+          const status = f.review?.status ?? 'Open';
+          switch (reviewFilter) {
+            case null:
+              return true;
+            case 'open':
+              return status === 'Open';
+            case 'flagged':
+              return !!f.review?.flagged;
+            case 'mine':
+              return !!user && f.review?.assignee?.id === user.id;
+            default:
+              return status === reviewFilter;
+          }
+        })
         .toSorted((a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) || a.startUs - b.startUs),
-    [findings, severity],
+    [findings, severity, reviewFilter, user],
   );
 
   const ruleName = (id: string) => rules.data?.find((r) => r.id === id)?.title ?? id;
@@ -142,6 +169,15 @@ export function FindingsPanel({
               value={severity}
               onChange={(v) => setSeverity(v as FindingSeverity | null)}
             />
+            <Select
+              size="xs"
+              aria-label="İnceleme filtresi"
+              placeholder="Tüm inceleme durumları"
+              clearable
+              data={REVIEW_FILTERS}
+              value={reviewFilter}
+              onChange={setReviewFilter}
+            />
             <Text size="xs" c="dimmed">
               {sorted.length} bulgu
             </Text>
@@ -167,9 +203,12 @@ export function FindingsPanel({
                     <Group gap="xs" wrap="nowrap">
                       <SeverityBadge severity={f.severity} />
                       <Stack gap={0} style={{ minWidth: 0 }}>
-                        <Text size="sm" fw={500} lineClamp={1}>
-                          {f.title}
-                        </Text>
+                        <Group gap={6} wrap="nowrap">
+                          <Text size="sm" fw={500} lineClamp={1}>
+                            {f.title}
+                          </Text>
+                          <ReviewBadge review={f.review} />
+                        </Group>
                         <Text size="xs" c="dimmed">
                           {formatLogTime(f.startUs, logFromUs)} – {formatLogTime(f.endUs, logFromUs)}
                           {f.occurrenceCount > 1 ? ` · ${f.occurrenceCount} kez` : ''}
@@ -230,6 +269,7 @@ export function FindingsPanel({
                           Grafikte göster
                         </Button>
                       </Group>
+                      {selectedId === f.id && <FindingReviewPanel finding={f} flightId={flightId} teamId={teamId} logFromUs={logFromUs} />}
                     </Stack>
                   </Accordion.Panel>
                 </Accordion.Item>

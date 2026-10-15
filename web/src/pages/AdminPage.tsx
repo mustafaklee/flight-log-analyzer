@@ -10,6 +10,7 @@ import { PageHeader } from '../components/PageHeader';
 import { ErrorState, LoadingState } from '../components/States';
 import { formatBytes, formatDateTime } from '../lib/format';
 import { AdminAiUsage } from './AdminAiUsage';
+import { AdminAuditLog } from './AdminAuditLog';
 
 function Users() {
   const { user } = useAuth();
@@ -226,12 +227,16 @@ export function AdminPage() {
           <Tabs.Tab value="processing">İşleme</Tabs.Tab>
           <Tabs.Tab value="ai">AI kullanımı</Tabs.Tab>
           <Tabs.Tab value="users">Kullanıcılar</Tabs.Tab>
+          <Tabs.Tab value="audit">Denetim kaydı</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="processing">
           <Processing />
         </Tabs.Panel>
         <Tabs.Panel value="ai">
           <AdminAiUsage />
+        </Tabs.Panel>
+        <Tabs.Panel value="audit">
+          <AdminAuditLog />
         </Tabs.Panel>
         <Tabs.Panel value="users">
           <Users />

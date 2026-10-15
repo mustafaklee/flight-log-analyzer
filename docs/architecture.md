@@ -109,11 +109,11 @@ erDiagram
     FLIGHT ||--o{ FLIGHT_PARAMETER : ""
     FLIGHT ||--o{ ANALYSIS_RUN : ""
     ANALYSIS_RUN ||--o{ ANALYSIS_FINDING : ""
-    ANALYSIS_FINDING ||--o{ ANALYSIS_EVIDENCE : ""
-    ANALYSIS_FINDING ||--o{ FINDING_ASSIGNMENT : ""
-    FLIGHT ||--o{ COMMENT : ""
-    FLIGHT }o--o{ TAG : ""
-    TEAM ||--o{ AUDIT_LOG : ""
+    FLIGHT ||--o{ FINDING_REVIEW : "kural + zaman aralığı"
+    FINDING_REVIEW ||--o{ FLIGHT_COMMENT : "bulgu notları"
+    FLIGHT ||--o{ FLIGHT_COMMENT : ""
+    FLIGHT ||--o{ AI_ANALYSIS : ""
+    TEAM ||--o{ AUDIT_ENTRY : "FK yok"
 ```
 
 ### 4.3 Veri sözlüğü (özet)
@@ -138,13 +138,11 @@ erDiagram
 | `AnalysisFinding` | Id, RunId, FlightId, RuleId, RuleVersion, Category, Title, Description, Severity (Info/Warning/Critical), Confidence (Low/Medium/High), StartUs, EndUs, Signals (text[]), Measured (jsonb), Threshold (jsonb), ThresholdSource, DataCoverage?, OccurrenceCount, Limitations? | idx (RunId, StartUs), FlightId | 4 |
 | `AiAnalysis` | Id, TeamId, FlightId, AnalysisRunId (dayandığı kural analizi), RequestedBy, Status (Queued/Running/Succeeded/Failed), Provider, Model, ResponseModel, PromptVersion, ContextVersion, ContextHash, Context (text; byte olarak korunur), ContextSummary (jsonb), Attempt, RetryCount, NextAttemptAt?, WorkerId, ProviderCalls, LatencyMs, Input/Output/CacheRead/CacheWriteTokens, CostUsd?, StopReason, RawOutput, Report (jsonb, doğrulanmış), FailureCode/Message, Version (xmin) | idx (FlightId, CreatedAt), (Status, CreatedAt), (TeamId, CreatedAt), AnalysisRunId | 6 |
 | `OutboxMessage` | Id, Type, AggregateId, Payload (jsonb), CorrelationId, CreatedAt, AvailableAt, PublishedAt?, PublishAttempts, LastError | kısmi idx (AvailableAt, Id) where PublishedAt is null; idx AggregateId, PublishedAt | 4 |
-| `AnalysisEvidence`, inceleme durumu (`ReviewStatus`) | FindingId, SignalId?/EventId?, StartUs, EndUs, Value (jsonb) | — | 7 (ertelendi) |
-| `Comment` | Id, FlightId, AuthorId, Body, StartUs?, EndUs?, CreatedAt, EditedAt | idx (FlightId, CreatedAt) | 7 |
-| `FindingAssignment` | FindingId, AssigneeId, AssignedBy, AssignedAt | — | 7 |
-| `Tag` / `FlightTag` | TeamId, Name / FlightId, TagId | unique (TeamId, Name) | 7 |
-| `AuditLog` | Id, TeamId?, ActorId, Action, EntityType, EntityId, Changes (jsonb), OccurredAt | idx (TeamId, OccurredAt) | 7 |
-| `AiProviderConfiguration` | Provider, Model, Enabled, MaxTokens, Limits (anahtar burada değil) | — | 6 |
-| `FlightComparison`, `Report` | Hesaplanmış çıktı metadata'sı; içerik nesne depolamada | — | 7 |
+| `FindingReview` | Id, TeamId, FlightId, RuleId, StartUs, EndUs, Status (Open/Investigating/Confirmed/Dismissed/Resolved), AssigneeId?, Flagged, CreatedBy/At, UpdatedBy/At, Version (xmin) | unique (FlightId, RuleId, StartUs, EndUs); idx (TeamId, AssigneeId, UpdatedAt), (TeamId, Status, UpdatedAt) | 7 |
+| `FlightComment` | Id, TeamId, FlightId, FindingReviewId?, AuthorId, Body? (silinince null), StartUs?, EndUs?, CreatedAt, EditedAt?, DeletedAt?, DeletedBy?, Version (xmin) | idx (FlightId, CreatedAt), FindingReviewId | 7 |
+| `Flight.Tags` | text[] (en fazla 20 × 40 karakter) | GIN | 7 |
+| `AuditEntry` | Id, TeamId?, ActorId, Action, EntityType, EntityId, FlightId?, Summary, Data (jsonb), CorrelationId, CreatedAt; yabancı anahtar yok | idx (TeamId, CreatedAt), (FlightId, CreatedAt), (EntityType, EntityId), CreatedAt | 7 |
+| `AnalysisEvidence` | Bulgunun sinyal/olay kanıtı | — | ertelendi |
 
 Tüm zaman damgaları UTC `timestamptz`. Uçuş içi zamanlar `bigint` mikro saniye (orijinal boot zamanı) olarak saklanır.
 
@@ -198,7 +196,7 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Team members | `GET/POST /api/v1/teams/{id}/members`, `PUT/DELETE /api/v1/teams/{id}/members/{userId}` | 1 |
 | Projects | `GET/POST /api/v1/teams/{teamId}/projects`, `GET/PUT/DELETE /api/v1/projects/{id}` | 1 |
 | Aircraft | `GET/POST /api/v1/teams/{teamId}/aircraft`, `GET/PUT/DELETE /api/v1/aircraft/{id}` | 2 |
-| Flights | `GET /api/v1/flights?teamId&projectId&aircraftId&autopilot&status&firmware&from&to&search&sort&page&pageSize`, `GET/PUT/DELETE /api/v1/flights/{id}` | 2 |
+| Flights | `GET /api/v1/flights?teamId&projectId&aircraftId&autopilot&status&firmware&tag&from&to&search&sort&page&pageSize`, `GET/PUT/DELETE /api/v1/flights/{id}` | 2 |
 | Uploads | `POST /api/v1/projects/{id}/logs?aircraftId&name` (multipart, alan `file`; yeni uçuş oluşturur), `GET /api/v1/log-files/{id}`, `GET /api/v1/log-files/{id}/content` | 2 |
 | Processing state | `POST /api/v1/log-files/{id}/cancel`, `POST /api/v1/log-files/{id}/retry` | 2 |
 | Processing jobs | `GET /api/v1/log-files/{id}/jobs` (deneme geçmişi, süre, bellek, parser istatistikleri) | 3 |
@@ -210,10 +208,11 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Processing stats | `GET /api/v1/admin/processing/stats?hours` (yalnızca Administrator) | 4 |
 | Dashboard | `GET /api/v1/teams/{teamId}/dashboard` | 5 |
 | Realtime | SignalR `/hubs/processing` (`StatusChanged`; ekip grupları, yöneticiler için ayrı grup) | 5 |
-| Findings | `PATCH /api/v1/findings/{id}` (durum), `POST /api/v1/findings/{id}/assignments` | 7 |
-| Comparisons | `POST /api/v1/flights/compare` | 7 |
-| Comments, Tags | `GET/POST /api/v1/flights/{id}/comments`, `PUT /api/v1/flights/{id}/tags` | 7 |
-| Reports | `GET /api/v1/flights/{id}/report?format=json|csv` | 7 |
+| Finding reviews | `PATCH /api/v1/findings/{id}/review`, `GET /api/v1/findings/{id}/history`, `GET /api/v1/teams/{teamId}/finding-reviews` | 7 |
+| Comments, Tags | `GET/POST /api/v1/flights/{id}/comments?findingId`, `PUT/DELETE /api/v1/comments/{id}`, `PUT /api/v1/flights/{id}/tags`, `GET /api/v1/teams/{teamId}/flight-tags` | 7 |
+| Audit | `GET /api/v1/flights/{id}/activity`, `GET /api/v1/teams/{teamId}/audit-log`, `GET /api/v1/admin/audit-log` | 7 |
+| Comparison | `GET /api/v1/flights/compare?ids&ids`, `GET /api/v1/flights/compare/export?ids&format` | 7 |
+| Exports | `GET /api/v1/flights/{id}/export/report.json`, `/findings.csv`, `/events.csv` | 7 |
 
 Kurallar: DTO ile entity ayrımı, FluentValidation, Problem Details (RFC 9457), `CancellationToken`, sayfalama (`page`, `pageSize` ≤ 100), başka ekibin kaynağı için 404.
 
@@ -324,7 +323,16 @@ Kod: `src/FlightLog.Application/Ai`, adaptör `src/FlightLog.Infrastructure/Ai`.
 4. **Doğrulama:** `FlightReportValidator` şemayı, referansları ve sayıları kontrol eder. Geçersiz yanıt için tek onarım çağrısı yapılır. Sonuç `Report` (jsonb) olarak saklanır; Markdown çıktısı istekte üretilir.
 5. **Hatalar:** reddetme, kesilme, bağlam penceresi, kimlik doğrulama ve istek reddi yeniden denenmez. 429/5xx/ağ hataları `Ai:MaxAutomaticRetries` kadar yeniden kuyruğa alınır. Takılı çalıştırmalar ve kaybolan mesajlar bakımda kurtarılır.
 
-### 8.3 Canlı durum güncellemeleri (ADR-0011)
+### 8.3 Ekip çalışması, denetim kaydı ve karşılaştırma (ADR-0012)
+
+Kod: `src/FlightLog.Application/Collaboration`, `Comparison`, `Exports`.
+
+- **İnceleme:** bulgunun kimliği değil `(uçuş, kural, başlangıç, bitiş)` anahtarı kullanılır. Bulgu listesi her bulguya eşleşen incelemeyi ekler; yeniden analizden sonra aynı aralığı bulan kural aynı incelemeye bağlanır.
+- **Denetim kaydı:** servisler değişikliği yaptıkları `SaveChanges` çağrısından önce `IAuditTrail.Record` ile kaydı bağlama ekler; ikisi aynı transaction'da yazılır. İz kimliği isteğin `X-Correlation-Id` değeridir. Worker bakımı `Audit:RetentionDays` süresini aşan kayıtları siler.
+- **Karşılaştırma:** her uçuş için yetki kontrolü, ardından kural analizinin kullandığı aynı veri okuyucusu (`AnalysisInputs`) ile sinyaller, olaylar ve arm aralıkları yüklenir. `FlightComparisonCalculator` saf fonksiyondur; sonuç saklanmaz.
+- **Dışa aktarma:** CSV ve JSON istekte üretilir; her indirme `data.exported` kaydı oluşturur.
+
+### 8.4 Canlı durum güncellemeleri (ADR-0011)
 
 Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı commit edildikten sonra `pg_notify('flightlog_status', ...)` gönderilir (`StatusNotificationInterceptor`). Bildirim worker'dan da gelse API'ye ulaşır: API'deki `StatusNotificationListener` PostgreSQL'i `LISTEN` ile dinler ve bildirimi SignalR hub'ında yalnızca ilgili ekibin grubuna (ve yöneticilere) iletir. Bildirim yalnızca neyin değiştiğini söyler (tür: dosya, analiz veya AI raporu; kimlik, durum, hata kodu); arayüz ayrıntıyı API'den yeniden okur. Bağlantı koparsa arayüz etkin işleri 15 saniyede bir yoklar, yeniden bağlanınca listeleri yeniler. Ayrı bir broker veya Redis backplane gerekmez; birden çok API örneği aynı kanalı dinler.
 
@@ -335,6 +343,7 @@ Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı
 - Ham log güvenilmeyen girdi: içerik doğrulama, boyut sınırı, parser zaman/bellek sınırı, depolama anahtarı sunucuda üretilir.
 - Gizli bilgiler environment variable / secret store; `.env` dosyası git dışında.
 - LLM'e giden veri minimize edilir (ham log, konum, uçuş adı/notu ve kullanıcı bilgisi gönderilmez); log içindeki metinler ayrı, "güvenilmeyen" bölümde gönderilir ve talimat olarak yorumlanmaz. API anahtarı yalnızca worker'dadır. Modelin yanıtı kanıt referansları ve sayılar açısından sunucuda doğrulanır; arayüzde "model yorumu" olarak, kural bulgularından ayrı gösterilir.
+- Denetim kaydı değişiklikle aynı transaction'da yazılır, yabancı anahtarı yoktur ve silinen kayıtlardan sonra da kalır; içinde parola, token veya dosya içeriği bulunmaz. Dışa aktarılan CSV'lerde formül gibi başlayan metin hücreleri etkisizleştirilir; dosyalarda konum ve e-posta yoktur.
 - Arayüz: access token yalnızca bellekte, refresh token `localStorage`'da (ADR-0010). nginx CSP ile satır içi script'i yasaklar, yalnızca aynı origin'e bağlantıya ve yapılandırılan harita karo sunucusuna izin verir. SignalR WebSocket'i token'ı sorgu dizesinde taşıdığı için nginx sorgu dizesini loglamaz. Log içindeki metinler (mesajlar, parametre adları) arayüzde düz metin olarak gösterilir, HTML olarak işlenmez.
 
 ## 10. Gözlemlenebilirlik

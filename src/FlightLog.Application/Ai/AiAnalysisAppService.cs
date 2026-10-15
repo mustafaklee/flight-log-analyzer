@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Collaboration;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Domain.Analysis;
@@ -72,6 +73,7 @@ internal sealed class AiAnalysisAppService(
     IApplicationDbContext db,
     ITeamAccessService access,
     ICurrentUser currentUser,
+    IAuditTrail audit,
     TimeProvider clock,
     IOptions<AiOptions> options) : IAiAnalysisAppService
 {
@@ -119,6 +121,7 @@ internal sealed class AiAnalysisAppService(
 
         var analysis = AiAnalysis.Queue(flight.TeamId, flightId, basis.Id, currentUser.UserId, settings.Provider, settings.Model, FlightReportPrompt.Version, now);
         db.AiAnalyses.Add(analysis);
+        audit.Record(flight.TeamId, AuditActions.AiAnalysisRequested, AuditEntities.AiAnalysis, analysis.Id, flightId, $"{flight.Name} ({settings.Model})");
         await db.SaveChangesAsync(cancellationToken);
         return ToDto(analysis, includeReport: false);
     }

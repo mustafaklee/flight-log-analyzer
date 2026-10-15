@@ -45,4 +45,26 @@ public sealed class FlightsController(IFlightService flights) : ControllerBase
         await flights.DeleteAsync(flightId, cancellationToken);
         return NoContent();
     }
+
+    /// <summary>Replaces the flight's tags (Engineer).</summary>
+    [HttpPut("{flightId:guid}/tags")]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
+    public Task<FlightDto> SetTags(Guid flightId, SetFlightTagsRequest request, CancellationToken cancellationToken) =>
+        flights.SetTagsAsync(flightId, request, cancellationToken);
+}
+
+/// <summary>Tags used in a team, for suggestions and filters.</summary>
+[ApiController]
+[Authorize]
+[Route("api/v1/teams/{teamId:guid}/flight-tags")]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+public sealed class FlightTagsController(IFlightService flights) : ControllerBase
+{
+    /// <summary>Tags of the team's flights, most used first (at most 200).</summary>
+    [HttpGet]
+    public Task<IReadOnlyList<TagCountDto>> List(Guid teamId, CancellationToken cancellationToken) => flights.ListTagsAsync(teamId, cancellationToken);
 }

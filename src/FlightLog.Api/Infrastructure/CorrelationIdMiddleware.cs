@@ -9,6 +9,7 @@ namespace FlightLog.Api.Infrastructure;
 internal sealed class CorrelationIdMiddleware(RequestDelegate next)
 {
     public const string HeaderName = "X-Correlation-Id";
+    public const string ItemKey = "FlightLog.CorrelationId";
     private const int MaxLength = 64;
 
     public async Task InvokeAsync(HttpContext context)
@@ -19,6 +20,7 @@ internal sealed class CorrelationIdMiddleware(RequestDelegate next)
             correlationId = context.TraceIdentifier;
         }
 
+        context.Items[ItemKey] = correlationId;
         context.Response.OnStarting(() =>
         {
             context.Response.Headers[HeaderName] = correlationId;

@@ -1,5 +1,6 @@
 using FlightLog.Application.Messaging;
 using FlightLog.Domain.Analysis;
+using FlightLog.Domain.Collaboration;
 using FlightLog.Domain.Fleet;
 using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
@@ -48,6 +49,12 @@ public interface IApplicationDbContext
     DbSet<AnalysisRuleResult> AnalysisRuleResults { get; }
 
     DbSet<AiAnalysis> AiAnalyses { get; }
+
+    DbSet<FindingReview> FindingReviews { get; }
+
+    DbSet<FlightComment> FlightComments { get; }
+
+    DbSet<AuditEntry> AuditEntries { get; }
 
     DbSet<OutboxMessage> OutboxMessages { get; }
 

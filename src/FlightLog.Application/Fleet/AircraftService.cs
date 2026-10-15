@@ -1,4 +1,5 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Collaboration;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Domain.Fleet;
@@ -24,6 +25,7 @@ public interface IAircraftService
 internal sealed class AircraftService(
     IApplicationDbContext db,
     ITeamAccessService access,
+    IAuditTrail audit,
     TimeProvider clock,
     IValidator<SaveAircraftRequest> validator) : IAircraftService
 {
@@ -69,6 +71,7 @@ internal sealed class AircraftService(
         await EnsureIdentifierIsFreeAsync(aircraft, cancellationToken);
 
         db.Aircraft.Add(aircraft);
+        audit.Record(teamId, AuditActions.AircraftCreated, AuditEntities.Aircraft, aircraft.Id, null, aircraft.Name);
         await db.SaveChangesAsync(cancellationToken);
         return ToDto(aircraft);
     }
@@ -102,6 +105,7 @@ internal sealed class AircraftService(
         // Flights of a deleted aircraft are kept; their aircraft link is cleared by the database (ON DELETE SET NULL).
         var aircraft = await LoadAuthorizedAsync(aircraftId, TeamRole.ProjectManager, cancellationToken);
         db.Aircraft.Remove(aircraft);
+        audit.Record(aircraft.TeamId, AuditActions.AircraftDeleted, AuditEntities.Aircraft, aircraft.Id, null, aircraft.Name);
         await db.SaveChangesAsync(cancellationToken);
     }
 

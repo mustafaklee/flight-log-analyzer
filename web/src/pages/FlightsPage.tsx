@@ -1,11 +1,11 @@
-import { Anchor, Button, Card, Group, Pagination, Select, Table, Text, TextInput } from '@mantine/core';
+import { Anchor, Badge, Button, Card, Checkbox, Group, Pagination, Select, Table, Text, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDebouncedValue } from '@mantine/hooks';
-import { IconSearch, IconUpload } from '@tabler/icons-react';
+import { IconArrowsDiff, IconSearch, IconUpload } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
-import { useAircraftList, useFlights, useProjects } from '../api/queries';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useAircraftList, useFlightTags, useFlights, useProjects } from '../api/queries';
 import type { FlightSort, ProcessingStatus } from '../api/types';
 import { useTeam } from '../auth/TeamContext';
 import { PageHeader } from '../components/PageHeader';
@@ -24,12 +24,16 @@ const sorts: { value: FlightSort; label: string }[] = [
 ];
 
 const PAGE_SIZE = 25;
+const MAX_COMPARE = 6;
 
 export function FlightsPage() {
   const { team } = useTeam();
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState(params.get('search') ?? '');
   const [debouncedSearch] = useDebouncedValue(search, 300);
+  const [picked, setPicked] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const toggle = (id: string, on: boolean) => setPicked((p) => (on ? [...p, id].slice(0, MAX_COMPARE) : p.filter((x) => x !== id)));
 
   const get = (key: string) => params.get(key) ?? undefined;
   const set = (key: string, value: string | null | undefined) => {
@@ -54,6 +58,7 @@ export function FlightsPage() {
     aircraftId: get('aircraftId'),
     autopilot: get('autopilot'),
     status: get('status'),
+    tag: get('tag'),
     from: get('from'),
     to: get('to'),
     search: debouncedSearch || undefined,
@@ -64,7 +69,8 @@ export function FlightsPage() {
   const flights = useFlights(query, !!team);
   const projects = useProjects(team?.teamId);
   const aircraft = useAircraftList(team?.teamId);
-  const filtered = ['projectId', 'aircraftId', 'autopilot', 'status', 'from', 'to'].some((k) => params.has(k)) || !!debouncedSearch;
+  const tags = useFlightTags(team?.teamId);
+  const filtered = ['projectId', 'aircraftId', 'autopilot', 'status', 'tag', 'from', 'to'].some((k) => params.has(k)) || !!debouncedSearch;
 
   return (
     <>
@@ -72,9 +78,19 @@ export function FlightsPage() {
         title="Uçuş geçmişi"
         description={flights.data ? `${flights.data.totalCount} uçuş` : undefined}
         actions={
-          <Button component={Link} to="/upload" leftSection={<IconUpload size={16} />}>
-            Log yükle
-          </Button>
+          <Group gap="xs">
+            <Button
+              variant="light"
+              leftSection={<IconArrowsDiff size={16} />}
+              disabled={picked.length < 2}
+              onClick={() => navigate(`/compare?ids=${picked.join(',')}`)}
+            >
+              Karşılaştır{picked.length > 0 ? ` (${picked.length})` : ''}
+            </Button>
+            <Button component={Link} to="/upload" leftSection={<IconUpload size={16} />}>
+              Log yükle
+            </Button>
+          </Group>
         }
       />
       <Card withBorder mb="md" padding="sm">
@@ -127,6 +143,15 @@ export function FlightsPage() {
             onChange={(v) => set('status', v)}
             w={160}
           />
+          <Select
+            label="Etiket"
+            clearable
+            searchable
+            data={tags.data?.map((t) => ({ value: t.tag, label: `${t.tag} (${t.flights})` })) ?? []}
+            value={get('tag') ?? null}
+            onChange={(v) => set('tag', v)}
+            w={170}
+          />
           <DatePickerInput
             type="range"
             label="Tarih aralığı"
@@ -168,6 +193,7 @@ export function FlightsPage() {
             <Table highlightOnHover verticalSpacing="xs">
               <Table.Thead>
                 <Table.Tr>
+                  <Table.Th w={36} aria-label="Karşılaştırma için seç" />
                   <Table.Th>Uçuş</Table.Th>
                   <Table.Th>Tarih</Table.Th>
                   <Table.Th>Süre</Table.Th>
@@ -182,12 +208,30 @@ export function FlightsPage() {
                 {flights.data.items.map((f) => (
                   <Table.Tr key={f.id}>
                     <Table.Td>
+                      <Checkbox
+                        size="xs"
+                        aria-label={`${f.name} karşılaştırmaya ekle`}
+                        checked={picked.includes(f.id)}
+                        disabled={!picked.includes(f.id) && picked.length >= MAX_COMPARE}
+                        onChange={(e) => toggle(f.id, e.currentTarget.checked)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
                       <Anchor component={Link} to={`/flights/${f.id}`} fw={500}>
                         {f.name}
                       </Anchor>
                       <Text size="xs" c="dimmed">
                         {f.projectName}
                       </Text>
+                      {f.tags.length > 0 && (
+                        <Group gap={4} mt={2}>
+                          {f.tags.map((t) => (
+                            <Badge key={t} size="xs" variant="outline" style={{ cursor: 'pointer' }} onClick={() => set('tag', t)}>
+                              {t}
+                            </Badge>
+                          ))}
+                        </Group>
+                      )}
                     </Table.Td>
                     <Table.Td>
                       <Text size="sm">{formatDateTime(f.occurredAt)}</Text>

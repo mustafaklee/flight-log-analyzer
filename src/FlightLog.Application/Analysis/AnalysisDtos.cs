@@ -1,4 +1,6 @@
+using FlightLog.Application.Collaboration;
 using FlightLog.Domain.Analysis;
+using FlightLog.Domain.Collaboration;
 
 namespace FlightLog.Application.Analysis;
 
@@ -60,9 +62,19 @@ public sealed record FindingDto(
     string ThresholdSource,
     double? DataCoverage,
     int OccurrenceCount,
-    string? Limitations);
+    string? Limitations,
+    FindingReviewDto? Review = null);
 
-public sealed record FindingQuery(FindingSeverity? MinSeverity = null, string? Category = null, string? RuleId = null, int Page = 1, int PageSize = 50)
+/// <summary>Finding filters. A finding nobody has reviewed counts as <see cref="FindingReviewStatus.Open"/>.</summary>
+public sealed record FindingQuery(
+    FindingSeverity? MinSeverity = null,
+    string? Category = null,
+    string? RuleId = null,
+    FindingReviewStatus? ReviewStatus = null,
+    Guid? AssigneeId = null,
+    bool? Flagged = null,
+    int Page = 1,
+    int PageSize = 50)
 {
     public const int MaxPageSize = 200;
 }

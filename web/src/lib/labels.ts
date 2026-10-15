@@ -1,4 +1,4 @@
-import type { Autopilot, EventSeverity, FindingConfidence, FindingSeverity, FlightEventKind, ProcessingStatus, TeamRole } from '../api/types';
+import type { Autopilot, EventSeverity, FindingConfidence, FindingReviewStatus, FindingSeverity, FlightEventKind, ProcessingStatus, TeamRole } from '../api/types';
 
 export const statusLabels: Record<ProcessingStatus, string> = {
   Uploaded: 'Yüklendi',
@@ -65,3 +65,48 @@ export function eventSeverityColor(severity: EventSeverity | null | undefined): 
 
   return SEVERE.includes(severity) ? 'red' : severity === 'Warning' ? 'yellow' : 'gray';
 }
+
+export const reviewStatusLabels: Record<FindingReviewStatus, string> = {
+  Open: 'Açık',
+  Investigating: 'İnceleniyor',
+  Confirmed: 'Doğrulandı',
+  Dismissed: 'Geçersiz',
+  Resolved: 'Çözüldü',
+};
+
+export const reviewStatusColors: Record<FindingReviewStatus, string> = {
+  Open: 'gray',
+  Investigating: 'blue',
+  Confirmed: 'orange',
+  Dismissed: 'dark',
+  Resolved: 'green',
+};
+
+/** Turkish names of audit actions; unknown actions are shown as written. */
+export const auditActionLabels: Record<string, string> = {
+  'flight.updated': 'Uçuş güncellendi',
+  'flight.deleted': 'Uçuş silindi',
+  'flight.tags_changed': 'Etiketler değişti',
+  'log_file.uploaded': 'Log yüklendi',
+  'log_file.cancelled': 'İşleme iptal edildi',
+  'log_file.retried': 'İşleme yeniden denendi',
+  'analysis.requested': 'Analiz istendi',
+  'ai_analysis.requested': 'AI raporu istendi',
+  'comment.created': 'Yorum eklendi',
+  'comment.edited': 'Yorum düzenlendi',
+  'comment.deleted': 'Yorum silindi',
+  'finding.status_changed': 'İnceleme durumu değişti',
+  'finding.assigned': 'Atama değişti',
+  'finding.flagged': 'İşaretlendi',
+  'finding.unflagged': 'İşaret kaldırıldı',
+  'team.member_added': 'Üye eklendi',
+  'team.member_role_changed': 'Üye rolü değişti',
+  'team.member_removed': 'Üye çıkarıldı',
+  'project.created': 'Proje oluşturuldu',
+  'project.deleted': 'Proje silindi',
+  'aircraft.created': 'Araç eklendi',
+  'aircraft.deleted': 'Araç silindi',
+  'data.exported': 'Veri dışa aktarıldı',
+};
+
+export const auditActionLabel = (action: string) => auditActionLabels[action] ?? action;

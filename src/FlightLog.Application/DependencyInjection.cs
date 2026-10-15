@@ -53,6 +53,13 @@ public static class DependencyInjection
         services.AddScoped<Ai.IAiAnalysisAppService, Ai.AiAnalysisAppService>();
         services.AddScoped<Ai.IAiUsageService, Ai.AiUsageService>();
         services.AddScoped<Dashboard.IDashboardService, Dashboard.DashboardService>();
+        services.AddScoped<Collaboration.IAuditTrail, Collaboration.AuditTrail>();
+        services.AddScoped<Collaboration.ICommentService, Collaboration.CommentService>();
+        services.AddScoped<Collaboration.IFindingReviewService, Collaboration.FindingReviewService>();
+        services.AddScoped<Collaboration.IAuditLogService, Collaboration.AuditLogService>();
+        services.AddScoped<Collaboration.IAuditRetention, Collaboration.AuditRetention>();
+        services.AddScoped<Comparison.IComparisonService, Comparison.ComparisonService>();
+        services.AddScoped<Exports.IExportService, Exports.ExportService>();
         return services;
     }
 }
