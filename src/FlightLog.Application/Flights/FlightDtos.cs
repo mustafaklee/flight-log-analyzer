@@ -47,6 +47,10 @@ public sealed record FlightListItemDto(
     long? FileSizeBytes,
     DateTimeOffset CreatedAt);
 
+/// <summary>
+/// A flight. Signal and event times are microseconds on the log's own clock; <c>LogStartTimestampUs</c> is where the
+/// flight starts on that clock and <c>BootTimeUtc</c> (when known) converts it to UTC: utc = BootTimeUtc + t µs.
+/// </summary>
 public sealed record FlightDto(
     Guid Id,
     Guid TeamId,
@@ -58,9 +62,14 @@ public sealed record FlightDto(
     string? Notes,
     Autopilot Autopilot,
     string? FirmwareVersion,
+    string? VehicleType,
+    string? Hardware,
     DateTimeOffset? StartedAt,
     DateTimeOffset OccurredAt,
     double? DurationSeconds,
+    DateTimeOffset? BootTimeUtc,
+    long? LogStartTimestampUs,
+    IReadOnlyDictionary<string, string> LogMetadata,
     Guid CreatedBy,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,

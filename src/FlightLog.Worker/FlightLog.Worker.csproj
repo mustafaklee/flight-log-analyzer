@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <!-- Background processing host: parses uploaded logs. Shares Application and Infrastructure with the API. -->
+  <PropertyGroup>
+    <UserSecretsId>flightlog-worker</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FlightLog.Application\FlightLog.Application.csproj" />
+    <ProjectReference Include="..\FlightLog.Infrastructure\FlightLog.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+</Project>

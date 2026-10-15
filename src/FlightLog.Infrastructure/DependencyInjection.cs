@@ -2,8 +2,10 @@ using Amazon.Runtime;
 using Amazon.S3;
 using FlightLog.Application.Abstractions;
 using FlightLog.Application.Logs;
+using FlightLog.Application.Processing;
 using FlightLog.Infrastructure.Identity;
 using FlightLog.Infrastructure.Persistence;
+using FlightLog.Infrastructure.Processing;
 using FlightLog.Infrastructure.Storage;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -52,6 +54,12 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
 
         services.Configure<UploadOptions>(configuration.GetSection(UploadOptions.SectionName));
+        services.Configure<ProcessingOptions>(configuration.GetSection(ProcessingOptions.SectionName));
+        if (configuration.GetValue<bool>($"{ProcessingOptions.SectionName}:{nameof(ProcessingOptions.Enabled)}"))
+        {
+            services.AddHostedService<LogProcessingWorker>();
+        }
+
         AddStorage(services, configuration);
 
         services.AddHealthChecks()

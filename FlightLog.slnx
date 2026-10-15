@@ -5,6 +5,7 @@
     <Project Path="src/FlightLog.Domain/FlightLog.Domain.csproj" />
     <Project Path="src/FlightLog.Infrastructure/FlightLog.Infrastructure.csproj" />
     <Project Path="src/FlightLog.LogParsing/FlightLog.LogParsing.csproj" />
+    <Project Path="src/FlightLog.Worker/FlightLog.Worker.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FlightLog.IntegrationTests/FlightLog.IntegrationTests.csproj" />
