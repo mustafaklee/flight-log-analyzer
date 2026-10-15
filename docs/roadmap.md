@@ -55,11 +55,21 @@ Ertelenenler: gerçek ArduPilot örnek dosyası (Aşama 3), uçuş listesinde bu
 
 ## Aşama 3 — Parser entegrasyonu
 
-- Fixture toplama: pyulog örnek `.ulg` dosyaları (BSD-3), lisansı uygun ArduPilot `.bin` dosyaları veya SITL ile üretilmiş loglar.
-- Oracle betiği (`tools/fixtures/`): pyulog/pymavlink ile beklenen JSON üretimi.
-- `UlogParser`, `DataFlashParser`, format algılayıcı; bozuk/kesik/bilinmeyen mesaj testleri.
-- Ortak sinyal modeli, birim tablosu, zaman normalizasyonu; sinyal blok depolama (ADR-0005) ve Parquet karşılaştırması.
-- Worker projesi (ilk sürüm: kuyruk yerine DB polling ile, Aşama 4'te RabbitMQ).
+Hedef: Her iki format için doğrulanmış örnekler işlenir; çıkarılan metadata ve sinyal verileri testlerle doğrulanır.
+
+- [x] Fixture'lar: pyulog örnek `.ulg` dosyaları (BSD-3) ve ArduCopter 4.6.3 SITL ile üretilmiş `.bin`
+- [x] Oracle betiği (`tools/fixtures/generate_expected.py`): pyulog/pymavlink ile beklenen JSON üretimi
+- [x] `ULogParser`, `DataFlashParser` (`FlightLog.LogParsing`, yalnızca BCL); oracle ile birebir eşleşme; bozuk/kesik/rastgele girdi, sınır, zaman aşımı ve iptal testleri
+- [x] Metadata ve olay çıkarımı: firmware, araç tipi, donanım, mod geçişleri, arm/disarm, failsafe, hatalar, EV olayları, mesajlar, dropout'lar, parametreler ve değişiklikleri
+- [x] Zaman normalizasyonu: orijinal µs korunur; GPS zamanından UTC açılış/başlangıç (artık saniye dahil), oracle ile doğrulandı
+- [x] Ortak sinyal modeli v1 (`attitude`, `gps`, `battery`) ve kaynak/dönüşüm kaydı; birim ve çarpan tablosu logdan
+- [x] Sinyal blok depolama (FLS1, ADR-0005) ve katalog tabloları; min/max downsampling
+- [x] Worker projesi (DB polling, compare-and-set ile iş alma, iptal, kapanışta kuyruğa dönüş, takılı iş kurtarma) ve işleme geçmişi (`LogProcessingJob`)
+- [x] API: sinyaller, sinyal verisi, olaylar, parametreler, işleme denemeleri
+- [x] Entegrasyon testleri: PX4 ve ArduPilot uçtan uca, bozuk dosya, iptal, kesinti, uçuş silme, ekip izolasyonu
+- [x] Docker Compose'da `worker` servisi ve CI'da gerçek log yükleyip işlenmesini bekleyen smoke test
+
+Ertelenenler: Parquet ile ölçümlü karşılaştırma (Aşama 8), titreşim ve barometrik irtifanın normalizasyonu (anlamları formatlar arasında farklı; ham sinyal olarak mevcut), RabbitMQ ile kuyruk (Aşama 4).
 
 ## Aşama 4 — Asenkron işleme ve teknik analiz
 

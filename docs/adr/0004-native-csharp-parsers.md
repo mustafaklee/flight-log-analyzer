@@ -30,3 +30,11 @@ Her iki format da resmi olarak dokümante edilmiş, kendini tanımlayan ikili fo
 ## Sonuçlar
 - Parser kodu bizim bakımımızda; format sürümleri ve uç durumlar (ULog appended data, `O` dropout mesajları, çoklu instance; DataFlash FMTU birimleri, `c/C/e/E/L` ölçek çarpanları) testlerle kapsanmalı.
 - Python ve pyulog/pymavlink yalnızca fixture üretimi için geliştirici ortamında gerekir.
+
+## Uygulama notu (Aşama 3, 2026-10-15)
+- Parser'lar `src/FlightLog.LogParsing` projesindedir (yalnızca .NET temel kütüphanesi): `ULogParser`, `DataFlashParser`. Sınıf adları ADR taslağındaki `UlogParser` yerine `ULogParser` oldu.
+- Oracle: `tools/fixtures/generate_expected.py` (pyulog 1.2.4, pymavlink 2.4.50; sürümler `requirements.txt`'te sabit). Her seri ve alan için kayıt sayısı, ilk/son zaman damgası, sayı/geçersiz sayısı/toplam/min/maks; ayrıca info, parametreler, mesajlar, dropout'lar, modlar ve firmware. C# testleri tüm fixture'larda **birebir** eşleşiyor (toplamlar 1e-12 göreli toleransla).
+- Oracle davranışları birebir izlendi: ULog'da yalnızca en dıştaki son `_padding` alanı atılır, veri mesajı boyutu format boyutuna tam eşit olmalıdır; DataFlash'ta bilinmeyen baytlar tek tek atlanır, `c/C/e/E/L` ölçekleri pymavlink gibi bölme ile uygulanır.
+- Fixture'lar: pyulog'un 5 örnek `.ulg` dosyası (BSD-3) ve bizim ArduCopter 4.6.3 SITL ile ürettiğimiz bir `.bin` (kalkış, loiter, RTL; SITL kapatılırken son mesaj kesildiği için dosya gerçekçi biçimde kesik biter).
+- Sınırlar `ParserLimits` ile verilir (format/seri/alan sayısı, iç içe tip derinliği, uyarı sayısı, süre); aşıldığında kararlı kodlu `LogParseException` atılır. Rastgele bozulmuş, kesilmiş ve rastgele baytlı girdilerle testler parser'ın başka bir istisna atmadığını doğrular.
+
