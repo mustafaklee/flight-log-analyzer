@@ -12,6 +12,7 @@ internal static class FlightMapping
 
     public static FlightDto ToDto(Flight f, string projectName, string? aircraftName, FlightLogFile? file) =>
         new(f.Id, f.TeamId, f.ProjectId, projectName, f.AircraftId, aircraftName, f.Name, f.Notes, f.Autopilot,
-            f.FirmwareVersion, f.StartedAt, f.OccurredAt, ToSeconds(f.DurationUs), f.CreatedBy, f.CreatedAt, f.UpdatedAt,
+            f.FirmwareVersion, f.VehicleType, f.Hardware, f.StartedAt, f.OccurredAt, ToSeconds(f.DurationUs), f.BootTimeUtc,
+            f.LogStartTimestampUs, f.LogMetadata, f.CreatedBy, f.CreatedAt, f.UpdatedAt,
             f.Version, file is null ? null : ToDto(file));
 }

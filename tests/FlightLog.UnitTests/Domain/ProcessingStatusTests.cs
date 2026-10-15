@@ -15,6 +15,7 @@ public sealed class ProcessingStatusTests
         (ProcessingStatus.Processing, ProcessingStatus.Processed),
         (ProcessingStatus.Processing, ProcessingStatus.Failed),
         (ProcessingStatus.Processing, ProcessingStatus.Cancelled),
+        (ProcessingStatus.Processing, ProcessingStatus.Queued),
         (ProcessingStatus.Processed, ProcessingStatus.AnalysisPending),
         (ProcessingStatus.AnalysisPending, ProcessingStatus.Analyzing),
         (ProcessingStatus.AnalysisPending, ProcessingStatus.Cancelled),

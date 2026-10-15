@@ -6,7 +6,7 @@ PX4 ve ArduPilot tabanlı İHA'ların uçuş loglarını yüklemek, arşivlemek,
 
 ## Durum
 
-Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–2: temel backend, araç/uçuş yönetimi ve log yükleme**:
+Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–3: temel backend, araç/uçuş yönetimi, log yükleme ve PX4/ArduPilot log işleme**:
 
 | Özellik | Durum |
 |---|---|
@@ -19,9 +19,10 @@ Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çal�
 | Araç (filo) CRUD: etiketler, ekip içi tekil kimlik, optimistic concurrency | Çalışıyor, testli |
 | Log yükleme: stream SHA-256, boyut sınırı, içerikten format algılama (.ulg / .bin), ekip içi tekrar tespiti | Çalışıyor, testli (gerçek PX4 örneği ile) |
 | Uçuş listesi: filtre, arama, sıralama, sayfalama; uçuş düzenleme/silme; orijinal dosyayı indirme | Çalışıyor, testli |
-| İşleme durumu (Queued, iptal, yeniden deneme) | Durum makinesi çalışıyor; dosyayı işleyen worker Aşama 3–4 |
-| PX4 ULog / ArduPilot DataFlash parser | Aşama 3 |
-| Asenkron işleme (RabbitMQ), kural tabanlı analiz | Aşama 4 |
+| PX4 ULog / ArduPilot DataFlash parser (native C#) | Çalışıyor; gerçek loglarda pyulog/pymavlink ile birebir doğrulandı |
+| Log işleme worker'ı (DB polling): uçuş başlangıcı (UTC), süre, firmware, araç tipi, olaylar, parametreler, sinyaller | Çalışıyor, testli; iptal, yeniden deneme ve işleme geçmişi dahil |
+| Ortak sinyaller v1 (`attitude`, `gps`, `battery`) ve ham log alanları; zaman aralığı ve downsampling ile okuma | Çalışıyor, testli |
+| RabbitMQ ile kuyruk, kural tabanlı analiz | Aşama 4 |
 | React arayüzü | Aşama 5 |
 | Yapay zekâ analizi | Aşama 6 |
 
@@ -59,9 +60,13 @@ curl -s -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
   -d '{"name":"Flight Test"}' $B/api/v1/teams
 # Proje oluşturduktan sonra log yükleme (.ulg veya .bin):
 curl -s -H "authorization: Bearer $TOKEN" -F "file=@00000042.ulg" $B/api/v1/projects/<projectId>/logs
+# İşlendikten sonra:
+curl -s -H "authorization: Bearer $TOKEN" "$B/api/v1/flights/<flightId>/signals?kind=Normalized"
+curl -s -H "authorization: Bearer $TOKEN" "$B/api/v1/flights/<flightId>/signals/data?names=attitude.roll,battery.voltage&maxPoints=2000"
+curl -s -H "authorization: Bearer $TOKEN" "$B/api/v1/flights/<flightId>/events?kind=ModeChange"
 ```
 
-Docker Compose üç servis başlatır: `postgres`, `storage` (SeaweedFS, S3 API `127.0.0.1:8333`) ve `api`. Yükleme sınırı `.env` içindeki `UPLOAD_MAX_BYTES` ile ayarlanır (varsayılan 512 MiB).
+Docker Compose dört servis başlatır: `postgres`, `storage` (SeaweedFS, S3 API `127.0.0.1:8333`), `api` ve yüklenen logları işleyen `worker`. Yükledikten birkaç saniye sonra dosya `Processed` olur; uçtan uca deneme için `scripts/smoke-test.sh`. Yükleme sınırı `.env` içindeki `UPLOAD_MAX_BYTES` ile ayarlanır (varsayılan 512 MiB).
 
 ### Windows + Docker Desktop
 
@@ -78,7 +83,7 @@ Durdurmak için `docker compose down`, veritabanını da silmek için `docker co
 ### Visual Studio
 
 `FlightLog.slnx` dosyasını açın (.NET 10 SDK ve onu destekleyen bir Visual Studio sürümü, ör. Visual Studio 2026, gerekir).
-API'yi Visual Studio'dan çalıştırmak için önce veritabanını ve depolamayı başlatın: `docker compose up -d postgres storage`, ardından `FlightLog.Api` projesini başlangıç projesi yapıp F5. Swagger UI: http://localhost:5177/swagger.
+API'yi Visual Studio'dan çalıştırmak için önce veritabanını ve depolamayı başlatın: `docker compose up -d postgres storage`, ardından `FlightLog.Api` projesini başlangıç projesi yapıp F5. Development ortamında API yüklenen logları kendi içinde işler (`Processing:Enabled`); ayrı worker gerekmez. Swagger UI: http://localhost:5177/swagger.
 `appsettings.Development.json` içindeki bağlantı dizesi `.env.example` varsayılanlarıyla eşleşir; `.env` içinde `POSTGRES_PASSWORD`'u değiştirdiyseniz aynı değeri User Secrets ile verin (`dotnet user-secrets set "ConnectionStrings:Postgres" "Host=localhost;Port=5432;Database=flightlog;Username=flightlog;Password=..." --project src/FlightLog.Api`).
 Testler Test Explorer'da görünür; entegrasyon testleri için Docker Desktop açık olmalıdır.
 
@@ -103,6 +108,7 @@ dotnet ef migrations add <Ad> -p src/FlightLog.Infrastructure -s src/FlightLog.A
 
 ```bash
 dotnet test --project tests/FlightLog.UnitTests          # Docker gerekmez
+dotnet test --project tests/FlightLog.ParserTests        # Docker gerekmez; gerçek loglar, oracle karşılaştırması
 dotnet test --project tests/FlightLog.IntegrationTests   # Docker gerekir (Testcontainers: PostgreSQL + SeaweedFS)
 ```
 
@@ -113,13 +119,18 @@ Ayrıntı: [docs/testing.md](docs/testing.md).
 ```
 src/
   FlightLog.Domain          İş kuralları, entity'ler (bağımlılıksız)
-  FlightLog.Application     Use case servisleri, DTO'lar, doğrulama, yetki kontrolleri
-  FlightLog.Infrastructure  EF Core, PostgreSQL, Identity, migration'lar, S3 depolama
+  FlightLog.LogParsing      ULog/DataFlash parser'ları, yorumlayıcılar, normalizasyon, sinyal blok formatı (yalnızca BCL)
+  FlightLog.Application     Use case servisleri, DTO'lar, doğrulama, yetki kontrolleri, log işleme
+  FlightLog.Infrastructure  EF Core, PostgreSQL, Identity, migration'lar, S3 depolama, worker döngüsü
   FlightLog.Api             HTTP API, kimlik doğrulama, hata yönetimi, OpenAPI
+  FlightLog.Worker          Log işleme servisi (Docker'da ayrı konteyner)
 tests/
   FlightLog.UnitTests        Domain, doğrulama, mimari katman testleri
-  FlightLog.IntegrationTests Gerçek API + PostgreSQL + SeaweedFS (Testcontainers)
-  fixtures/                  Lisanslı örnek log dosyaları (pyulog, BSD-3-Clause)
+  FlightLog.ParserTests      Parser'lar ve normalizasyon, pyulog/pymavlink oracle'ına karşı
+  FlightLog.IntegrationTests Gerçek API + PostgreSQL + SeaweedFS (Testcontainers), uçtan uca işleme
+  fixtures/                  Gerçek PX4 logları (pyulog, BSD-3) ve kendi ürettiğimiz ArduPilot SITL logu
+tools/fixtures/              Oracle verisini üreten Python betiği (yalnızca geliştirme)
+scripts/smoke-test.sh        Çalışan Compose ortamında log yükleyip işlenmesini bekler
 docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağıtım
 ```
 
@@ -146,6 +157,11 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | GET/PUT/DELETE | `/api/v1/flights/{id}` | Uçuş ayrıntısı / ad, not, araç güncelle (`version`) / sil (Project Manager) |
 | GET | `/api/v1/log-files/{id}`, `/api/v1/log-files/{id}/content` | Dosya durumu / orijinal dosyayı indir |
 | POST | `/api/v1/log-files/{id}/cancel`, `/retry` | İşlemeyi iptal et / yeniden kuyruğa al |
+| GET | `/api/v1/log-files/{id}/jobs` | İşleme denemeleri: süre, bellek, parser istatistikleri, hata kodu |
+| GET | `/api/v1/flights/{id}/signals` | Sinyal kataloğu (`kind=Raw|Normalized`, `search`): birim, kaynak, örnek sayısı, min/maks |
+| GET | `/api/v1/flights/{id}/signals/data` | En fazla 8 sinyalin değerleri (`names`, `fromUs`, `toUs`, `maxPoints`); uzun aralıklar min/maks korunarak azaltılır |
+| GET | `/api/v1/flights/{id}/events` | Mesajlar, mod geçişleri, arm/disarm, failsafe, hatalar (`kind`, `maxSeverity`, `fromUs`, `toUs`, `search`, sayfalama) |
+| GET | `/api/v1/flights/{id}/parameters` | Başlangıç değerleri, varsayılanlar ve uçuştaki değişiklikler (`search`, `changedOnly`) |
 | GET | `/health/live`, `/health/ready` | Sağlık kontrolleri (hazırlık: veritabanı + depolama) |
 
 Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`).
@@ -156,8 +172,10 @@ Sunucu kurulumu, migration, gizli bilgi yönetimi, yedekleme ve log saklama: [do
 
 ## Bilinen eksikler
 
-- Yüklenen loglar `Queued` durumunda bekler: dosyayı ayrıştıran worker Aşama 3'te, RabbitMQ ile asenkron işleme Aşama 4'te gelir. Uçuş başlangıç zamanı, süre ve firmware bu yüzden şimdilik boş (`null`) görünür.
-- ArduPilot `.bin` için gerçek örnek dosya henüz repoda yok; format algılama sentetik başlıkla test edildi. Gerçek DataFlash örnekleri parser ile birlikte (Aşama 3) eklenecek.
+- Worker kuyruğu veritabanını yoklayarak bulur (varsayılan 2 s); RabbitMQ ile bildirim Aşama 4'te gelir.
+- GPS UTC zamanı olmayan loglarda uçuşun başlangıç tarihi bilinemez ve boş kalır (tahmin edilmez); liste tarihi yükleme zamanıdır.
+- Normalize sinyaller v1 yalnızca tutum, GPS ve batarya içerir; titreşim ve barometrik irtifa formatlar arasında farklı anlam taşıdığı için şimdilik ham sinyal olarak okunur ([mimari](docs/architecture.md#51-sinyaller-ve-normalizasyon-v1)).
+- Sinyal blok formatı ile Parquet'in ölçümlü karşılaştırması Aşama 8'e ertelendi ([ADR-0005](docs/adr/0005-time-series-storage.md)).
 - Tek istekte tek dosya yüklenir; çoklu yükleme istemci tarafında (Aşama 5) ardışık isteklerle yapılacak.
 - Devre dışı bırakılan kullanıcının daha önce aldığı access token süresi dolana kadar (`Auth:AccessTokenMinutes`) geçerli kalır; refresh ve giriş hemen engellenir.
 - Yönetici davet akışı ve e-posta doğrulama yok.

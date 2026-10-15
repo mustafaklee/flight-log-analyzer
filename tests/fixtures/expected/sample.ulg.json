@@ -1,0 +1,2819 @@
+{
+ "format": "ulog",
+ "file": "sample.ulg",
+ "sha256": "81952e6059bc095717e7911c010e07f85749d6b04d332a5ffc51575a3fd0a558",
+ "header_timestamp": 112500176,
+ "last_timestamp": 181493506,
+ "corrupt": false,
+ "info": {
+  "ver_sw": "fd483321a5cf50ead91164356d15aa474643aa73",
+  "ver_hw": "AUAV_X21",
+  "sys_name": "PX4",
+  "time_ref_utc": "0"
+ },
+ "initial_parameters": {
+  "ATT_ACC_COMP": 1.0,
+  "ATT_BIAS_MAX": 0.05000000074505806,
+  "ATT_EXT_HDG_M": 0.0,
+  "ATT_MAG_DECL": 0.0,
+  "ATT_MAG_DECL_A": 1.0,
+  "ATT_VIBE_THRESH": 0.20000000298023224,
+  "ATT_W_ACC": 0.20000000298023224,
+  "ATT_W_EXT_HDG": 0.10000000149011612,
+  "ATT_W_GYRO_BIAS": 0.10000000149011612,
+  "ATT_W_MAG": 0.10000000149011612,
+  "BAT_A_PER_V": 15.391030311584473,
+  "BAT_CAPACITY": -1.0,
+  "BAT_CNT_V_CURR": 0.0008056640508584678,
+  "BAT_CNT_V_VOLT": 0.0008056640508584678,
+  "BAT_CRIT_THR": 0.07000000029802322,
+  "BAT_LOW_THR": 0.15000000596046448,
+  "BAT_N_CELLS": 3.0,
+  "BAT_R_INTERNAL": -1.0,
+  "BAT_SOURCE": 0.0,
+  "BAT_V_CHARGED": 4.050000190734863,
+  "BAT_V_DIV": 10.177939414978027,
+  "BAT_V_EMPTY": 3.4000000953674316,
+  "BAT_V_LOAD_DROP": 0.30000001192092896,
+  "BAT_V_OFFS_CURR": 0.0,
+  "BAT_V_SCALE_IO": 10000.0,
+  "CAL_ACC0_ID": 1245450.0,
+  "CAL_ACC0_XOFF": -0.20248746871948242,
+  "CAL_ACC0_XSCALE": 1.0043339729309082,
+  "CAL_ACC0_YOFF": 0.34955739974975586,
+  "CAL_ACC0_YSCALE": 1.0087971687316895,
+  "CAL_ACC0_ZOFF": -0.6137104034423828,
+  "CAL_ACC0_ZSCALE": 0.9878426790237427,
+  "CAL_ACC1_ID": 1441792.0,
+  "CAL_ACC1_XOFF": -0.04746294021606445,
+  "CAL_ACC1_XSCALE": 1.0031466484069824,
+  "CAL_ACC1_YOFF": 0.1509847640991211,
+  "CAL_ACC1_YSCALE": 0.996483564376831,
+  "CAL_ACC1_ZOFF": 0.18107271194458008,
+  "CAL_ACC1_ZSCALE": 0.9835612773895264,
+  "CAL_ACC2_XOFF": 0.0,
+  "CAL_ACC2_XSCALE": 1.0,
+  "CAL_ACC2_YOFF": 0.0,
+  "CAL_ACC2_YSCALE": 1.0,
+  "CAL_ACC2_ZOFF": 0.0,
+  "CAL_ACC2_ZSCALE": 1.0,
+  "CAL_ACC_PRIME": 1245450.0,
+  "CAL_BARO_PRIME": 0.0,
+  "CAL_GYRO0_ID": 2162688.0,
+  "CAL_GYRO0_XOFF": 0.0011175398249179125,
+  "CAL_GYRO0_XSCALE": 1.0,
+  "CAL_GYRO0_YOFF": -0.0188062135130167,
+  "CAL_GYRO0_YSCALE": 1.0,
+  "CAL_GYRO0_ZOFF": 0.007620425429195166,
+  "CAL_GYRO0_ZSCALE": 1.0,
+  "CAL_GYRO1_ID": 2359296.0,
+  "CAL_GYRO1_XOFF": -0.019763268530368805,
+  "CAL_GYRO1_XSCALE": 1.0,
+  "CAL_GYRO1_YOFF": -0.0009251082665286958,
+  "CAL_GYRO1_YSCALE": 1.0,
+  "CAL_GYRO1_ZOFF": 0.017394589260220528,
+  "CAL_GYRO1_ZSCALE": 1.0,
+  "CAL_GYRO2_XOFF": 0.0,
+  "CAL_GYRO2_XSCALE": 1.0,
+  "CAL_GYRO2_YOFF": 0.0,
+  "CAL_GYRO2_YSCALE": 1.0,
+  "CAL_GYRO2_ZOFF": 0.0,
+  "CAL_GYRO2_ZSCALE": 1.0,
+  "CAL_GYRO_PRIME": 2162688.0,
+  "CAL_MAG0_ID": 262144.0,
+  "CAL_MAG0_ROT": -1.0,
+  "CAL_MAG0_XOFF": 0.02824728563427925,
+  "CAL_MAG0_XSCALE": 1.0,
+  "CAL_MAG0_YOFF": -0.2002083659172058,
+  "CAL_MAG0_YSCALE": 1.0,
+  "CAL_MAG0_ZOFF": -0.13690485060214996,
+  "CAL_MAG0_ZSCALE": 1.0,
+  "CAL_MAG1_ID": 0.0,
+  "CAL_MAG1_ROT": -1.0,
+  "CAL_MAG1_XOFF": 0.0,
+  "CAL_MAG1_XSCALE": 1.0,
+  "CAL_MAG1_YOFF": 0.0,
+  "CAL_MAG1_YSCALE": 1.0,
+  "CAL_MAG1_ZOFF": 0.0,
+  "CAL_MAG1_ZSCALE": 1.0,
+  "CAL_MAG2_ID": 0.0,
+  "CAL_MAG2_ROT": -1.0,
+  "CAL_MAG2_XOFF": 0.0,
+  "CAL_MAG2_XSCALE": 1.0,
+  "CAL_MAG2_YOFF": 0.0,
+  "CAL_MAG2_YSCALE": 1.0,
+  "CAL_MAG2_ZOFF": 0.0,
+  "CAL_MAG2_ZSCALE": 1.0,
+  "CAL_MAG_PRIME": 262144.0,
+  "CAL_MAG_SIDES": 63.0,
+  "CBRK_AIRSPD_CHK": 0.0,
+  "CBRK_BUZZER": 0.0,
+  "CBRK_ENGINEFAIL": 284953.0,
+  "CBRK_FLIGHTTERM": 121212.0,
+  "CBRK_GPSFAIL": 0.0,
+  "CBRK_IO_SAFETY": 0.0,
+  "CBRK_RATE_CTRL": 0.0,
+  "CBRK_SUPPLY_CHK": 0.0,
+  "CBRK_USB_CHK": 0.0,
+  "COM_ARM_EKF_AB": 0.0020000000949949026,
+  "COM_ARM_EKF_GB": 0.0003499999875202775,
+  "COM_ARM_EKF_HGT": 1.0,
+  "COM_ARM_EKF_POS": 0.5,
+  "COM_ARM_EKF_VEL": 0.5,
+  "COM_ARM_EKF_YAW": 0.5,
+  "COM_ARM_IMU_ACC": 0.699999988079071,
+  "COM_ARM_IMU_GYR": 0.09000000357627869,
+  "COM_ARM_WO_GPS": 1.0,
+  "COM_AUTOS_PAR": 1.0,
+  "COM_DISARM_LAND": 0.0,
+  "COM_DL_LOSS_T": 10.0,
+  "COM_DL_REG_T": 0.0,
+  "COM_EF_C2T": 5.0,
+  "COM_EF_THROT": 0.5,
+  "COM_EF_TIME": 10.0,
+  "COM_FLTMODE1": -1.0,
+  "COM_FLTMODE2": -1.0,
+  "COM_FLTMODE3": -1.0,
+  "COM_FLTMODE4": -1.0,
+  "COM_FLTMODE5": -1.0,
+  "COM_FLTMODE6": -1.0,
+  "COM_HOME_H_T": 5.0,
+  "COM_HOME_V_T": 10.0,
+  "COM_LOW_BAT_ACT": 0.0,
+  "COM_OBL_ACT": 0.0,
+  "COM_OBL_RC_ACT": 0.0,
+  "COM_OF_LOSS_T": 0.0,
+  "COM_RC_ARM_HYST": 1000.0,
+  "COM_RC_IN_MODE": 0.0,
+  "COM_RC_LOSS_T": 0.5,
+  "EKF2_REC_RPL": 0.0,
+  "FW_AIRSPD_TRIM": 15.0,
+  "FW_ARSP_MODE": 0.0,
+  "FW_CLMBOUT_DIFF": 10.0,
+  "FW_MAN_P_SC": 1.0,
+  "FW_MAN_R_SC": 1.0,
+  "FW_MAN_Y_SC": 1.0,
+  "FW_THR_CRUISE": 0.6000000238418579,
+  "GF_ACTION": 1.0,
+  "GF_ALTMODE": 0.0,
+  "GF_COUNT": -1.0,
+  "GF_MAX_HOR_DIST": 0.0,
+  "GF_MAX_VER_DIST": 0.0,
+  "GF_SOURCE": 0.0,
+  "GPS_DUMP_COMM": 0.0,
+  "LNDMC_FFALL_THR": 2.0,
+  "LNDMC_FFALL_TTRI": 0.30000001192092896,
+  "LNDMC_ROT_MAX": 20.0,
+  "LNDMC_XY_VEL_MAX": 1.5,
+  "LNDMC_Z_VEL_MAX": 0.699999988079071,
+  "LPE_ACC_XY": 0.012000000104308128,
+  "LPE_ACC_Z": 0.019999999552965164,
+  "LPE_BAR_Z": 3.0,
+  "LPE_EPH_MAX": 3.0,
+  "LPE_EPV_MAX": 5.0,
+  "LPE_FGYRO_HP": 0.0010000000474974513,
+  "LPE_FLW_GYRO_CMP": 1.0,
+  "LPE_FLW_OFF_Z": 0.0,
+  "LPE_FLW_QMIN": 150.0,
+  "LPE_FLW_SCALE": 1.2999999523162842,
+  "LPE_GPS_DELAY": 0.28999999165534973,
+  "LPE_GPS_ON": 1.0,
+  "LPE_GPS_VXY": 0.25,
+  "LPE_GPS_VZ": 0.25,
+  "LPE_GPS_XY": 1.0,
+  "LPE_GPS_Z": 3.0,
+  "LPE_LAND_Z": 0.029999999329447746,
+  "LPE_LAT": 40.43000030517578,
+  "LPE_LDR_OFF_Z": 0.0,
+  "LPE_LDR_Z": 0.029999999329447746,
+  "LPE_LON": -86.92900085449219,
+  "LPE_PN_B": 0.0010000000474974513,
+  "LPE_PN_P": 0.10000000149011612,
+  "LPE_PN_T": 0.0010000000474974513,
+  "LPE_PN_V": 0.10000000149011612,
+  "LPE_PUB_AGL_Z": 0.0,
+  "LPE_SNR_OFF_Z": 0.0,
+  "LPE_SNR_Z": 0.05000000074505806,
+  "LPE_T_MAX_GRADE": 1.0,
+  "LPE_VIC_P": 0.0010000000474974513,
+  "LPE_VIS_DELAY": 0.10000000149011612,
+  "LPE_VIS_ON": 1.0,
+  "LPE_VIS_XY": 0.10000000149011612,
+  "LPE_VIS_Z": 0.5,
+  "LPE_VXY_PUB": 0.30000001192092896,
+  "LPE_X_LP": 5.0,
+  "LPE_Z_PUB": 1.0,
+  "MAV_BROADCAST": 0.0,
+  "MAV_COMP_ID": 1.0,
+  "MAV_FWDEXTSP": 1.0,
+  "MAV_PROTO_VER": 0.0,
+  "MAV_RADIO_ID": 0.0,
+  "MAV_SYS_ID": 1.0,
+  "MAV_TEST_PAR": 1.0,
+  "MAV_TYPE": 2.0,
+  "MAV_USEHILGPS": 0.0,
+  "MC_ACRO_P_MAX": 360.0,
+  "MC_ACRO_R_MAX": 360.0,
+  "MC_ACRO_Y_MAX": 360.0,
+  "MC_BAT_SCALE_EN": 0.0,
+  "MC_PITCHRATE_D": 0.004000000189989805,
+  "MC_PITCHRATE_FF": 0.0,
+  "MC_PITCHRATE_I": 0.09000000357627869,
+  "MC_PITCHRATE_MAX": 220.0,
+  "MC_PITCHRATE_P": 0.14000000059604645,
+  "MC_PITCH_P": 6.0,
+  "MC_PITCH_TC": 0.20000000298023224,
+  "MC_RATT_TH": 1.0,
+  "MC_ROLLRATE_D": 0.004000000189989805,
+  "MC_ROLLRATE_FF": 0.0,
+  "MC_ROLLRATE_I": 0.10000000149011612,
+  "MC_ROLLRATE_MAX": 220.0,
+  "MC_ROLLRATE_P": 0.14000000059604645,
+  "MC_ROLL_P": 6.5,
+  "MC_ROLL_TC": 0.20000000298023224,
+  "MC_TPA_BREAK": 1.0,
+  "MC_TPA_SLOPE": 1.0,
+  "MC_YAWRATE_D": 0.0,
+  "MC_YAWRATE_FF": 0.0,
+  "MC_YAWRATE_I": 0.10000000149011612,
+  "MC_YAWRATE_MAX": 200.0,
+  "MC_YAWRATE_P": 0.20000000298023224,
+  "MC_YAWRAUTO_MAX": 45.0,
+  "MC_YAW_FF": 0.5,
+  "MC_YAW_P": 4.0,
+  "MIS_ALTMODE": 1.0,
+  "MIS_DIST_1WP": 900.0,
+  "MIS_LTRMIN_ALT": 1.2000000476837158,
+  "MIS_ONBOARD_EN": 1.0,
+  "MIS_TAKEOFF_ALT": 2.5,
+  "MIS_YAWMODE": 1.0,
+  "MIS_YAW_ERR": 12.0,
+  "MIS_YAW_TMT": -1.0,
+  "MOT_SLEW_MAX": 0.0,
+  "MPC_ACC_HOR_MAX": 5.0,
+  "MPC_ALTCTL_DY": 0.0,
+  "MPC_ALTCTL_DZ": 0.10000000149011612,
+  "MPC_ALT_MODE": 0.0,
+  "MPC_HOLD_MAX_XY": 0.800000011920929,
+  "MPC_HOLD_MAX_Z": 0.6000000238418579,
+  "MPC_HOLD_XY_DZ": 0.10000000149011612,
+  "MPC_LAND_SPEED": 0.5,
+  "MPC_MANTHR_MAX": 0.8999999761581421,
+  "MPC_MANTHR_MIN": 0.07999999821186066,
+  "MPC_MAN_P_MAX": 35.0,
+  "MPC_MAN_R_MAX": 35.0,
+  "MPC_MAN_Y_MAX": 200.0,
+  "MPC_THR_HOVER": 0.5,
+  "MPC_THR_MAX": 0.8999999761581421,
+  "MPC_THR_MIN": 0.11999999731779099,
+  "MPC_TILTMAX_AIR": 45.0,
+  "MPC_TILTMAX_LND": 12.0,
+  "MPC_TKO_SPEED": 1.5,
+  "MPC_VELD_LP": 5.0,
+  "MPC_XY_CRUISE": 5.0,
+  "MPC_XY_FF": 0.5,
+  "MPC_XY_P": 0.949999988079071,
+  "MPC_XY_VEL_D": 0.009999999776482582,
+  "MPC_XY_VEL_I": 0.019999999552965164,
+  "MPC_XY_VEL_MAX": 8.0,
+  "MPC_XY_VEL_P": 0.09000000357627869,
+  "MPC_Z_FF": 0.5,
+  "MPC_Z_P": 1.0,
+  "MPC_Z_VEL_D": 0.0,
+  "MPC_Z_VEL_I": 0.019999999552965164,
+  "MPC_Z_VEL_MAX": 1.0,
+  "MPC_Z_VEL_MAX_DN": 1.0,
+  "MPC_Z_VEL_MAX_UP": 3.0,
+  "MPC_Z_VEL_P": 0.20000000298023224,
+  "NAV_ACC_RAD": 2.0,
+  "NAV_AH_ALT": 600.0,
+  "NAV_AH_LAT": -265847810.0,
+  "NAV_AH_LON": 1518423250.0,
+  "NAV_DLL_ACT": 0.0,
+  "NAV_DLL_AH_T": 120.0,
+  "NAV_DLL_CHSK": 0.0,
+  "NAV_DLL_CH_ALT": 600.0,
+  "NAV_DLL_CH_LAT": -266072120.0,
+  "NAV_DLL_CH_LON": 1518453890.0,
+  "NAV_DLL_CH_T": 120.0,
+  "NAV_DLL_N": 2.0,
+  "NAV_FT_DST": 8.0,
+  "NAV_FT_FS": 1.0,
+  "NAV_FT_RS": 0.5,
+  "NAV_FW_ALT_RAD": 10.0,
+  "NAV_GPSF_LT": 30.0,
+  "NAV_GPSF_P": 0.0,
+  "NAV_GPSF_R": 15.0,
+  "NAV_GPSF_TR": 0.699999988079071,
+  "NAV_LOITER_RAD": 50.0,
+  "NAV_MC_ALT_RAD": 3.0,
+  "NAV_MIN_FT_HT": 8.0,
+  "NAV_RCL_ACT": 2.0,
+  "NAV_RCL_LT": 120.0,
+  "PWM_AUX_DISARMED": 1000.0,
+  "PWM_AUX_MAX": 2000.0,
+  "PWM_AUX_MIN": 1000.0,
+  "PWM_AUX_REV1": 0.0,
+  "PWM_AUX_REV2": 0.0,
+  "PWM_AUX_REV3": 0.0,
+  "PWM_AUX_REV4": 0.0,
+  "PWM_AUX_REV5": 0.0,
+  "PWM_AUX_REV6": 0.0,
+  "PWM_DISARMED": 900.0,
+  "PWM_MAIN_REV1": 0.0,
+  "PWM_MAIN_REV2": 0.0,
+  "PWM_MAIN_REV3": 0.0,
+  "PWM_MAIN_REV4": 0.0,
+  "PWM_MAIN_REV5": 0.0,
+  "PWM_MAIN_REV6": 0.0,
+  "PWM_MAIN_REV7": 0.0,
+  "PWM_MAIN_REV8": 0.0,
+  "PWM_MAX": 1950.0,
+  "PWM_MIN": 1075.0,
+  "PWM_RATE": 400.0,
+  "PWM_SBUS_MODE": 0.0,
+  "RC10_DZ": 0.0,
+  "RC10_MAX": 2000.0,
+  "RC10_MIN": 1000.0,
+  "RC10_REV": 1.0,
+  "RC10_TRIM": 1500.0,
+  "RC11_DZ": 0.0,
+  "RC11_MAX": 2000.0,
+  "RC11_MIN": 1000.0,
+  "RC11_REV": 1.0,
+  "RC11_TRIM": 1500.0,
+  "RC12_DZ": 0.0,
+  "RC12_MAX": 2000.0,
+  "RC12_MIN": 1000.0,
+  "RC12_REV": 1.0,
+  "RC12_TRIM": 1500.0,
+  "RC13_DZ": 0.0,
+  "RC13_MAX": 2000.0,
+  "RC13_MIN": 1000.0,
+  "RC13_REV": 1.0,
+  "RC13_TRIM": 1500.0,
+  "RC14_DZ": 0.0,
+  "RC14_MAX": 2000.0,
+  "RC14_MIN": 1000.0,
+  "RC14_REV": 1.0,
+  "RC14_TRIM": 1500.0,
+  "RC15_DZ": 0.0,
+  "RC15_MAX": 2000.0,
+  "RC15_MIN": 1000.0,
+  "RC15_REV": 1.0,
+  "RC15_TRIM": 1500.0,
+  "RC16_DZ": 0.0,
+  "RC16_MAX": 2000.0,
+  "RC16_MIN": 1000.0,
+  "RC16_REV": 1.0,
+  "RC16_TRIM": 1500.0,
+  "RC17_DZ": 0.0,
+  "RC17_MAX": 2000.0,
+  "RC17_MIN": 1000.0,
+  "RC17_REV": 1.0,
+  "RC17_TRIM": 1500.0,
+  "RC18_DZ": 0.0,
+  "RC18_MAX": 2000.0,
+  "RC18_MIN": 1000.0,
+  "RC18_REV": 1.0,
+  "RC18_TRIM": 1500.0,
+  "RC1_DZ": 10.0,
+  "RC1_MAX": 2000.0,
+  "RC1_MIN": 1000.0,
+  "RC1_REV": 1.0,
+  "RC1_TRIM": 1500.0,
+  "RC2_DZ": 10.0,
+  "RC2_MAX": 2000.0,
+  "RC2_MIN": 1000.0,
+  "RC2_REV": 1.0,
+  "RC2_TRIM": 1500.0,
+  "RC3_DZ": 10.0,
+  "RC3_MAX": 2000.0,
+  "RC3_MIN": 1000.0,
+  "RC3_REV": 1.0,
+  "RC3_TRIM": 1500.0,
+  "RC4_DZ": 10.0,
+  "RC4_MAX": 2000.0,
+  "RC4_MIN": 1000.0,
+  "RC4_REV": 1.0,
+  "RC4_TRIM": 1500.0,
+  "RC5_DZ": 10.0,
+  "RC5_MAX": 2000.0,
+  "RC5_MIN": 1000.0,
+  "RC5_REV": 1.0,
+  "RC5_TRIM": 1500.0,
+  "RC6_DZ": 10.0,
+  "RC6_MAX": 2000.0,
+  "RC6_MIN": 1000.0,
+  "RC6_REV": 1.0,
+  "RC6_TRIM": 1500.0,
+  "RC7_DZ": 10.0,
+  "RC7_MAX": 2000.0,
+  "RC7_MIN": 1000.0,
+  "RC7_REV": 1.0,
+  "RC7_TRIM": 1500.0,
+  "RC8_DZ": 10.0,
+  "RC8_MAX": 2000.0,
+  "RC8_MIN": 1000.0,
+  "RC8_REV": 1.0,
+  "RC8_TRIM": 1500.0,
+  "RC9_DZ": 0.0,
+  "RC9_MAX": 2000.0,
+  "RC9_MIN": 1000.0,
+  "RC9_REV": 1.0,
+  "RC9_TRIM": 1500.0,
+  "RC_ACRO_TH": 0.5,
+  "RC_ASSIST_TH": 0.25,
+  "RC_AUTO_TH": 0.75,
+  "RC_CHAN_CNT": 0.0,
+  "RC_DSM_BIND": -1.0,
+  "RC_FAILS_THR": 0.0,
+  "RC_GEAR_TH": 0.25,
+  "RC_KILLSWITCH_TH": 0.25,
+  "RC_LOITER_TH": 0.5,
+  "RC_MAP_ACRO_SW": 0.0,
+  "RC_MAP_AUX1": 0.0,
+  "RC_MAP_AUX2": 0.0,
+  "RC_MAP_AUX3": 0.0,
+  "RC_MAP_AUX4": 0.0,
+  "RC_MAP_AUX5": 0.0,
+  "RC_MAP_FAILSAFE": 0.0,
+  "RC_MAP_FLAPS": 0.0,
+  "RC_MAP_FLTMODE": 0.0,
+  "RC_MAP_GEAR_SW": 0.0,
+  "RC_MAP_KILL_SW": 0.0,
+  "RC_MAP_LOITER_SW": 0.0,
+  "RC_MAP_MODE_SW": 0.0,
+  "RC_MAP_OFFB_SW": 0.0,
+  "RC_MAP_PARAM1": 0.0,
+  "RC_MAP_PARAM2": 0.0,
+  "RC_MAP_PARAM3": 0.0,
+  "RC_MAP_PITCH": 0.0,
+  "RC_MAP_POSCTL_SW": 0.0,
+  "RC_MAP_RATT_SW": 0.0,
+  "RC_MAP_RETURN_SW": 0.0,
+  "RC_MAP_ROLL": 0.0,
+  "RC_MAP_THROTTLE": 0.0,
+  "RC_MAP_TRANS_SW": 0.0,
+  "RC_MAP_YAW": 0.0,
+  "RC_OFFB_TH": 0.5,
+  "RC_POSCTL_TH": 0.5,
+  "RC_RATT_TH": 0.5,
+  "RC_RETURN_TH": 0.5,
+  "RC_RSSI_PWM_CHAN": 0.0,
+  "RC_RSSI_PWM_MAX": 1000.0,
+  "RC_RSSI_PWM_MIN": 2000.0,
+  "RC_TH_USER": 1.0,
+  "RC_TRANS_TH": 0.25,
+  "RTL_DESCEND_ALT": 10.0,
+  "RTL_LAND_DELAY": 0.0,
+  "RTL_MIN_DIST": 5.0,
+  "RTL_RETURN_ALT": 30.0,
+  "SDLOG_EXT": -1.0,
+  "SDLOG_GPSTIME": 1.0,
+  "SDLOG_PRIO_BOOST": 2.0,
+  "SDLOG_RATE": -1.0,
+  "SDLOG_UTC_OFFSET": 0.0,
+  "SENS_BARO_QNH": 1013.25,
+  "SENS_BOARD_ROT": 0.0,
+  "SENS_BOARD_X_OFF": -1.50480055809021,
+  "SENS_BOARD_Y_OFF": 1.1870635747909546,
+  "SENS_BOARD_Z_OFF": 0.0,
+  "SENS_DPRES_ANSC": 0.0,
+  "SENS_DPRES_OFF": 0.0,
+  "SENS_EN_LL40LS": 0.0,
+  "SENS_EN_MB12XX": 0.0,
+  "SENS_EN_SF0X": 0.0,
+  "SENS_EN_SF1XX": 0.0,
+  "SENS_EN_TRONE": 0.0,
+  "SYS_AUTOCONFIG": 0.0,
+  "SYS_AUTOSTART": 10020.0,
+  "SYS_COMPANION": 157600.0,
+  "SYS_LOGGER": 0.0,
+  "SYS_MC_EST_GROUP": 1.0,
+  "SYS_PARAM_VER": 1.0,
+  "SYS_RESTART_TYPE": 0.0,
+  "SYS_USE_IO": 1.0,
+  "TRIG_MODE": 0.0,
+  "TRIM_PITCH": 0.0,
+  "TRIM_ROLL": 0.0,
+  "TRIM_YAW": 0.0,
+  "UAVCAN_ENABLE": 0.0,
+  "VT_NAV_FORCE_VT": 1.0,
+  "VT_OPT_RECOV_EN": 0.0,
+  "VT_TYPE": 0.0,
+  "VT_WV_LND_EN": 0.0,
+  "VT_WV_LTR_EN": 0.0,
+  "VT_WV_YAWR_SCL": 0.15000000596046448
+ },
+ "changed_parameters": [
+  [
+   158196367,
+   "COM_AUTOS_PAR",
+   0.0
+  ],
+  [
+   158196367,
+   "MPC_Z_VEL_MAX_DN",
+   1.0
+  ],
+  [
+   162054776,
+   "COM_AUTOS_PAR",
+   1.0
+  ],
+  [
+   162054776,
+   "MPC_Z_VEL_MAX_DN",
+   1.0
+  ],
+  [
+   171616706,
+   "COM_AUTOS_PAR",
+   0.0
+  ],
+  [
+   176400452,
+   "COM_AUTOS_PAR",
+   1.0
+  ]
+ ],
+ "logged_messages": [
+  [
+   158215813,
+   3,
+   "[sensors] no barometer found on /dev/baro0 (2)"
+  ],
+  [
+   162073276,
+   3,
+   "[sensors] no barometer found on /dev/baro0 (2)"
+  ],
+  [
+   171624480,
+   3,
+   "[sensors] no barometer found on /dev/baro0 (2)"
+  ],
+  [
+   176408129,
+   3,
+   "[sensors] no barometer found on /dev/baro0 (2)"
+  ]
+ ],
+ "tagged_logged_messages": 0,
+ "dropouts": [
+  [
+   112574774,
+   0
+  ],
+  [
+   112574774,
+   26
+  ],
+  [
+   112614307,
+   31
+  ],
+  [
+   153855108,
+   62
+  ]
+ ],
+ "series": [
+  {
+   "message": "actuator_controls_0",
+   "instance": 0,
+   "records": 3269,
+   "first_timestamp": 112574774,
+   "last_timestamp": 181481200,
+   "fields": {
+    "timestamp": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 480629896145.0,
+     "min": 112574774.0,
+     "max": 181481200.0
+    },
+    "timestamp_sample": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 480627963691.0,
+     "min": 112574307.0,
+     "max": 181480707.0
+    },
+    "control[0]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": -136.47092706360854,
+     "min": -0.5108709335327148,
+     "max": 0.45387423038482666
+    },
+    "control[1]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": -311.65248487424105,
+     "min": -0.39470744132995605,
+     "max": 0.22711358964443207
+    },
+    "control[2]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": -82.1058396056178,
+     "min": -0.3488435745239258,
+     "max": 0.2722630202770233
+    },
+    "control[3]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[4]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[5]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[6]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[7]": {
+     "count": 3269,
+     "nonfinite": 0,
+     "sum": -3269.0,
+     "min": -1.0,
+     "max": -1.0
+    }
+   }
+  },
+  {
+   "message": "actuator_outputs",
+   "instance": 0,
+   "records": 1311,
+   "first_timestamp": 112572962,
+   "last_timestamp": 181470523,
+   "fields": {
+    "timestamp": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 192751613548.0,
+     "min": 112572962.0,
+     "max": 181470523.0
+    },
+    "noutputs": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 10488.0,
+     "min": 8.0,
+     "max": 8.0
+    },
+    "output[0]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 1179900.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[1]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 1179900.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[2]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 1179900.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[3]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 1179900.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[4]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[5]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[6]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[7]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[8]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[9]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[10]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[11]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[12]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[13]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[14]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[15]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "commander_state",
+   "instance": 0,
+   "records": 678,
+   "first_timestamp": 2069758,
+   "last_timestamp": 2069758,
+   "fields": {
+    "timestamp": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 1403295924.0,
+     "min": 2069758.0,
+     "max": 2069758.0
+    },
+    "main_state": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "control_state",
+   "instance": 0,
+   "records": 3268,
+   "first_timestamp": 112650307,
+   "last_timestamp": 181480707,
+   "fields": {
+    "timestamp": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 480514579607.0,
+     "min": 112650307.0,
+     "max": 181480707.0
+    },
+    "x_acc": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 3564.7798569323495,
+     "min": -1.6971975564956665,
+     "max": 1.9613535404205322
+    },
+    "y_acc": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": -1445.7935007059714,
+     "min": -4.23515510559082,
+     "max": 4.166045665740967
+    },
+    "z_acc": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": -31432.490931034088,
+     "min": -11.684996604919434,
+     "max": -7.857512950897217
+    },
+    "x_vel": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "y_vel": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_vel": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "x_pos": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "y_pos": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_pos": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "airspeed": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[0]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[1]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[2]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[0]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[1]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[2]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q[0]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 3107.840140879154,
+     "min": 0.8991642594337463,
+     "max": 0.9741137027740479
+    },
+    "q[1]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 127.90422462258721,
+     "min": -0.16073846817016602,
+     "max": 0.175445556640625
+    },
+    "q[2]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 154.96428199025104,
+     "min": -0.10003210604190826,
+     "max": 0.11369273066520691
+    },
+    "q[3]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": -985.6679622679949,
+     "min": -0.3918837904930115,
+     "max": -0.166276752948761
+    },
+    "delta_q_reset[0]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_q_reset[1]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_q_reset[2]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_q_reset[3]": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "roll_rate": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 3.702617670467589,
+     "min": -2.730881452560425,
+     "max": 2.512255907058716
+    },
+    "pitch_rate": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": -2.1584866925841197,
+     "min": -1.2308886051177979,
+     "max": 0.8028508424758911
+    },
+    "yaw_rate": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": -9.690056805615313,
+     "min": -1.5748292207717896,
+     "max": 1.7327059507369995
+    },
+    "horz_acc_mag": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "airspeed_valid": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "quat_reset_counter": {
+     "count": 3268,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "cpuload",
+   "instance": 0,
+   "records": 69,
+   "first_timestamp": 112859000,
+   "last_timestamp": 181298132,
+   "fields": {
+    "timestamp": {
+     "count": 69,
+     "nonfinite": 0,
+     "sum": 10148438546.0,
+     "min": 112859000.0,
+     "max": 181298132.0
+    },
+    "load": {
+     "count": 69,
+     "nonfinite": 0,
+     "sum": 37.69769299030304,
+     "min": 0.5048459768295288,
+     "max": 0.8331869840621948
+    },
+    "ram_usage": {
+     "count": 69,
+     "nonfinite": 0,
+     "sum": 59.495668828487396,
+     "min": 0.8610789179801941,
+     "max": 0.8633294701576233
+    }
+   }
+  },
+  {
+   "message": "ekf2_innovations",
+   "instance": 0,
+   "records": 3271,
+   "first_timestamp": 0,
+   "last_timestamp": 0,
+   "fields": {
+    "timestamp": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[2]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[3]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[4]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[5]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov[2]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "heading_innov": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "airspeed_innov": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "beta_innov": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_innov": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 26.104088120162487,
+     "min": 0.004036411643028259,
+     "max": 0.02560238540172577
+    },
+    "vel_pos_innov_var[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[2]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[3]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[4]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[5]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov_var[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov_var[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov_var[2]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "heading_innov_var": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "airspeed_innov_var": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "beta_innov_var": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov_var[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov_var[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_innov_var": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 2.943899949430488,
+     "min": 0.0008999999845400453,
+     "max": 0.0008999999845400453
+    },
+    "output_tracking_error[0]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output_tracking_error[1]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output_tracking_error[2]": {
+     "count": 3271,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "estimator_status",
+   "instance": 0,
+   "records": 1311,
+   "first_timestamp": 112689688,
+   "last_timestamp": 181481417,
+   "fields": {
+    "timestamp": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 192816417172.0,
+     "min": 112689688.0,
+     "max": 181481417.0
+    },
+    "states[0]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[1]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[2]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 125.19588819146156,
+     "min": 0.09192095696926117,
+     "max": 0.11209865659475327
+    },
+    "states[3]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[4]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[5]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 108.86730061471462,
+     "min": 0.05655837431550026,
+     "max": 0.23633374273777008
+    },
+    "states[6]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[7]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[8]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 79.3758715391159,
+     "min": 0.04576242342591286,
+     "max": 0.07306452095508575
+    },
+    "states[9]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 118.42432501912117,
+     "min": 0.09028942137956619,
+     "max": 0.09043142944574356
+    },
+    "states[10]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[11]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[12]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[13]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[14]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[15]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[16]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[17]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[18]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[19]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[20]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[21]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[22]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[23]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[24]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[25]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[26]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[27]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[28]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[29]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[30]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[31]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "n_states": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 13110.0,
+     "min": 10.0,
+     "max": 10.0
+    },
+    "vibe[0]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vibe[1]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vibe[2]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[0]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 5560931.475830078,
+     "min": 2403.120849609375,
+     "max": 6402.06591796875
+    },
+    "covariances[1]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 23529920.57763672,
+     "min": 7275.498046875,
+     "max": 33629.9453125
+    },
+    "covariances[2]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 41.07433161512017,
+     "min": 0.030560681596398354,
+     "max": 0.032234400510787964
+    },
+    "covariances[3]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 306.3768199235201,
+     "min": 0.23352880775928497,
+     "max": 0.2339736372232437
+    },
+    "covariances[4]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 3517.374317765236,
+     "min": 1.7224310636520386,
+     "max": 3.8719117641448975
+    },
+    "covariances[5]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 19.76318370644003,
+     "min": 0.014601913280785084,
+     "max": 0.01563519425690174
+    },
+    "covariances[6]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.1423708067231928,
+     "min": 9.133786079473794e-05,
+     "max": 0.0001240581041201949
+    },
+    "covariances[7]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.16545774032420013,
+     "min": 0.000100083758297842,
+     "max": 0.00015104985504876822
+    },
+    "covariances[8]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.12016647535347147,
+     "min": 8.204512414522469e-05,
+     "max": 9.831239731283858e-05
+    },
+    "covariances[9]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 266.6932153403759,
+     "min": 0.2033761441707611,
+     "max": 0.20347847044467926
+    },
+    "covariances[10]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[11]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[12]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[13]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[14]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[15]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[16]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[17]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[18]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[19]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[20]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[21]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[22]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[23]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[24]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[25]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[26]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[27]": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_horiz_accuracy": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_vert_accuracy": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hgt_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "tas_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_test_ratio": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "gps_check_fail_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control_mode_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "filter_fault_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "innovation_check_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "solution_status_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "nan_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "health_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "timeout_flags": {
+     "count": 1311,
+     "nonfinite": 0,
+     "sum": 1311.0,
+     "min": 1.0,
+     "max": 1.0
+    }
+   }
+  },
+  {
+   "message": "sensor_combined",
+   "instance": 0,
+   "records": 17070,
+   "first_timestamp": 112614307,
+   "last_timestamp": 181493506,
+   "fields": {
+    "timestamp": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 2509845601128.0,
+     "min": 112614307.0,
+     "max": 181493506.0
+    },
+    "gyro_rad[0]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -3.1584717029407443,
+     "min": -2.7625181674957275,
+     "max": 2.5924675464630127
+    },
+    "gyro_rad[1]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -52.66588105221399,
+     "min": -1.238738775253296,
+     "max": 0.8256530165672302
+    },
+    "gyro_rad[2]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -103.92121585325367,
+     "min": -1.6041613817214966,
+     "max": 1.7803831100463867
+    },
+    "gyro_integral_dt": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 68.67599033005536,
+     "min": 0.003936000168323517,
+     "max": 0.004844999872148037
+    },
+    "accelerometer_timestamp_relative": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "accelerometer_m_s2[0]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 18621.467004005564,
+     "min": -1.9448624849319458,
+     "max": 2.2649731636047363
+    },
+    "accelerometer_m_s2[1]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -7546.712555993348,
+     "min": -4.393050670623779,
+     "max": 4.2123637199401855
+    },
+    "accelerometer_m_s2[2]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -164179.2346625328,
+     "min": -14.108567237854004,
+     "max": -6.247771739959717
+    },
+    "accelerometer_integral_dt": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 68.67599033005536,
+     "min": 0.003936000168323517,
+     "max": 0.004844999872148037
+    },
+    "magnetometer_timestamp_relative": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": -90502415.0,
+     "min": -30022.0,
+     "max": 1210.0
+    },
+    "magnetometer_ga[0]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 2152.980518899858,
+     "min": 0.09519366174936295,
+     "max": 0.25516748428344727
+    },
+    "magnetometer_ga[1]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 2465.1195904930355,
+     "min": -0.021873006597161293,
+     "max": 0.21676622331142426
+    },
+    "magnetometer_ga[2]": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 7534.633295208216,
+     "min": 0.33747851848602295,
+     "max": 0.487324595451355
+    },
+    "baro_timestamp_relative": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 36657545854290.0,
+     "min": 2147483647.0,
+     "max": 2147483647.0
+    },
+    "baro_alt_meter": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "baro_temp_celcius": {
+     "count": 17070,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "sensor_preflight",
+   "instance": 0,
+   "records": 17072,
+   "first_timestamp": 0,
+   "last_timestamp": 0,
+   "fields": {
+    "timestamp": {
+     "count": 17072,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "accel_inconsistency_m_s_s": {
+     "count": 17072,
+     "nonfinite": 0,
+     "sum": 1006.4786287206225,
+     "min": 0.004701125435531139,
+     "max": 0.2573675811290741
+    },
+    "gyro_inconsistency_rad_s": {
+     "count": 17072,
+     "nonfinite": 0,
+     "sum": 98.51711615757085,
+     "min": 0.0015480576548725367,
+     "max": 0.0864957943558693
+    }
+   }
+  },
+  {
+   "message": "telemetry_status",
+   "instance": 0,
+   "records": 70,
+   "first_timestamp": 112475951,
+   "last_timestamp": 181470216,
+   "fields": {
+    "timestamp": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 10287645271.0,
+     "min": 112475951.0,
+     "max": 181470216.0
+    },
+    "heartbeat_time": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 10287645271.0,
+     "min": 112475951.0,
+     "max": 181470216.0
+    },
+    "telem_time": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "rxerrors": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "fixed": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "type": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 280.0,
+     "min": 4.0,
+     "max": 4.0
+    },
+    "rssi": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "remote_rssi": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "noise": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "remote_noise": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "txbuf": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "system_id": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "component_id": {
+     "count": 70,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_attitude",
+   "instance": 0,
+   "records": 6461,
+   "first_timestamp": 112574307,
+   "last_timestamp": 181488706,
+   "fields": {
+    "timestamp": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": 949996640696.0,
+     "min": 112574307.0,
+     "max": 181488706.0
+    },
+    "rollspeed": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": 6.377851706929505,
+     "min": -2.7379276752471924,
+     "max": 2.5593390464782715
+    },
+    "pitchspeed": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": -4.5758527289144695,
+     "min": -1.2274473905563354,
+     "max": 0.8028508424758911
+    },
+    "yawspeed": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": -20.43587268819101,
+     "min": -1.5892181396484375,
+     "max": 1.7693878412246704
+    },
+    "q[0]": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": 6144.352904975414,
+     "min": 0.8990313410758972,
+     "max": 0.9741290807723999
+    },
+    "q[1]": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": 252.90551411354681,
+     "min": -0.16082626581192017,
+     "max": 0.175445556640625
+    },
+    "q[2]": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": 306.5053384612256,
+     "min": -0.10000328719615936,
+     "max": 0.11359263211488724
+    },
+    "q[3]": {
+     "count": 6461,
+     "nonfinite": 0,
+     "sum": -1948.7574253082275,
+     "min": -0.3919421136379242,
+     "max": -0.1661224365234375
+    }
+   }
+  },
+  {
+   "message": "vehicle_attitude_setpoint",
+   "instance": 0,
+   "records": 3272,
+   "first_timestamp": 112572924,
+   "last_timestamp": 181472782,
+   "fields": {
+    "timestamp": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 481090590836.0,
+     "min": 112572924.0,
+     "max": 181472782.0
+    },
+    "roll_body": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": -0.0,
+     "max": -0.0
+    },
+    "pitch_body": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw_body": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": -2114.8680119514465,
+     "min": -0.6463533043861389,
+     "max": -0.6463533043861389
+    },
+    "yaw_sp_move_rate": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q_d[0]": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 3102.6129426956177,
+     "min": 0.9482313394546509,
+     "max": 0.9482313394546509
+    },
+    "q_d[1]": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q_d[2]": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q_d[3]": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": -1039.1229774951935,
+     "min": -0.31758037209510803,
+     "max": -0.31758037209510803
+    },
+    "thrust": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "landing_gear": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": -3272.0,
+     "min": -1.0,
+     "max": -1.0
+    },
+    "q_d_valid": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 3272.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "roll_reset_integral": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pitch_reset_integral": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw_reset_integral": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "fw_control_yaw": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "disable_mc_yaw_control": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "apply_flaps": {
+     "count": 3272,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_local_position",
+   "instance": 0,
+   "records": 678,
+   "first_timestamp": 112571708,
+   "last_timestamp": 181401588,
+   "fields": {
+    "timestamp": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 99655625715.0,
+     "min": 112571708.0,
+     "max": 181401588.0
+    },
+    "ref_timestamp": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 99655625715.0,
+     "min": 112571708.0,
+     "max": 181401588.0
+    },
+    "ref_lat": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ref_lon": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "surface_bottom_timestamp": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 99655625715.0,
+     "min": 112571708.0,
+     "max": 181401588.0
+    },
+    "x": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "y": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 65.45388367027044,
+     "min": 0.09352193027734756,
+     "max": 0.10744904726743698
+    },
+    "delta_xy[0]": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_xy[1]": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_z": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vx": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vy": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vz": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 56.821595061570406,
+     "min": 0.057835936546325684,
+     "max": 0.2135505974292755
+    },
+    "delta_vxy[0]": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_vxy[1]": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_vz": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": -414.7536273300648,
+     "min": -0.8375376462936401,
+     "max": -0.3593321144580841
+    },
+    "ref_alt": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "dist_bottom": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": -4.209333390230313,
+     "min": -0.017137762159109116,
+     "max": -0.003100066678598523
+    },
+    "dist_bottom_rate": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": -56.821595061570406,
+     "min": -0.2135505974292755,
+     "max": -0.057835936546325684
+    },
+    "eph": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 98926.15897369385,
+     "min": 98.23651123046875,
+     "max": 199.93865966796875
+    },
+    "epv": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 119.95440626144409,
+     "min": 0.1749114990234375,
+     "max": 0.17987771332263947
+    },
+    "xy_valid": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_valid": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 678.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "v_xy_valid": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "v_z_valid": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 678.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "xy_reset_counter": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_reset_counter": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vxy_reset_counter": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vz_reset_counter": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "xy_global": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_global": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 678.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "dist_bottom_valid": {
+     "count": 678,
+     "nonfinite": 0,
+     "sum": 678.0,
+     "min": 1.0,
+     "max": 1.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_rates_setpoint",
+   "instance": 0,
+   "records": 6448,
+   "first_timestamp": 112574757,
+   "last_timestamp": 181489367,
+   "fields": {
+    "timestamp": {
+     "count": 6448,
+     "nonfinite": 0,
+     "sum": 948079085840.0,
+     "min": 112574757.0,
+     "max": 181489367.0
+    },
+    "roll": {
+     "count": 6448,
+     "nonfinite": 0,
+     "sum": -1913.7711962933827,
+     "min": -2.408844232559204,
+     "max": 2.510727643966675
+    },
+    "pitch": {
+     "count": 6448,
+     "nonfinite": 0,
+     "sum": -4399.06651669438,
+     "min": -0.8010375499725342,
+     "max": 0.9285488128662109
+    },
+    "yaw": {
+     "count": 6448,
+     "nonfinite": 0,
+     "sum": -828.8383009491954,
+     "min": -1.22612464427948,
+     "max": 0.7035267353057861
+    },
+    "thrust": {
+     "count": 6448,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_status",
+   "instance": 0,
+   "records": 294,
+   "first_timestamp": 112494179,
+   "last_timestamp": 181275226,
+   "fields": {
+    "timestamp": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 43249005824.0,
+     "min": 112494179.0,
+     "max": 181275226.0
+    },
+    "system_id": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 294.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "component_id": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 294.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "onboard_control_sensors_present": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "onboard_control_sensors_enabled": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "onboard_control_sensors_health": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "nav_state": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "arming_state": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hil_state": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "failsafe": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "system_type": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 588.0,
+     "min": 2.0,
+     "max": 2.0
+    },
+    "is_rotary_wing": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 294.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "is_vtol": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vtol_fw_permanent_stab": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "in_transition_mode": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "in_transition_to_fw": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "rc_signal_lost": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 294.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "rc_input_mode": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "data_link_lost": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "data_link_lost_counter": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "engine_failure": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "engine_failure_cmd": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mission_failure": {
+     "count": 294,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  }
+ ]
+}

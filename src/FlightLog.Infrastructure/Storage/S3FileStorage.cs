@@ -52,6 +52,43 @@ internal sealed class S3FileStorage(IAmazonS3 s3, IOptions<StorageOptions> optio
         }
     }
 
+    public async Task UploadBytesAsync(string key, ReadOnlyMemory<byte> content, string contentType, CancellationToken cancellationToken)
+    {
+        using var stream = new MemoryStream(content.ToArray(), writable: false);
+        await s3.PutObjectAsync(
+            new PutObjectRequest { BucketName = Bucket, Key = key, InputStream = stream, ContentType = contentType, AutoCloseStream = false },
+            cancellationToken);
+    }
+
+    public async Task<byte[]> ReadAllBytesAsync(string key, CancellationToken cancellationToken)
+    {
+        await using var stream = await OpenReadAsync(key, cancellationToken);
+        using var buffer = new MemoryStream();
+        await stream.CopyToAsync(buffer, cancellationToken);
+        return buffer.ToArray();
+    }
+
+    public async Task<int> DeletePrefixAsync(string prefix, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(prefix);
+        var deleted = 0;
+        var request = new ListObjectsV2Request { BucketName = Bucket, Prefix = prefix, MaxKeys = 1000 };
+        while (true)
+        {
+            // Always list from the start: the previous page has been deleted.
+            var page = await s3.ListObjectsV2Async(request, cancellationToken);
+            if (page.S3Objects is not { Count: > 0 } objects)
+            {
+                return deleted;
+            }
+
+            await s3.DeleteObjectsAsync(
+                new DeleteObjectsRequest { BucketName = Bucket, Objects = [.. objects.Select(o => new KeyVersion { Key = o.Key })], Quiet = true },
+                cancellationToken);
+            deleted += objects.Count;
+        }
+    }
+
     public Task DeleteAsync(string key, CancellationToken cancellationToken) =>
         s3.DeleteObjectAsync(new DeleteObjectRequest { BucketName = Bucket, Key = key }, cancellationToken);
 

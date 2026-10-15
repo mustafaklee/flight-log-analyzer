@@ -19,6 +19,9 @@ internal sealed class FlightConfiguration : IEntityTypeConfiguration<Flight>
         builder.Property(f => f.Notes).HasMaxLength(Flight.NotesMaxLength);
         builder.Property(f => f.Autopilot).HasConversion<string>().HasMaxLength(32);
         builder.Property(f => f.FirmwareVersion).HasMaxLength(200);
+        builder.Property(f => f.VehicleType).HasMaxLength(50);
+        builder.Property(f => f.Hardware).HasMaxLength(200);
+        builder.Property(f => f.LogMetadata).AsRequiredJsonb();
         builder.Property(f => f.Version).IsRowVersion();
 
         // Flight history queries: by team or project, newest first; by aircraft.

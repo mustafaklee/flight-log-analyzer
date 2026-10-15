@@ -165,6 +165,9 @@ internal sealed class FlightService(
         db.Flights.Remove(flight);
         await db.SaveChangesAsync(cancellationToken);
 
+        // Derived data (signal chunks) belongs to this flight only; the catalog rows went with the flight.
+        await storage.DeletePrefixAsync($"derived/{flightId:N}/", cancellationToken);
+
         // Raw objects are content addressed and may be shared by uploads of other teams; delete only orphans.
         foreach (var key in files.Select(f => f.StorageKey).Distinct())
         {

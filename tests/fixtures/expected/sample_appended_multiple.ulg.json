@@ -1,0 +1,3465 @@
+{
+ "format": "ulog",
+ "file": "sample_appended_multiple.ulg",
+ "sha256": "daf30f3224303e39d5c97701e048e84ba04480797e369502331f45ab2e99a2b7",
+ "header_timestamp": 12100461,
+ "last_timestamp": 21880422,
+ "corrupt": false,
+ "info": {
+  "ver_sw": "f54a6c2999e1e2fcbf56dd89de06b615b4186a6e",
+  "ver_sw_release": "17170432",
+  "ver_hw": "PX4FMU_V4PRO",
+  "sys_name": "PX4",
+  "sys_os_name": "NuttX",
+  "ver_sw_branch": "ulog_crash_dump",
+  "sys_os_ver": "8b81cf5c7ece0c228eaaea3e9d8e667fc4d21a06",
+  "sys_os_ver_release": "192",
+  "sys_toolchain": "GNU GCC",
+  "sys_toolchain_ver": "5.4.1 20160919 (release) [ARM/embedded-5-branch revision 240496]",
+  "sys_mcu": "STM32F???, rev. A",
+  "sys_uuid": "0035002B3434511732343031",
+  "time_ref_utc": "0",
+  "perf_counter_preflight-00": "navigator: 9 events, 275us elapsed, 30us avg, min 21us max 75us 16.883us rms",
+  "perf_counter_preflight-01": "mc_att_control: 2465 events, 188639us elapsed, 76us avg, min 18us max 392us 31.226us rms",
+  "perf_counter_preflight-02": "ctl_lat: 0 events, 0us elapsed, 0us avg, min 0us max 0us 0.000us rms",
+  "perf_counter_preflight-03": "logger_sd_fsync: 0 events, 0us elapsed, 0us avg, min 0us max 0us 0.000us rms",
+  "perf_counter_preflight-04": "logger_sd_write: 3 events, 73113us elapsed, 24371us avg, min 9us max 37955us 21144.707us rms",
+  "perf_counter_preflight-05": "mavlink_txe: 569 events",
+  "perf_counter_preflight-06": "mavlink_el: 3104 events, 474097us elapsed, 152us avg, min 78us max 3448us 209.233us rms",
+  "perf_counter_preflight-07": "mavlink_txe: 12 events",
+  "perf_counter_preflight-08": "mavlink_el: 883 events, 113212us elapsed, 128us avg, min 44us max 2234us 210.405us rms",
+  "perf_counter_preflight-09": "mavlink_txe: 0 events",
+  "perf_counter_preflight-10": "mavlink_el: 995 events, 174125us elapsed, 175us avg, min 62us max 4784us 329.831us rms",
+  "perf_counter_preflight-11": "io latency: 2044 events, 5113031102us elapsed, 2501482us avg, min 987us max 7524739us 2916104.750us rms",
+  "perf_counter_preflight-12": "io write: 0 events, 0us elapsed, 0us avg, min 0us max 0us 0.000us rms",
+  "perf_counter_preflight-13": "io update: 2132 events, 1319684us elapsed, 618us avg, min 256us max 18515us 733.727us rms",
+  "perf_counter_preflight-14": "io_txns: 3950 events, 1243786us elapsed, 314us avg, min 131us max 2714us 139.806us rms",
+  "perf_counter_preflight-15": "stack_check: 21 events, 252us elapsed, 12us avg, min 1us max 29us 6.380us rms",
+  "perf_counter_preflight-16": "sensors: 2543 events, 361486us elapsed, 142us avg, min 78us max 6150us 126.879us rms",
+  "perf_counter_preflight-17": "lis3mdl_conf_errors: 3 events",
+  "perf_counter_preflight-18": "lis3mdl_range_errors: 0 events",
+  "perf_counter_preflight-19": "lis3mdl_comms_errors: 0 events",
+  "perf_counter_preflight-20": "lis3mdl_read: 475 events, 16303us elapsed, 34us avg, min 28us max 259us 27.699us rms",
+  "perf_counter_preflight-21": "mpu9250_dupe: 2848 events",
+  "perf_counter_preflight-22": "mpu9250_reset: 0 events",
+  "perf_counter_preflight-23": "mpu9250_good_trans: 10151 events",
+  "perf_counter_preflight-24": "mpu9250_bad_reg: 0 events",
+  "perf_counter_preflight-25": "mpu9250_bad_trans: 0 events",
+  "perf_counter_preflight-26": "mpu9250_read: 13000 events, 973697us elapsed, 74us avg, min 58us max 91us 9.448us rms",
+  "perf_counter_preflight-27": "mpu9250_gyro_read: 0 events",
+  "perf_counter_preflight-28": "mpu9250_acc_read: 9 events",
+  "perf_counter_preflight-29": "mpu9250_mag_duplicates: 9077 events",
+  "perf_counter_preflight-30": "mpu9250_mag_overflows: 0 events",
+  "perf_counter_preflight-31": "mpu9250_mag_overruns: 142 events",
+  "perf_counter_preflight-32": "mpu9250_mag_errors: 0 events",
+  "perf_counter_preflight-33": "mpu9250_mag_reads: 0 events",
+  "perf_counter_preflight-34": "ctrl_latency: 2044 events, 583836us elapsed, 285us avg, min 198us max 904us 53.847us rms",
+  "perf_counter_preflight-35": "mpu6k_duplicates: 2925 events",
+  "perf_counter_preflight-36": "mpu6k_reset: 0 events",
+  "perf_counter_preflight-37": "mpu6k_good_trans: 10111 events",
+  "perf_counter_preflight-38": "mpu6k_bad_reg: 0 events",
+  "perf_counter_preflight-39": "mpu6k_bad_trans: 0 events",
+  "perf_counter_preflight-40": "mpu6k_read: 13036 events, 791547us elapsed, 60us avg, min 43us max 82us 11.774us rms",
+  "perf_counter_preflight-41": "mpu6k_gyro_read: 0 events",
+  "perf_counter_preflight-42": "mpu6k_acc_read: 9 events",
+  "perf_counter_preflight-43": "adc_samples: 9324 events, 23193us elapsed, 2us avg, min 2us max 3us 0.500us rms",
+  "perf_counter_preflight-44": "ms5611_com_err: 0 events",
+  "perf_counter_preflight-45": "ms5611_measure: 950 events, 7047us elapsed, 7us avg, min 5us max 240us 16.192us rms",
+  "perf_counter_preflight-46": "ms5611_read: 949 events, 63895us elapsed, 67us avg, min 10us max 331us 49.056us rms",
+  "perf_counter_preflight-47": "dma_alloc: 7 events",
+  "perf_top_preflight-00": " PID COMMAND                   CPU(ms) CPU(%)  USED/STACK PRIO(BASE) STATE ",
+  "perf_top_preflight-01": "   0 Idle Task                    7229 49.950   604/  748   0 (  0)  READY ",
+  "perf_top_preflight-02": "   1 hpwork                        375  3.396   816/ 1780 192 (192)  w:sig ",
+  "perf_top_preflight-03": "   2 lpwork                         28  0.099   640/ 1780  50 ( 50)  w:sig ",
+  "perf_top_preflight-04": "   3 init                         3747  0.000  1680/ 2484 100 (100)  w:sem ",
+  "perf_top_preflight-05": " 239 log_writer_file                64  3.396   544/ 1060  60 ( 60)  w:sem ",
+  "perf_top_preflight-06": " 106 gps                            91  0.099   944/ 1524 220 (220)  w:sem ",
+  "perf_top_preflight-07": " 110 dataman                       142  0.000   704/ 1180  90 ( 90)  w:sem ",
+  "perf_top_preflight-08": " 147 sensors                       511  4.295  1464/ 1980 250 (250)  w:sem ",
+  "perf_top_preflight-09": " 149 commander                     222  2.497  2792/ 3652 140 (140)  w:sig ",
+  "perf_top_preflight-10": " 156 px4io                         324  2.997  1072/ 1380 240 (240)  w:sem ",
+  "perf_top_preflight-11": " 168 mavlink_if0                   201  1.398  1656/ 2436 100 (100)  READY ",
+  "perf_top_preflight-12": " 169 mavlink_rcv_if0                39  0.299  1320/ 2140 175 (175)  READY ",
+  "perf_top_preflight-13": " 182 mavlink_if1                   138  1.098  1640/ 2388 100 (100)  w:sig ",
+  "perf_top_preflight-14": " 183 mavlink_rcv_if1                39  0.399  1496/ 2140 175 (175)  READY ",
+  "perf_top_preflight-15": " 219 mavlink_if2                   522  3.896  1600/ 2388 100 (100)  READY ",
+  "perf_top_preflight-16": " 221 mavlink_rcv_if2               190  1.898  1320/ 2140 175 (175)  READY ",
+  "perf_top_preflight-17": " 237 logger                        195  5.794  3104/ 3532 250 (250)  RUN   ",
+  "perf_top_preflight-18": " 318 commander_low_prio              0  0.000   592/ 2996  50 ( 50)  w:sem ",
+  "perf_top_preflight-19": " 282 ekf2                         1091 11.588  5056/ 5780 250 (250)  w:sem ",
+  "perf_top_preflight-20": " 287 mc_att_control                287  3.196  1176/ 1676 250 (250)  READY ",
+  "perf_top_preflight-21": " 293 mc_pos_control                145  2.397   584/ 1876 250 (250)  w:sem ",
+  "perf_top_preflight-22": " 299 navigator                       4  0.000   872/ 1772 105 (105)  w:sem ",
+  "perf_top_preflight-23": "",
+  "perf_top_preflight-24": "Processes: 22 total, 8 running, 14 sleeping",
+  "perf_top_preflight-25": "CPU usage: 48.75% tasks, 1.30% sched, 49.95% idle",
+  "perf_top_preflight-26": "DMA Memory: 5120 total, 1536 used 1536 peak",
+  "perf_top_preflight-27": "Uptime: 13.266s total, 7.229s idle"
+ },
+ "initial_parameters": {
+  "ATT_VIBE_THRESH": 0.20000000298023224,
+  "BAT_A_PER_V": 26.399999618530273,
+  "BAT_CAPACITY": -1.0,
+  "BAT_CNT_V_CURR": 0.0008056640508584678,
+  "BAT_CNT_V_VOLT": 0.0008056640508584678,
+  "BAT_CRIT_THR": 0.07000000029802322,
+  "BAT_EMERGEN_THR": 0.05000000074505806,
+  "BAT_LOW_THR": 0.15000000596046448,
+  "BAT_N_CELLS": 3.0,
+  "BAT_R_INTERNAL": -1.0,
+  "BAT_SOURCE": 0.0,
+  "BAT_V_CHARGED": 4.050000190734863,
+  "BAT_V_DIV": 6.490196228027344,
+  "BAT_V_EMPTY": 3.4000000953674316,
+  "BAT_V_LOAD_DROP": 0.30000001192092896,
+  "BAT_V_OFFS_CURR": 0.0,
+  "BAT_V_SCALE_IO": 10000.0,
+  "CAL_ACC0_ID": 3608074.0,
+  "CAL_ACC0_XOFF": -0.08231544494628906,
+  "CAL_ACC0_XSCALE": 1.0023186206817627,
+  "CAL_ACC0_YOFF": 0.18521690368652344,
+  "CAL_ACC0_YSCALE": 1.0578622817993164,
+  "CAL_ACC0_ZOFF": 0.03508329391479492,
+  "CAL_ACC0_ZSCALE": 1.0331326723098755,
+  "CAL_ACC1_ID": 1442826.0,
+  "CAL_ACC1_XOFF": -0.054198265075683594,
+  "CAL_ACC1_XSCALE": 1.0032219886779785,
+  "CAL_ACC1_YOFF": 0.08046817779541016,
+  "CAL_ACC1_YSCALE": 1.0105912685394287,
+  "CAL_ACC1_ZOFF": 0.01377725601196289,
+  "CAL_ACC1_ZSCALE": 1.029524326324463,
+  "CAL_ACC2_XOFF": 0.0,
+  "CAL_ACC2_XSCALE": 1.0,
+  "CAL_ACC2_YOFF": 0.0,
+  "CAL_ACC2_YSCALE": 1.0,
+  "CAL_ACC2_ZOFF": 0.0,
+  "CAL_ACC2_ZSCALE": 1.0,
+  "CAL_ACC_PRIME": 3608074.0,
+  "CAL_BARO_PRIME": 0.0,
+  "CAL_GYRO0_ID": 3673610.0,
+  "CAL_GYRO0_XOFF": -0.004239972215145826,
+  "CAL_GYRO0_XSCALE": 1.0,
+  "CAL_GYRO0_YOFF": -0.00411255145445466,
+  "CAL_GYRO0_YSCALE": 1.0,
+  "CAL_GYRO0_ZOFF": -0.010439026169478893,
+  "CAL_GYRO0_ZSCALE": 1.0,
+  "CAL_GYRO1_ID": 2360330.0,
+  "CAL_GYRO1_XOFF": 0.015103213489055634,
+  "CAL_GYRO1_XSCALE": 1.0,
+  "CAL_GYRO1_YOFF": -0.01220004539936781,
+  "CAL_GYRO1_YSCALE": 1.0,
+  "CAL_GYRO1_ZOFF": -0.0031036303844302893,
+  "CAL_GYRO1_ZSCALE": 1.0,
+  "CAL_GYRO2_XOFF": 0.0,
+  "CAL_GYRO2_XSCALE": 1.0,
+  "CAL_GYRO2_YOFF": 0.0,
+  "CAL_GYRO2_YSCALE": 1.0,
+  "CAL_GYRO2_ZOFF": 0.0,
+  "CAL_GYRO2_ZSCALE": 1.0,
+  "CAL_GYRO_PRIME": 3673610.0,
+  "CAL_MAG0_ID": 263178.0,
+  "CAL_MAG0_ROT": -1.0,
+  "CAL_MAG0_XOFF": 1.1511715650558472,
+  "CAL_MAG0_XSCALE": 0.8055909276008606,
+  "CAL_MAG0_YOFF": 0.05012188479304314,
+  "CAL_MAG0_YSCALE": 0.20557592809200287,
+  "CAL_MAG0_ZOFF": 0.5226723551750183,
+  "CAL_MAG0_ZSCALE": 0.12456244230270386,
+  "CAL_MAG1_ID": 329482.0,
+  "CAL_MAG1_ROT": -1.0,
+  "CAL_MAG1_XOFF": 0.12487971782684326,
+  "CAL_MAG1_XSCALE": 0.7696900963783264,
+  "CAL_MAG1_YOFF": 1.1023495197296143,
+  "CAL_MAG1_YSCALE": 0.6226150989532471,
+  "CAL_MAG1_ZOFF": 0.3718331754207611,
+  "CAL_MAG1_ZSCALE": 0.5210188031196594,
+  "CAL_MAG2_ID": 73233.0,
+  "CAL_MAG2_ROT": 0.0,
+  "CAL_MAG2_XOFF": 0.3823220431804657,
+  "CAL_MAG2_XSCALE": 1.112818717956543,
+  "CAL_MAG2_YOFF": 0.45980751514434814,
+  "CAL_MAG2_YSCALE": 0.966951847076416,
+  "CAL_MAG2_ZOFF": 0.02353796735405922,
+  "CAL_MAG2_ZSCALE": 0.9461732506752014,
+  "CAL_MAG3_ID": 0.0,
+  "CAL_MAG3_ROT": -1.0,
+  "CAL_MAG3_XOFF": 0.0,
+  "CAL_MAG3_XSCALE": 1.0,
+  "CAL_MAG3_YOFF": 0.0,
+  "CAL_MAG3_YSCALE": 1.0,
+  "CAL_MAG3_ZOFF": 0.0,
+  "CAL_MAG3_ZSCALE": 1.0,
+  "CAL_MAG_PRIME": 73233.0,
+  "CAL_MAG_SIDES": 63.0,
+  "CBRK_AIRSPD_CHK": 0.0,
+  "CBRK_ENGINEFAIL": 284953.0,
+  "CBRK_FLIGHTTERM": 121212.0,
+  "CBRK_GPSFAIL": 0.0,
+  "CBRK_IO_SAFETY": 0.0,
+  "CBRK_RATE_CTRL": 0.0,
+  "CBRK_SUPPLY_CHK": 0.0,
+  "CBRK_USB_CHK": 0.0,
+  "CBRK_VELPOSERR": 0.0,
+  "COM_ARM_EKF_AB": 0.004999999888241291,
+  "COM_ARM_EKF_GB": 0.0008699999889358878,
+  "COM_ARM_EKF_HGT": 1.0,
+  "COM_ARM_EKF_POS": 0.5,
+  "COM_ARM_EKF_VEL": 0.5,
+  "COM_ARM_EKF_YAW": 0.5,
+  "COM_ARM_IMU_ACC": 0.699999988079071,
+  "COM_ARM_IMU_GYR": 0.20000000298023224,
+  "COM_ARM_MIS_REQ": 0.0,
+  "COM_ARM_SWISBTN": 0.0,
+  "COM_ARM_WO_GPS": 1.0,
+  "COM_DISARM_LAND": 0.0,
+  "COM_DL_LOSS_T": 10.0,
+  "COM_DL_REG_T": 0.0,
+  "COM_EF_C2T": 5.0,
+  "COM_EF_THROT": 0.5,
+  "COM_EF_TIME": 10.0,
+  "COM_FLTMODE1": -1.0,
+  "COM_FLTMODE2": -1.0,
+  "COM_FLTMODE3": -1.0,
+  "COM_FLTMODE4": -1.0,
+  "COM_FLTMODE5": -1.0,
+  "COM_FLTMODE6": -1.0,
+  "COM_HOME_H_T": 5.0,
+  "COM_HOME_V_T": 10.0,
+  "COM_LOW_BAT_ACT": 0.0,
+  "COM_OBL_ACT": 0.0,
+  "COM_OBL_RC_ACT": 0.0,
+  "COM_OF_LOSS_T": 0.0,
+  "COM_POSCTL_NAVL": 0.0,
+  "COM_RC_ARM_HYST": 1000.0,
+  "COM_RC_IN_MODE": 0.0,
+  "COM_RC_LOSS_T": 0.5,
+  "COM_RC_OVERRIDE": 0.0,
+  "COM_RC_STICK_OV": 12.0,
+  "EKF2_ABIAS_INIT": 0.20000000298023224,
+  "EKF2_ACC_B_NOISE": 0.003000000026077032,
+  "EKF2_ACC_NOISE": 0.3499999940395355,
+  "EKF2_AID_MASK": 1.0,
+  "EKF2_ANGERR_INIT": 0.10000000149011612,
+  "EKF2_ARSP_THR": 0.0,
+  "EKF2_ASP_DELAY": 100.0,
+  "EKF2_BARO_DELAY": 0.0,
+  "EKF2_BARO_GATE": 5.0,
+  "EKF2_BARO_NOISE": 2.0,
+  "EKF2_BETA_NOISE": 0.30000001192092896,
+  "EKF2_DECL_TYPE": 7.0,
+  "EKF2_EAS_NOISE": 1.399999976158142,
+  "EKF2_EVA_NOISE": 0.05000000074505806,
+  "EKF2_EVP_NOISE": 0.05000000074505806,
+  "EKF2_EV_DELAY": 175.0,
+  "EKF2_EV_GATE": 5.0,
+  "EKF2_EV_POS_X": 0.0,
+  "EKF2_EV_POS_Y": 0.0,
+  "EKF2_EV_POS_Z": 0.0,
+  "EKF2_FUSE_BETA": 0.0,
+  "EKF2_GBIAS_INIT": 0.10000000149011612,
+  "EKF2_GPS_CHECK": 21.0,
+  "EKF2_GPS_DELAY": 110.0,
+  "EKF2_GPS_POS_X": 0.0,
+  "EKF2_GPS_POS_Y": 0.0,
+  "EKF2_GPS_POS_Z": 0.0,
+  "EKF2_GPS_P_GATE": 5.0,
+  "EKF2_GPS_P_NOISE": 0.5,
+  "EKF2_GPS_V_GATE": 5.0,
+  "EKF2_GPS_V_NOISE": 0.5,
+  "EKF2_GYR_B_NOISE": 0.0010000000474974513,
+  "EKF2_GYR_NOISE": 0.014999999664723873,
+  "EKF2_HDG_GATE": 2.5999999046325684,
+  "EKF2_HEAD_NOISE": 0.30000001192092896,
+  "EKF2_HGT_MODE": 0.0,
+  "EKF2_IMU_POS_X": 0.0,
+  "EKF2_IMU_POS_Y": 0.0,
+  "EKF2_IMU_POS_Z": 0.0,
+  "EKF2_MAGBIAS_ID": 329482.0,
+  "EKF2_MAGBIAS_X": 0.0,
+  "EKF2_MAGBIAS_Y": 0.0,
+  "EKF2_MAGBIAS_Z": 0.0,
+  "EKF2_MAGB_K": 0.20000000298023224,
+  "EKF2_MAGB_VREF": 2.499999993688107e-07,
+  "EKF2_MAG_ACCLIM": 0.5,
+  "EKF2_MAG_B_NOISE": 9.999999747378752e-05,
+  "EKF2_MAG_DECL": 0.0,
+  "EKF2_MAG_DELAY": 0.0,
+  "EKF2_MAG_E_NOISE": 0.0010000000474974513,
+  "EKF2_MAG_GATE": 3.0,
+  "EKF2_MAG_NOISE": 0.05000000074505806,
+  "EKF2_MAG_TYPE": 0.0,
+  "EKF2_MAG_YAWLIM": 0.25,
+  "EKF2_MIN_OBS_DT": 20.0,
+  "EKF2_MIN_RNG": 0.10000000149011612,
+  "EKF2_NOAID_NOISE": 10.0,
+  "EKF2_OF_DELAY": 5.0,
+  "EKF2_OF_GATE": 3.0,
+  "EKF2_OF_N_MAX": 0.5,
+  "EKF2_OF_N_MIN": 0.15000000596046448,
+  "EKF2_OF_POS_X": 0.0,
+  "EKF2_OF_POS_Y": 0.0,
+  "EKF2_OF_POS_Z": 0.0,
+  "EKF2_OF_QMIN": 1.0,
+  "EKF2_OF_RMAX": 2.5,
+  "EKF2_REC_RPL": 0.0,
+  "EKF2_REQ_EPH": 5.0,
+  "EKF2_REQ_EPV": 8.0,
+  "EKF2_REQ_GDOP": 2.5,
+  "EKF2_REQ_HDRIFT": 0.30000001192092896,
+  "EKF2_REQ_NSATS": 6.0,
+  "EKF2_REQ_SACC": 1.0,
+  "EKF2_REQ_VDRIFT": 0.5,
+  "EKF2_RNG_AID": 0.0,
+  "EKF2_RNG_A_HMAX": 5.0,
+  "EKF2_RNG_A_VMAX": 1.0,
+  "EKF2_RNG_DELAY": 5.0,
+  "EKF2_RNG_GATE": 5.0,
+  "EKF2_RNG_NOISE": 0.10000000149011612,
+  "EKF2_RNG_PITCH": 0.0,
+  "EKF2_RNG_POS_X": 0.0,
+  "EKF2_RNG_POS_Y": 0.0,
+  "EKF2_RNG_POS_Z": 0.0,
+  "EKF2_RNG_SFE": 0.05000000074505806,
+  "EKF2_TAS_GATE": 3.0,
+  "EKF2_TAU_POS": 0.25,
+  "EKF2_TAU_VEL": 0.25,
+  "EKF2_TERR_GRAD": 0.5,
+  "EKF2_TERR_NOISE": 5.0,
+  "EKF2_WIND_NOISE": 0.10000000149011612,
+  "FW_ARSP_MODE": 0.0,
+  "FW_CLMBOUT_DIFF": 10.0,
+  "FW_MAN_P_SC": 1.0,
+  "FW_MAN_R_SC": 1.0,
+  "FW_MAN_Y_SC": 1.0,
+  "GF_ACTION": 1.0,
+  "GF_ALTMODE": 0.0,
+  "GF_COUNT": -1.0,
+  "GF_MAX_HOR_DIST": 0.0,
+  "GF_MAX_VER_DIST": 0.0,
+  "GF_SOURCE": 0.0,
+  "GPS_DUMP_COMM": 0.0,
+  "GPS_UBX_DYNMODEL": 7.0,
+  "LED_RGB_MAXBRT": 3.0,
+  "LNDMC_ALT_MAX": 10000.0,
+  "LNDMC_FFALL_THR": 2.0,
+  "LNDMC_FFALL_TTRI": 0.30000001192092896,
+  "LNDMC_MAN_DWNTHR": 0.15000000596046448,
+  "LNDMC_POS_UPTHR": 0.6499999761581421,
+  "LNDMC_ROT_MAX": 20.0,
+  "LNDMC_THR_RANGE": 0.10000000149011612,
+  "LNDMC_XY_VEL_MAX": 1.5,
+  "LNDMC_Z_VEL_MAX": 0.5,
+  "LND_FLIGHT_T_HI": 0.0,
+  "LND_FLIGHT_T_LO": 0.0,
+  "MAV_BROADCAST": 0.0,
+  "MAV_COMP_ID": 1.0,
+  "MAV_FWDEXTSP": 1.0,
+  "MAV_PROTO_VER": 0.0,
+  "MAV_RADIO_ID": 0.0,
+  "MAV_SYS_ID": 1.0,
+  "MAV_TEST_PAR": 1.0,
+  "MAV_TYPE": 2.0,
+  "MAV_USEHILGPS": 0.0,
+  "MC_ACRO_P_MAX": 360.0,
+  "MC_ACRO_R_MAX": 360.0,
+  "MC_ACRO_Y_MAX": 360.0,
+  "MC_BAT_SCALE_EN": 0.0,
+  "MC_PITCHRATE_D": 0.003000000026077032,
+  "MC_PITCHRATE_FF": 0.0,
+  "MC_PITCHRATE_I": 0.05000000074505806,
+  "MC_PITCHRATE_MAX": 220.0,
+  "MC_PITCHRATE_P": 0.15000000596046448,
+  "MC_PITCH_P": 6.5,
+  "MC_PITCH_TC": 0.20000000298023224,
+  "MC_PR_INT_LIM": 0.30000001192092896,
+  "MC_RATT_TH": 0.800000011920929,
+  "MC_ROLLRATE_D": 0.003000000026077032,
+  "MC_ROLLRATE_FF": 0.0,
+  "MC_ROLLRATE_I": 0.05000000074505806,
+  "MC_ROLLRATE_MAX": 220.0,
+  "MC_ROLLRATE_P": 0.15000000596046448,
+  "MC_ROLL_P": 6.5,
+  "MC_ROLL_TC": 0.20000000298023224,
+  "MC_RR_INT_LIM": 0.30000001192092896,
+  "MC_TPA_BREAK_D": 1.0,
+  "MC_TPA_BREAK_I": 1.0,
+  "MC_TPA_BREAK_P": 1.0,
+  "MC_TPA_RATE_D": 0.0,
+  "MC_TPA_RATE_I": 0.0,
+  "MC_TPA_RATE_P": 0.0,
+  "MC_YAWRATE_D": 0.0,
+  "MC_YAWRATE_FF": 0.0,
+  "MC_YAWRATE_I": 0.10000000149011612,
+  "MC_YAWRATE_MAX": 200.0,
+  "MC_YAWRATE_P": 0.20000000298023224,
+  "MC_YAWRAUTO_MAX": 45.0,
+  "MC_YAW_FF": 0.5,
+  "MC_YAW_P": 2.799999952316284,
+  "MC_YR_INT_LIM": 0.30000001192092896,
+  "MIS_ALTMODE": 1.0,
+  "MIS_DIST_1WP": 900.0,
+  "MIS_LTRMIN_ALT": -1.0,
+  "MIS_ONBOARD_EN": 1.0,
+  "MIS_TAKEOFF_ALT": 2.5,
+  "MIS_YAWMODE": 1.0,
+  "MIS_YAW_ERR": 12.0,
+  "MIS_YAW_TMT": -1.0,
+  "MNT_MODE_IN": -1.0,
+  "MOT_SLEW_MAX": 0.0,
+  "MPC_ACC_DOWN_MAX": 5.0,
+  "MPC_ACC_HOR_MAX": 5.0,
+  "MPC_ACC_UP_MAX": 5.0,
+  "MPC_ALT_MODE": 0.0,
+  "MPC_DEC_HOR_MAX": 10.0,
+  "MPC_HOLD_DZ": 0.10000000149011612,
+  "MPC_HOLD_MAX_XY": 0.800000011920929,
+  "MPC_HOLD_MAX_Z": 0.6000000238418579,
+  "MPC_LAND_ALT1": 10.0,
+  "MPC_LAND_ALT2": 5.0,
+  "MPC_LAND_SPEED": 0.5,
+  "MPC_MANTHR_MAX": 0.8999999761581421,
+  "MPC_MANTHR_MIN": 0.07999999821186066,
+  "MPC_MAN_TILT_MAX": 35.0,
+  "MPC_MAN_Y_MAX": 200.0,
+  "MPC_TARGET_THRE": 15.0,
+  "MPC_THR_HOVER": 0.5,
+  "MPC_THR_MAX": 0.8999999761581421,
+  "MPC_THR_MIN": 0.11999999731779099,
+  "MPC_TILTMAX_AIR": 45.0,
+  "MPC_TILTMAX_LND": 12.0,
+  "MPC_TKO_RAMP_T": 0.4000000059604645,
+  "MPC_TKO_SPEED": 1.5,
+  "MPC_VELD_LP": 5.0,
+  "MPC_VEL_MAN_MAX": 10.0,
+  "MPC_XY_CRUISE": 5.0,
+  "MPC_XY_MAN_EXPO": 0.0,
+  "MPC_XY_P": 0.949999988079071,
+  "MPC_XY_VEL_D": 0.009999999776482582,
+  "MPC_XY_VEL_I": 0.019999999552965164,
+  "MPC_XY_VEL_MAX": 8.0,
+  "MPC_XY_VEL_P": 0.09000000357627869,
+  "MPC_Z_MAN_EXPO": 0.0,
+  "MPC_Z_P": 1.0,
+  "MPC_Z_VEL_D": 0.0,
+  "MPC_Z_VEL_I": 0.019999999552965164,
+  "MPC_Z_VEL_MAX_DN": 1.0,
+  "MPC_Z_VEL_MAX_UP": 3.0,
+  "MPC_Z_VEL_P": 0.20000000298023224,
+  "NAV_ACC_RAD": 2.0,
+  "NAV_AH_ALT": 600.0,
+  "NAV_AH_LAT": -265847810.0,
+  "NAV_AH_LON": 1518423250.0,
+  "NAV_DLL_ACT": 0.0,
+  "NAV_DLL_AH_T": 120.0,
+  "NAV_DLL_CHSK": 0.0,
+  "NAV_DLL_CH_ALT": 600.0,
+  "NAV_DLL_CH_LAT": -266072120.0,
+  "NAV_DLL_CH_LON": 1518453890.0,
+  "NAV_DLL_CH_T": 120.0,
+  "NAV_DLL_N": 2.0,
+  "NAV_FORCE_VT": 1.0,
+  "NAV_FT_DST": 8.0,
+  "NAV_FT_FS": 1.0,
+  "NAV_FT_RS": 0.5,
+  "NAV_FW_ALT_RAD": 10.0,
+  "NAV_GPSF_LT": 30.0,
+  "NAV_GPSF_P": 0.0,
+  "NAV_GPSF_R": 15.0,
+  "NAV_GPSF_TR": 0.699999988079071,
+  "NAV_LOITER_RAD": 50.0,
+  "NAV_MC_ALT_RAD": 0.800000011920929,
+  "NAV_MIN_FT_HT": 8.0,
+  "NAV_RCL_ACT": 2.0,
+  "NAV_RCL_LT": 120.0,
+  "PWM_AUX_DISARMED": 1500.0,
+  "PWM_AUX_MAX": 2000.0,
+  "PWM_AUX_MIN": 1000.0,
+  "PWM_AUX_REV1": 0.0,
+  "PWM_AUX_REV2": 0.0,
+  "PWM_AUX_REV3": 0.0,
+  "PWM_AUX_REV4": 0.0,
+  "PWM_AUX_REV5": 0.0,
+  "PWM_AUX_REV6": 0.0,
+  "PWM_AUX_TRIM1": 0.0,
+  "PWM_AUX_TRIM2": 0.0,
+  "PWM_AUX_TRIM3": 0.0,
+  "PWM_AUX_TRIM4": 0.0,
+  "PWM_AUX_TRIM5": 0.0,
+  "PWM_AUX_TRIM6": 0.0,
+  "PWM_DISARMED": 900.0,
+  "PWM_MAIN_REV1": 0.0,
+  "PWM_MAIN_REV2": 0.0,
+  "PWM_MAIN_REV3": 0.0,
+  "PWM_MAIN_REV4": 0.0,
+  "PWM_MAIN_REV5": 0.0,
+  "PWM_MAIN_REV6": 0.0,
+  "PWM_MAIN_REV7": 0.0,
+  "PWM_MAIN_REV8": 0.0,
+  "PWM_MAIN_TRIM1": 0.0,
+  "PWM_MAIN_TRIM2": 0.0,
+  "PWM_MAIN_TRIM3": 0.0,
+  "PWM_MAIN_TRIM4": 0.0,
+  "PWM_MAIN_TRIM5": 0.0,
+  "PWM_MAIN_TRIM6": 0.0,
+  "PWM_MAIN_TRIM7": 0.0,
+  "PWM_MAIN_TRIM8": 0.0,
+  "PWM_MAX": 1950.0,
+  "PWM_MIN": 1075.0,
+  "PWM_RATE": 400.0,
+  "PWM_SBUS_MODE": 0.0,
+  "RC10_DZ": 0.0,
+  "RC10_MAX": 2000.0,
+  "RC10_MIN": 1000.0,
+  "RC10_REV": 1.0,
+  "RC10_TRIM": 1500.0,
+  "RC11_DZ": 0.0,
+  "RC11_MAX": 2000.0,
+  "RC11_MIN": 1000.0,
+  "RC11_REV": 1.0,
+  "RC11_TRIM": 1500.0,
+  "RC12_DZ": 0.0,
+  "RC12_MAX": 2000.0,
+  "RC12_MIN": 1000.0,
+  "RC12_REV": 1.0,
+  "RC12_TRIM": 1500.0,
+  "RC13_DZ": 0.0,
+  "RC13_MAX": 2000.0,
+  "RC13_MIN": 1000.0,
+  "RC13_REV": 1.0,
+  "RC13_TRIM": 1500.0,
+  "RC14_DZ": 0.0,
+  "RC14_MAX": 2000.0,
+  "RC14_MIN": 1000.0,
+  "RC14_REV": 1.0,
+  "RC14_TRIM": 1500.0,
+  "RC15_DZ": 0.0,
+  "RC15_MAX": 2000.0,
+  "RC15_MIN": 1000.0,
+  "RC15_REV": 1.0,
+  "RC15_TRIM": 1500.0,
+  "RC16_DZ": 0.0,
+  "RC16_MAX": 2000.0,
+  "RC16_MIN": 1000.0,
+  "RC16_REV": 1.0,
+  "RC16_TRIM": 1500.0,
+  "RC17_DZ": 0.0,
+  "RC17_MAX": 2000.0,
+  "RC17_MIN": 1000.0,
+  "RC17_REV": 1.0,
+  "RC17_TRIM": 1500.0,
+  "RC18_DZ": 0.0,
+  "RC18_MAX": 2000.0,
+  "RC18_MIN": 1000.0,
+  "RC18_REV": 1.0,
+  "RC18_TRIM": 1500.0,
+  "RC1_DZ": 10.0,
+  "RC1_MAX": 2000.0,
+  "RC1_MIN": 1000.0,
+  "RC1_REV": 1.0,
+  "RC1_TRIM": 1500.0,
+  "RC2_DZ": 10.0,
+  "RC2_MAX": 2000.0,
+  "RC2_MIN": 1000.0,
+  "RC2_REV": 1.0,
+  "RC2_TRIM": 1500.0,
+  "RC3_DZ": 10.0,
+  "RC3_MAX": 2000.0,
+  "RC3_MIN": 1000.0,
+  "RC3_REV": 1.0,
+  "RC3_TRIM": 1500.0,
+  "RC4_DZ": 10.0,
+  "RC4_MAX": 2000.0,
+  "RC4_MIN": 1000.0,
+  "RC4_REV": 1.0,
+  "RC4_TRIM": 1500.0,
+  "RC5_DZ": 10.0,
+  "RC5_MAX": 2000.0,
+  "RC5_MIN": 1000.0,
+  "RC5_REV": 1.0,
+  "RC5_TRIM": 1500.0,
+  "RC6_DZ": 10.0,
+  "RC6_MAX": 2000.0,
+  "RC6_MIN": 1000.0,
+  "RC6_REV": 1.0,
+  "RC6_TRIM": 1500.0,
+  "RC7_DZ": 10.0,
+  "RC7_MAX": 2000.0,
+  "RC7_MIN": 1000.0,
+  "RC7_REV": 1.0,
+  "RC7_TRIM": 1500.0,
+  "RC8_DZ": 10.0,
+  "RC8_MAX": 2000.0,
+  "RC8_MIN": 1000.0,
+  "RC8_REV": 1.0,
+  "RC8_TRIM": 1500.0,
+  "RC9_DZ": 0.0,
+  "RC9_MAX": 2000.0,
+  "RC9_MIN": 1000.0,
+  "RC9_REV": 1.0,
+  "RC9_TRIM": 1500.0,
+  "RC_ACRO_TH": 0.5,
+  "RC_ARMSWITCH_TH": 0.25,
+  "RC_ASSIST_TH": 0.25,
+  "RC_AUTO_TH": 0.75,
+  "RC_CHAN_CNT": 0.0,
+  "RC_DSM_BIND": -1.0,
+  "RC_FAILS_THR": 0.0,
+  "RC_FLT_CUTOFF": 10.0,
+  "RC_FLT_SMP_RATE": 50.0,
+  "RC_GEAR_TH": 0.25,
+  "RC_KILLSWITCH_TH": 0.25,
+  "RC_LOITER_TH": 0.5,
+  "RC_MAN_TH": 0.5,
+  "RC_MAP_ACRO_SW": 0.0,
+  "RC_MAP_ARM_SW": 0.0,
+  "RC_MAP_AUX1": 0.0,
+  "RC_MAP_AUX2": 0.0,
+  "RC_MAP_AUX3": 0.0,
+  "RC_MAP_AUX4": 0.0,
+  "RC_MAP_AUX5": 0.0,
+  "RC_MAP_FAILSAFE": 0.0,
+  "RC_MAP_FLAPS": 0.0,
+  "RC_MAP_FLTMODE": 0.0,
+  "RC_MAP_GEAR_SW": 0.0,
+  "RC_MAP_KILL_SW": 0.0,
+  "RC_MAP_LOITER_SW": 0.0,
+  "RC_MAP_MAN_SW": 0.0,
+  "RC_MAP_MODE_SW": 0.0,
+  "RC_MAP_OFFB_SW": 0.0,
+  "RC_MAP_PARAM1": 0.0,
+  "RC_MAP_PARAM2": 0.0,
+  "RC_MAP_PARAM3": 0.0,
+  "RC_MAP_PITCH": 0.0,
+  "RC_MAP_POSCTL_SW": 0.0,
+  "RC_MAP_RATT_SW": 0.0,
+  "RC_MAP_RETURN_SW": 0.0,
+  "RC_MAP_ROLL": 0.0,
+  "RC_MAP_STAB_SW": 0.0,
+  "RC_MAP_THROTTLE": 0.0,
+  "RC_MAP_TRANS_SW": 0.0,
+  "RC_MAP_YAW": 0.0,
+  "RC_OFFB_TH": 0.5,
+  "RC_POSCTL_TH": 0.5,
+  "RC_RATT_TH": 0.5,
+  "RC_RETURN_TH": 0.5,
+  "RC_RSSI_PWM_CHAN": 0.0,
+  "RC_RSSI_PWM_MAX": 1000.0,
+  "RC_RSSI_PWM_MIN": 2000.0,
+  "RC_STAB_TH": 0.5,
+  "RC_TH_USER": 1.0,
+  "RC_TRANS_TH": 0.25,
+  "RTL_DESCEND_ALT": 10.0,
+  "RTL_LAND_DELAY": 0.0,
+  "RTL_MIN_DIST": 5.0,
+  "RTL_RETURN_ALT": 30.0,
+  "SDLOG_DIRS_MAX": 0.0,
+  "SDLOG_MODE": 0.0,
+  "SDLOG_UTC_OFFSET": 0.0,
+  "SDLOG_UUID": 1.0,
+  "SENS_BARO_QNH": 1013.25,
+  "SENS_BOARD_ROT": 0.0,
+  "SENS_BOARD_X_OFF": 0.0,
+  "SENS_BOARD_Y_OFF": 0.0,
+  "SENS_BOARD_Z_OFF": 0.0,
+  "SENS_DPRES_ANSC": 0.0,
+  "SENS_DPRES_OFF": 0.0,
+  "SENS_EN_LL40LS": 0.0,
+  "SENS_EN_MB12XX": 0.0,
+  "SENS_EN_SF0X": 0.0,
+  "SENS_EN_SF1XX": 0.0,
+  "SENS_EN_THERMAL": -1.0,
+  "SENS_EN_TRONE": 0.0,
+  "SYS_AUTOCONFIG": 0.0,
+  "SYS_AUTOSTART": 4001.0,
+  "SYS_CAL_ACCEL": 0.0,
+  "SYS_CAL_BARO": 0.0,
+  "SYS_CAL_GYRO": 0.0,
+  "SYS_CAL_TDEL": 24.0,
+  "SYS_CAL_TMAX": 10.0,
+  "SYS_CAL_TMIN": 5.0,
+  "SYS_COMPANION": 157600.0,
+  "SYS_LOGGER": 1.0,
+  "SYS_MC_EST_GROUP": 2.0,
+  "SYS_PARAM_VER": 1.0,
+  "SYS_RESTART_TYPE": 0.0,
+  "SYS_STCK_EN": 1.0,
+  "SYS_USE_IO": 1.0,
+  "TC_A0_ID": 0.0,
+  "TC_A0_SCL_0": 1.0,
+  "TC_A0_SCL_1": 1.0,
+  "TC_A0_SCL_2": 1.0,
+  "TC_A0_TMAX": 100.0,
+  "TC_A0_TMIN": 0.0,
+  "TC_A0_TREF": 25.0,
+  "TC_A0_X0_0": 0.0,
+  "TC_A0_X0_1": 0.0,
+  "TC_A0_X0_2": 0.0,
+  "TC_A0_X1_0": 0.0,
+  "TC_A0_X1_1": 0.0,
+  "TC_A0_X1_2": 0.0,
+  "TC_A0_X2_0": 0.0,
+  "TC_A0_X2_1": 0.0,
+  "TC_A0_X2_2": 0.0,
+  "TC_A0_X3_0": 0.0,
+  "TC_A0_X3_1": 0.0,
+  "TC_A0_X3_2": 0.0,
+  "TC_A1_ID": 0.0,
+  "TC_A1_SCL_0": 1.0,
+  "TC_A1_SCL_1": 1.0,
+  "TC_A1_SCL_2": 1.0,
+  "TC_A1_TMAX": 100.0,
+  "TC_A1_TMIN": 0.0,
+  "TC_A1_TREF": 25.0,
+  "TC_A1_X0_0": 0.0,
+  "TC_A1_X0_1": 0.0,
+  "TC_A1_X0_2": 0.0,
+  "TC_A1_X1_0": 0.0,
+  "TC_A1_X1_1": 0.0,
+  "TC_A1_X1_2": 0.0,
+  "TC_A1_X2_0": 0.0,
+  "TC_A1_X2_1": 0.0,
+  "TC_A1_X2_2": 0.0,
+  "TC_A1_X3_0": 0.0,
+  "TC_A1_X3_1": 0.0,
+  "TC_A1_X3_2": 0.0,
+  "TC_A2_ID": 0.0,
+  "TC_A2_SCL_0": 1.0,
+  "TC_A2_SCL_1": 1.0,
+  "TC_A2_SCL_2": 1.0,
+  "TC_A2_TMAX": 100.0,
+  "TC_A2_TMIN": 0.0,
+  "TC_A2_TREF": 25.0,
+  "TC_A2_X0_0": 0.0,
+  "TC_A2_X0_1": 0.0,
+  "TC_A2_X0_2": 0.0,
+  "TC_A2_X1_0": 0.0,
+  "TC_A2_X1_1": 0.0,
+  "TC_A2_X1_2": 0.0,
+  "TC_A2_X2_0": 0.0,
+  "TC_A2_X2_1": 0.0,
+  "TC_A2_X2_2": 0.0,
+  "TC_A2_X3_0": 0.0,
+  "TC_A2_X3_1": 0.0,
+  "TC_A2_X3_2": 0.0,
+  "TC_A_ENABLE": 0.0,
+  "TC_B0_ID": 0.0,
+  "TC_B0_SCL": 1.0,
+  "TC_B0_TMAX": 75.0,
+  "TC_B0_TMIN": 5.0,
+  "TC_B0_TREF": 40.0,
+  "TC_B0_X0": 0.0,
+  "TC_B0_X1": 0.0,
+  "TC_B0_X2": 0.0,
+  "TC_B0_X3": 0.0,
+  "TC_B0_X4": 0.0,
+  "TC_B0_X5": 0.0,
+  "TC_B1_ID": 0.0,
+  "TC_B1_SCL": 1.0,
+  "TC_B1_TMAX": 75.0,
+  "TC_B1_TMIN": 5.0,
+  "TC_B1_TREF": 40.0,
+  "TC_B1_X0": 0.0,
+  "TC_B1_X1": 0.0,
+  "TC_B1_X2": 0.0,
+  "TC_B1_X3": 0.0,
+  "TC_B1_X4": 0.0,
+  "TC_B1_X5": 0.0,
+  "TC_B2_ID": 0.0,
+  "TC_B2_SCL": 1.0,
+  "TC_B2_TMAX": 75.0,
+  "TC_B2_TMIN": 5.0,
+  "TC_B2_TREF": 40.0,
+  "TC_B2_X0": 0.0,
+  "TC_B2_X1": 0.0,
+  "TC_B2_X2": 0.0,
+  "TC_B2_X3": 0.0,
+  "TC_B2_X4": 0.0,
+  "TC_B2_X5": 0.0,
+  "TC_B_ENABLE": 0.0,
+  "TC_G0_ID": 0.0,
+  "TC_G0_SCL_0": 1.0,
+  "TC_G0_SCL_1": 1.0,
+  "TC_G0_SCL_2": 1.0,
+  "TC_G0_TMAX": 100.0,
+  "TC_G0_TMIN": 0.0,
+  "TC_G0_TREF": 25.0,
+  "TC_G0_X0_0": 0.0,
+  "TC_G0_X0_1": 0.0,
+  "TC_G0_X0_2": 0.0,
+  "TC_G0_X1_0": 0.0,
+  "TC_G0_X1_1": 0.0,
+  "TC_G0_X1_2": 0.0,
+  "TC_G0_X2_0": 0.0,
+  "TC_G0_X2_1": 0.0,
+  "TC_G0_X2_2": 0.0,
+  "TC_G0_X3_0": 0.0,
+  "TC_G0_X3_1": 0.0,
+  "TC_G0_X3_2": 0.0,
+  "TC_G1_ID": 0.0,
+  "TC_G1_SCL_0": 1.0,
+  "TC_G1_SCL_1": 1.0,
+  "TC_G1_SCL_2": 1.0,
+  "TC_G1_TMAX": 100.0,
+  "TC_G1_TMIN": 0.0,
+  "TC_G1_TREF": 25.0,
+  "TC_G1_X0_0": 0.0,
+  "TC_G1_X0_1": 0.0,
+  "TC_G1_X0_2": 0.0,
+  "TC_G1_X1_0": 0.0,
+  "TC_G1_X1_1": 0.0,
+  "TC_G1_X1_2": 0.0,
+  "TC_G1_X2_0": 0.0,
+  "TC_G1_X2_1": 0.0,
+  "TC_G1_X2_2": 0.0,
+  "TC_G1_X3_0": 0.0,
+  "TC_G1_X3_1": 0.0,
+  "TC_G1_X3_2": 0.0,
+  "TC_G2_ID": 0.0,
+  "TC_G2_SCL_0": 1.0,
+  "TC_G2_SCL_1": 1.0,
+  "TC_G2_SCL_2": 1.0,
+  "TC_G2_TMAX": 100.0,
+  "TC_G2_TMIN": 0.0,
+  "TC_G2_TREF": 25.0,
+  "TC_G2_X0_0": 0.0,
+  "TC_G2_X0_1": 0.0,
+  "TC_G2_X0_2": 0.0,
+  "TC_G2_X1_0": 0.0,
+  "TC_G2_X1_1": 0.0,
+  "TC_G2_X1_2": 0.0,
+  "TC_G2_X2_0": 0.0,
+  "TC_G2_X2_1": 0.0,
+  "TC_G2_X2_2": 0.0,
+  "TC_G2_X3_0": 0.0,
+  "TC_G2_X3_1": 0.0,
+  "TC_G2_X3_2": 0.0,
+  "TC_G_ENABLE": 0.0,
+  "THR_MDL_FAC": 0.0,
+  "TRIG_MODE": 0.0,
+  "TRIM_PITCH": 0.0,
+  "TRIM_ROLL": 0.0,
+  "TRIM_YAW": 0.0,
+  "UAVCAN_ENABLE": 0.0,
+  "VT_B_TRANS_DUR": 4.0,
+  "VT_OPT_RECOV_EN": 0.0,
+  "VT_TYPE": 0.0,
+  "VT_WV_LND_EN": 0.0,
+  "VT_WV_LTR_EN": 0.0,
+  "VT_WV_TKO_EN": 0.0,
+  "VT_WV_YAWR_SCL": 0.15000000596046448
+ },
+ "changed_parameters": [],
+ "logged_messages": [
+  [
+   11912381,
+   4,
+   "[commander_tests] Not ready to fly: Sensors not set up correctly"
+  ]
+ ],
+ "tagged_logged_messages": 0,
+ "dropouts": [],
+ "series": [
+  {
+   "message": "actuator_controls_0",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 12263108,
+   "last_timestamp": 21803904,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1618260646.0,
+     "min": 12263108.0,
+     "max": 21803904.0
+    },
+    "timestamp_sample": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1617885460.0,
+     "min": 12259154.0,
+     "max": 21799982.0
+    },
+    "control[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 3.3031461047939956,
+     "min": -0.015043914318084717,
+     "max": 0.09360090643167496
+    },
+    "control[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -4.873355390504003,
+     "min": -0.07802171260118484,
+     "max": -0.025394229218363762
+    },
+    "control[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -66.28419786691666,
+     "min": -0.7061506509780884,
+     "max": -0.6934919953346252
+    },
+    "control[3]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[4]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[5]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[6]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control[7]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -95.0,
+     "min": -1.0,
+     "max": -1.0
+    }
+   }
+  },
+  {
+   "message": "actuator_outputs",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 12244619,
+   "last_timestamp": 21794624,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1617247261.0,
+     "min": 12244619.0,
+     "max": 21794624.0
+    },
+    "noutputs": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 760.0,
+     "min": 8.0,
+     "max": 8.0
+    },
+    "output[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 85500.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 85500.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 85500.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[3]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 85500.0,
+     "min": 900.0,
+     "max": 900.0
+    },
+    "output[4]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[5]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[6]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[7]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[8]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[9]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[10]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[11]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[12]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[13]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[14]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[15]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "actuator_outputs",
+   "instance": 1,
+   "records": 96,
+   "first_timestamp": 12262584,
+   "last_timestamp": 21817040,
+   "fields": {
+    "timestamp": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 1631856154.0,
+     "min": 12262584.0,
+     "max": 21817040.0
+    },
+    "noutputs": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 384.0,
+     "min": 4.0,
+     "max": 4.0
+    },
+    "output[0]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 144000.0,
+     "min": 1500.0,
+     "max": 1500.0
+    },
+    "output[1]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 144000.0,
+     "min": 1500.0,
+     "max": 1500.0
+    },
+    "output[2]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 144000.0,
+     "min": 1500.0,
+     "max": 1500.0
+    },
+    "output[3]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 144000.0,
+     "min": 1500.0,
+     "max": 1500.0
+    },
+    "output[4]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[5]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[6]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[7]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[8]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[9]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[10]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[11]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[12]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[13]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[14]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output[15]": {
+     "count": 96,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "commander_state",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 1881810,
+   "last_timestamp": 1881810,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 178771950.0,
+     "min": 1881810.0,
+     "max": 1881810.0
+    },
+    "main_state": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "control_state",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21803961,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1618246752.0,
+     "min": 12263164.0,
+     "max": 21803961.0
+    },
+    "x_acc": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 50.828284204006195,
+     "min": 0.4730639159679413,
+     "max": 0.6253377795219421
+    },
+    "y_acc": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 30.910451538860798,
+     "min": -0.09785588085651398,
+     "max": 0.6539829969406128
+    },
+    "z_acc": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -931.6958475112915,
+     "min": -10.166683197021484,
+     "max": -9.209558486938477
+    },
+    "x_vel": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.6271642483770847,
+     "min": 0.0044318451546132565,
+     "max": 0.009037626907229424
+    },
+    "y_vel": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1.0515024515625555,
+     "min": -0.0005224270862527192,
+     "max": 0.02091745287179947
+    },
+    "z_vel": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -3.39075462715482,
+     "min": -0.05997565761208534,
+     "max": 0.00195718533359468
+    },
+    "x_pos": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.5912615462684698,
+     "min": -0.014110781252384186,
+     "max": 0.002184614771977067
+    },
+    "y_pos": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.3537269248627126,
+     "min": 0.0013164954725652933,
+     "max": 0.007407263852655888
+    },
+    "z_pos": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -37.4630057066679,
+     "min": -0.47461047768592834,
+     "max": -0.232159823179245
+    },
+    "airspeed": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_variance[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_variance[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 72.48812276124954,
+     "min": 0.7628255486488342,
+     "max": 0.7632362246513367
+    },
+    "q[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -2.7905777152627707,
+     "min": -0.029974326491355896,
+     "max": -0.028543604537844658
+    },
+    "q[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1.0223238579928875,
+     "min": 0.01005636341869831,
+     "max": 0.012156814336776733
+    },
+    "q[3]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 61.33219927549362,
+     "min": 0.6453706622123718,
+     "max": 0.6458399891853333
+    },
+    "delta_q_reset[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 94.99994337558746,
+     "min": 0.9999994039535522,
+     "max": 0.9999994039535522
+    },
+    "delta_q_reset[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.005400466252467595,
+     "min": -5.684701318386942e-05,
+     "max": -5.684701318386942e-05
+    },
+    "delta_q_reset[2]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.0029396907302725594,
+     "min": -3.094411295023747e-05,
+     "max": -3.094411295023747e-05
+    },
+    "delta_q_reset[3]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.09758292930200696,
+     "min": 0.00102718872949481,
+     "max": 0.00102718872949481
+    },
+    "roll_rate": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -1.1712002308231604,
+     "min": -0.1791839301586151,
+     "max": 0.2695857882499695
+    },
+    "pitch_rate": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.47338503356149886,
+     "min": -0.06169256940484047,
+     "max": 0.09169081598520279
+    },
+    "yaw_rate": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.07846223531942087,
+     "min": -0.021871646866202354,
+     "max": 0.027126917615532875
+    },
+    "horz_acc_mag": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 6.511520832777023,
+     "min": 0.013120247051119804,
+     "max": 0.2295723259449005
+    },
+    "roll_rate_bias": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.3937511881813407,
+     "min": -0.004332301206886768,
+     "max": -0.0039682225324213505
+    },
+    "pitch_rate_bias": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.6820707023143768,
+     "min": 0.007091163191944361,
+     "max": 0.007322980090975761
+    },
+    "yaw_rate_bias": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.2834845611359924,
+     "min": 0.0029030933510512114,
+     "max": 0.0030796302016824484
+    },
+    "airspeed_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "quat_reset_counter": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 190.0,
+     "min": 2.0,
+     "max": 2.0
+    }
+   }
+  },
+  {
+   "message": "cpuload",
+   "instance": 0,
+   "records": 10,
+   "first_timestamp": 11919707,
+   "last_timestamp": 20930505,
+   "fields": {
+    "timestamp": {
+     "count": 10,
+     "nonfinite": 0,
+     "sum": 164245574.0,
+     "min": 11919707.0,
+     "max": 20930505.0
+    },
+    "load": {
+     "count": 10,
+     "nonfinite": 0,
+     "sum": 4.935077011585236,
+     "min": 0.42028000950813293,
+     "max": 0.558559000492096
+    },
+    "ram_usage": {
+     "count": 10,
+     "nonfinite": 0,
+     "sum": 5.540603518486023,
+     "min": 0.513505220413208,
+     "max": 0.5593570470809937
+    }
+   }
+  },
+  {
+   "message": "ekf2_innovations",
+   "instance": 0,
+   "records": 184,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21860785,
+   "fields": {
+    "timestamp": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 3139378288.0,
+     "min": 12263164.0,
+     "max": 21860785.0
+    },
+    "vel_pos_innov[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[2]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov[3]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": -0.790296443065472,
+     "min": -0.009897151030600071,
+     "max": 0.00035823072539642453
+    },
+    "vel_pos_innov[4]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.48024196131154895,
+     "min": 0.001201695529744029,
+     "max": 0.005319491494446993
+    },
+    "vel_pos_innov[5]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": -6.4011083245277405,
+     "min": -0.6913952827453613,
+     "max": 0.9478813409805298
+    },
+    "mag_innov[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov[2]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "heading_innov": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": -0.11392414569854736,
+     "min": -0.006957650184631348,
+     "max": 0.004387497901916504
+    },
+    "airspeed_innov": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "beta_innov": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_innov": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[2]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vel_pos_innov_var[3]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 47.999811351299286,
+     "min": 0.25857430696487427,
+     "max": 0.2648664116859436
+    },
+    "vel_pos_innov_var[4]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 47.99978360533714,
+     "min": 0.2585742175579071,
+     "max": 0.2648659944534302
+    },
+    "vel_pos_innov_var[5]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 748.5134525299072,
+     "min": 4.055578708648682,
+     "max": 4.090649127960205
+    },
+    "mag_innov_var[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov_var[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_innov_var[2]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "heading_innov_var": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 16.71264488250017,
+     "min": 0.09056926518678665,
+     "max": 0.09110844880342484
+    },
+    "airspeed_innov_var": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "beta_innov_var": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov_var[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "flow_innov_var[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_innov_var": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "output_tracking_error[0]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0325122441026906,
+     "min": 3.8184010918485e-05,
+     "max": 0.0005487866583280265
+    },
+    "output_tracking_error[1]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.6569782827282324,
+     "min": 0.000425023608841002,
+     "max": 0.018081072717905045
+    },
+    "output_tracking_error[2]": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 1.5738351898617111,
+     "min": 0.0005179965519346297,
+     "max": 0.03910037502646446
+    }
+   }
+  },
+  {
+   "message": "ekf2_timestamps",
+   "instance": 0,
+   "records": 2373,
+   "first_timestamp": 12262822,
+   "last_timestamp": 21880422,
+   "fields": {
+    "timestamp": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 40512487272.0,
+     "min": 12262822.0,
+     "max": 21880422.0
+    },
+    "gps_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    },
+    "optical_flow_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    },
+    "distance_sensor_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    },
+    "airspeed_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    },
+    "vision_position_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    },
+    "vision_attitude_timestamp_rel": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 77756091.0,
+     "min": 32767.0,
+     "max": 32767.0
+    }
+   }
+  },
+  {
+   "message": "estimator_status",
+   "instance": 0,
+   "records": 48,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21799982,
+   "fields": {
+    "timestamp": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 817561486.0,
+     "min": 12263164.0,
+     "max": 21799982.0
+    },
+    "states[0]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 36.62474972009659,
+     "min": 0.7627941370010376,
+     "max": 0.7632375955581665
+    },
+    "states[1]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -1.4096629451960325,
+     "min": -0.029990630224347115,
+     "max": -0.029032070189714432
+    },
+    "states[2]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.521943393163383,
+     "min": 0.009993462823331356,
+     "max": 0.011400503106415272
+    },
+    "states[3]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 30.989804923534393,
+     "min": 0.6453624367713928,
+     "max": 0.6458783149719238
+    },
+    "states[4]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -0.35849508034880273,
+     "min": -0.01564350165426731,
+     "max": 0.004011294338852167
+    },
+    "states[5]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.22734372736886144,
+     "min": 0.0017725271172821522,
+     "max": 0.009743946604430676
+    },
+    "states[6]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -1.8222381109371781,
+     "min": -0.06575281918048859,
+     "max": -0.0014807747211307287
+    },
+    "states[7]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -0.20049994429427898,
+     "min": -0.009446568787097931,
+     "max": 0.0003171822754666209
+    },
+    "states[8]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.12152771570254117,
+     "min": 0.001171850715763867,
+     "max": 0.005091566126793623
+    },
+    "states[9]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -18.71737703680992,
+     "min": -0.46080952882766724,
+     "max": -0.22431448101997375
+    },
+    "states[10]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -0.002414633308944758,
+     "min": -5.263127968646586e-05,
+     "max": -4.829029421671294e-05
+    },
+    "states[11]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.004182832984952256,
+     "min": 8.627834904473275e-05,
+     "max": 8.896375948097557e-05
+    },
+    "states[12]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0017378396951244213,
+     "min": 3.514940181048587e-05,
+     "max": 3.728170850081369e-05
+    },
+    "states[13]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.003022813099960331,
+     "min": 6.026137634762563e-05,
+     "max": 7.125929550966248e-05
+    },
+    "states[14]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0015938505912345136,
+     "min": 2.2349686332745478e-05,
+     "max": 4.450397682376206e-05
+    },
+    "states[15]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": -0.07701317919418216,
+     "min": -0.0016532038571313024,
+     "max": -0.0015514097176492214
+    },
+    "states[16]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 48.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "states[17]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 6.591795909116627e-06,
+     "min": 1.3732908143992972e-07,
+     "max": 1.3732908143992972e-07
+    },
+    "states[18]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 21.78453540802002,
+     "min": 0.45384448766708374,
+     "max": 0.45384448766708374
+    },
+    "states[19]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[20]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[21]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[22]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "states[23]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "n_states": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vibe[0]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 2.2263350185625086e-07,
+     "min": 7.743075070010264e-10,
+     "max": 1.4484248467283578e-08
+    },
+    "vibe[1]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.00415182195683883,
+     "min": 2.197900539613329e-05,
+     "max": 0.00015874784730840474
+    },
+    "vibe[2]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.04736693558515981,
+     "min": 0.0005527574103325605,
+     "max": 0.0013041244819760323
+    },
+    "covariances[0]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.004125773237319663,
+     "min": 5.9239057009108365e-05,
+     "max": 0.00011398045171517879
+    },
+    "covariances[1]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.00452460689120926,
+     "min": 7.8194985690061e-05,
+     "max": 0.00016425753710791469
+    },
+    "covariances[2]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.004543051996733993,
+     "min": 7.851321424823254e-05,
+     "max": 0.00016477271856274456
+    },
+    "covariances[3]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.005780678016890306,
+     "min": 8.301778143504634e-05,
+     "max": 0.00015973520930856466
+    },
+    "covariances[4]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.6616853759624064,
+     "min": 0.0074829221703112125,
+     "max": 0.03168928995728493
+    },
+    "covariances[5]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.6616595187224448,
+     "min": 0.007482777815312147,
+     "max": 0.03168632090091705
+    },
+    "covariances[6]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.6117850206792355,
+     "min": 0.008179394528269768,
+     "max": 0.024606171995401382
+    },
+    "covariances[7]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.5055769206956029,
+     "min": 0.008375296369194984,
+     "max": 0.014444899745285511
+    },
+    "covariances[8]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.5055700531229377,
+     "min": 0.008375205099582672,
+     "max": 0.014444512315094471
+    },
+    "covariances[9]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 3.228713698685169,
+     "min": 0.055184364318847656,
+     "max": 0.0879252552986145
+    },
+    "covariances[10]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 3.510286941676988e-08,
+     "min": 7.447401029203604e-11,
+     "max": 5.106382872099857e-09
+    },
+    "covariances[11]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 3.4686955592555524e-08,
+     "min": 7.213400710082141e-11,
+     "max": 5.092703592168846e-09
+    },
+    "covariances[12]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 2.7524613799290165e-07,
+     "min": 1.2623964096292184e-09,
+     "max": 1.7793103879171213e-08
+    },
+    "covariances[13]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.00019895153081961325,
+     "min": 4.110760983166983e-06,
+     "max": 4.291393906896701e-06
+    },
+    "covariances[14]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.00019941163236580906,
+     "min": 4.119874574826099e-06,
+     "max": 4.300836280890508e-06
+    },
+    "covariances[15]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 3.4975528038216908e-06,
+     "min": 3.671968684670901e-08,
+     "max": 1.8975616455918498e-07
+    },
+    "covariances[16]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[17]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[18]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[19]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[20]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[21]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[22]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariances[23]": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "control_mode_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 25488.0,
+     "min": 531.0,
+     "max": 531.0
+    },
+    "pos_horiz_accuracy": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_vert_accuracy": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mag_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.09194197374063151,
+     "min": 1.367482695968647e-06,
+     "max": 0.008888106793165207
+    },
+    "vel_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pos_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.004366230938103399,
+     "min": 2.394729199295398e-05,
+     "max": 0.000192243664059788
+    },
+    "hgt_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.9602160605136305,
+     "min": 0.0002160166040994227,
+     "max": 0.08786901086568832
+    },
+    "tas_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hagl_test_ratio": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "time_slip": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 1.756648002192378,
+     "min": 0.028327999636530876,
+     "max": 0.0371830016374588
+    },
+    "gps_check_fail_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "filter_fault_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "innovation_check_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "solution_status_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 32496.0,
+     "min": 677.0,
+     "max": 677.0
+    },
+    "nan_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "health_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "timeout_flags": {
+     "count": 48,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "sensor_combined",
+   "instance": 0,
+   "records": 2373,
+   "first_timestamp": 12262822,
+   "last_timestamp": 21880422,
+   "fields": {
+    "timestamp": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 40512487272.0,
+     "min": 12262822.0,
+     "max": 21880422.0
+    },
+    "gyro_rad[0]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": -9.165098065610437,
+     "min": -0.2996428608894348,
+     "max": 0.2896503508090973
+    },
+    "gyro_rad[1]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 16.58403808845833,
+     "min": -0.1087200865149498,
+     "max": 0.11822711676359177
+    },
+    "gyro_rad[2]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 7.062504631358934,
+     "min": -0.04320012778043747,
+     "max": 0.048362623900175095
+    },
+    "gyro_integral_dt": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 9.605600180570036,
+     "min": 0.003924999851733446,
+     "max": 0.004881999921053648
+    },
+    "accelerometer_timestamp_relative": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "accelerometer_m_s2[0]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 1286.2456587255,
+     "min": 0.37683403491973877,
+     "max": 0.650963544845581
+    },
+    "accelerometer_m_s2[1]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 743.2037981428439,
+     "min": -0.21200217306613922,
+     "max": 0.7960366010665894
+    },
+    "accelerometer_m_s2[2]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": -23543.02658843994,
+     "min": -10.405061721801758,
+     "max": -9.342771530151367
+    },
+    "accelerometer_integral_dt": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 9.605600180570036,
+     "min": 0.003924999851733446,
+     "max": 0.004881999921053648
+    },
+    "magnetometer_timestamp_relative": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": -25483399.0,
+     "min": -23393.0,
+     "max": -199.0
+    },
+    "magnetometer_ga[0]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 365.9326841235161,
+     "min": 0.14720776677131653,
+     "max": 0.1627320647239685
+    },
+    "magnetometer_ga[1]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": -2560.0760085582733,
+     "min": -1.083549976348877,
+     "max": -1.0738130807876587
+    },
+    "magnetometer_ga[2]": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 1026.8022103011608,
+     "min": 0.42399728298187256,
+     "max": 0.4408264756202698
+    },
+    "baro_timestamp_relative": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": -19552949.0,
+     "min": -23354.0,
+     "max": -213.0
+    },
+    "baro_alt_meter": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 780633.8649902344,
+     "min": 327.9297790527344,
+     "max": 329.9920959472656
+    },
+    "baro_temp_celcius": {
+     "count": 2373,
+     "nonfinite": 0,
+     "sum": 65556.10842895508,
+     "min": 27.26999855041504,
+     "max": 27.959999084472656
+    }
+   }
+  },
+  {
+   "message": "sensor_preflight",
+   "instance": 0,
+   "records": 184,
+   "first_timestamp": 0,
+   "last_timestamp": 0,
+   "fields": {
+    "timestamp": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "accel_inconsistency_m_s_s": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 45.24761086702347,
+     "min": 0.22194118797779083,
+     "max": 0.26237139105796814
+    },
+    "gyro_inconsistency_rad_s": {
+     "count": 184,
+     "nonfinite": 0,
+     "sum": 1.6022779420018196,
+     "min": 0.00769676361232996,
+     "max": 0.011850548908114433
+    }
+   }
+  },
+  {
+   "message": "system_power",
+   "instance": 0,
+   "records": 32,
+   "first_timestamp": 12262288,
+   "last_timestamp": 21592288,
+   "fields": {
+    "timestamp": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 541643253.0,
+     "min": 12262288.0,
+     "max": 21592288.0
+    },
+    "voltage5V_v": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 152.28984022140503,
+     "min": 4.716357231140137,
+     "max": 4.792089939117432
+    },
+    "usb_connected": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 32.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "brick_valid": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 32.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "servo_valid": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 32.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "periph_5V_OC": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hipower_5V_OC": {
+     "count": 32,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "task_stack_info",
+   "instance": 0,
+   "records": 20,
+   "first_timestamp": 11919825,
+   "last_timestamp": 20931068,
+   "fields": {
+    "timestamp": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 328495754.0,
+     "min": 11919825.0,
+     "max": 20931068.0
+    },
+    "stack_free": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 16288.0,
+     "min": 308.0,
+     "max": 2404.0
+    },
+    "task_name[0]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 2143.0,
+     "min": 99.0,
+     "max": 115.0
+    },
+    "task_name[1]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 2085.0,
+     "min": 97.0,
+     "max": 120.0
+    },
+    "task_name[2]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 2176.0,
+     "min": 52.0,
+     "max": 119.0
+    },
+    "task_name[3]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 2033.0,
+     "min": 0.0,
+     "max": 116.0
+    },
+    "task_name[4]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1933.0,
+     "min": 0.0,
+     "max": 119.0
+    },
+    "task_name[5]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1861.0,
+     "min": 0.0,
+     "max": 116.0
+    },
+    "task_name[6]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1478.0,
+     "min": 0.0,
+     "max": 116.0
+    },
+    "task_name[7]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1197.0,
+     "min": 0.0,
+     "max": 116.0
+    },
+    "task_name[8]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1322.0,
+     "min": 0.0,
+     "max": 114.0
+    },
+    "task_name[9]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 1032.0,
+     "min": 0.0,
+     "max": 114.0
+    },
+    "task_name[10]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 936.0,
+     "min": 0.0,
+     "max": 118.0
+    },
+    "task_name[11]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 726.0,
+     "min": 0.0,
+     "max": 114.0
+    },
+    "task_name[12]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 761.0,
+     "min": 0.0,
+     "max": 119.0
+    },
+    "task_name[13]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 725.0,
+     "min": 0.0,
+     "max": 108.0
+    },
+    "task_name[14]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 360.0,
+     "min": 0.0,
+     "max": 112.0
+    },
+    "task_name[15]": {
+     "count": 20,
+     "nonfinite": 0,
+     "sum": 114.0,
+     "min": 0.0,
+     "max": 114.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_attitude",
+   "instance": 0,
+   "records": 306,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21872804,
+   "fields": {
+    "timestamp": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 5222596602.0,
+     "min": 12263164.0,
+     "max": 21872804.0
+    },
+    "rollspeed": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0708125822711736,
+     "min": -0.22492042183876038,
+     "max": 0.20856595039367676
+    },
+    "pitchspeed": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -0.09022863861173391,
+     "min": -0.09177707135677338,
+     "max": 0.09103626012802124
+    },
+    "yawspeed": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -0.018213474308140576,
+     "min": -0.034862589091062546,
+     "max": 0.03440084680914879
+    },
+    "q[0]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 233.48690593242645,
+     "min": 0.762805163860321,
+     "max": 0.7632694840431213
+    },
+    "q[1]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -8.981968432664871,
+     "min": -0.030081024393439293,
+     "max": -0.028614044189453125
+    },
+    "q[2]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 3.304676759056747,
+     "min": 0.010069544427096844,
+     "max": 0.012056011706590652
+    },
+    "q[3]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 197.5557166337967,
+     "min": 0.64531010389328,
+     "max": 0.6458656191825867
+    }
+   }
+  },
+  {
+   "message": "vehicle_attitude_setpoint",
+   "instance": 0,
+   "records": 306,
+   "first_timestamp": 12263394,
+   "last_timestamp": 21873316,
+   "fields": {
+    "timestamp": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 5222591185.0,
+     "min": 12263394.0,
+     "max": 21873316.0
+    },
+    "roll_body": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": -0.0,
+     "max": -0.0
+    },
+    "pitch_body": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw_body": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.6286406423896551,
+     "min": 0.0020543811842799187,
+     "max": 0.0020543811842799187
+    },
+    "yaw_sp_move_rate": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q_d[0]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 305.9998358488083,
+     "min": 0.999999463558197,
+     "max": 0.999999463558197
+    },
+    "q_d[1]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": -0.0,
+     "max": -0.0
+    },
+    "q_d[2]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "q_d[3]": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.3143202499486506,
+     "min": 0.0010271903593093157,
+     "max": 0.0010271903593093157
+    },
+    "thrust": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "landing_gear": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -306.0,
+     "min": -1.0,
+     "max": -1.0
+    },
+    "q_d_valid": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 306.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "roll_reset_integral": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "pitch_reset_integral": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw_reset_integral": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "fw_control_yaw": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "disable_mc_yaw_control": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "apply_flaps": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_land_detected",
+   "instance": 0,
+   "records": 1,
+   "first_timestamp": 2201081,
+   "last_timestamp": 2201081,
+   "fields": {
+    "timestamp": {
+     "count": 1,
+     "nonfinite": 0,
+     "sum": 2201081.0,
+     "min": 2201081.0,
+     "max": 2201081.0
+    },
+    "alt_max": {
+     "count": 1,
+     "nonfinite": 0,
+     "sum": 10000.0,
+     "min": 10000.0,
+     "max": 10000.0
+    },
+    "landed": {
+     "count": 1,
+     "nonfinite": 0,
+     "sum": 1.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "freefall": {
+     "count": 1,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ground_contact": {
+     "count": 1,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_local_position",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21803961,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1618246752.0,
+     "min": 12263164.0,
+     "max": 21803961.0
+    },
+    "ref_timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ref_lat": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ref_lon": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "surface_bottom_timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1618246752.0,
+     "min": 12263164.0,
+     "max": 21803961.0
+    },
+    "x": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "y": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -37.4630057066679,
+     "min": -0.47461047768592834,
+     "max": -0.232159823179245
+    },
+    "delta_xy[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_xy[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_z": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vx": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -0.8595171224042133,
+     "min": -0.019252633675932884,
+     "max": 0.002838157583028078
+    },
+    "vy": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.591452443273738,
+     "min": 0.002488511148840189,
+     "max": 0.01162742543965578
+    },
+    "vz": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -3.4505585471197264,
+     "min": -0.06035100668668747,
+     "max": 0.001085003255866468
+    },
+    "z_deriv": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": -1.3012419231818058,
+     "min": -0.06725490838289261,
+     "max": 0.05645120516419411
+    },
+    "delta_vxy[0]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_vxy[1]": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "delta_vz": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ax": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "ay": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "az": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "yaw": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 133.34280264377594,
+     "min": 1.4030112028121948,
+     "max": 1.4042396545410156
+    },
+    "ref_alt": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "dist_bottom": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 9.90622004121542,
+     "min": 0.07686805725097656,
+     "max": 0.12610390782356262
+    },
+    "dist_bottom_rate": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 3.4505585471197264,
+     "min": -0.001085003255866468,
+     "max": 0.06035100668668747
+    },
+    "eph": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "epv": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "evh": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "evv": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "estimator_type": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "xy_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 95.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "v_xy_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "v_z_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 95.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "xy_reset_counter": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_reset_counter": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vxy_reset_counter": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vz_reset_counter": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "xy_global": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "z_global": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "dist_bottom_valid": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_rates_setpoint",
+   "instance": 0,
+   "records": 306,
+   "first_timestamp": 12263085,
+   "last_timestamp": 21872717,
+   "fields": {
+    "timestamp": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 5222646440.0,
+     "min": 12263085.0,
+     "max": 21872717.0
+    },
+    "roll": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 61.40088713169098,
+     "min": 0.18009933829307556,
+     "max": 0.21268917620182037
+    },
+    "pitch": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -108.23605138063431,
+     "min": -0.3608071804046631,
+     "max": -0.3494725823402405
+    },
+    "yaw": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": -1068.141580581665,
+     "min": -3.490658760070801,
+     "max": -3.490658760070801
+    },
+    "thrust": {
+     "count": 306,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "vehicle_status",
+   "instance": 0,
+   "records": 43,
+   "first_timestamp": 12031826,
+   "last_timestamp": 21841448,
+   "fields": {
+    "timestamp": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 729448181.0,
+     "min": 12031826.0,
+     "max": 21841448.0
+    },
+    "system_id": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 43.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "component_id": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 43.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "onboard_control_sensors_present": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "onboard_control_sensors_enabled": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "onboard_control_sensors_health": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "nav_state": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "arming_state": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "hil_state": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "failsafe": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "system_type": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 86.0,
+     "min": 2.0,
+     "max": 2.0
+    },
+    "is_rotary_wing": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 43.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "is_vtol": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "vtol_fw_permanent_stab": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "in_transition_mode": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "in_transition_to_fw": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "rc_signal_lost": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 43.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "rc_input_mode": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "data_link_lost": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 43.0,
+     "min": 1.0,
+     "max": 1.0
+    },
+    "data_link_lost_counter": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "engine_failure": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "engine_failure_cmd": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "mission_failure": {
+     "count": 43,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  },
+  {
+   "message": "wind_estimate",
+   "instance": 0,
+   "records": 95,
+   "first_timestamp": 12263164,
+   "last_timestamp": 21803961,
+   "fields": {
+    "timestamp": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 1618246752.0,
+     "min": 12263164.0,
+     "max": 21803961.0
+    },
+    "windspeed_north": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "windspeed_east": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariance_north": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    },
+    "covariance_east": {
+     "count": 95,
+     "nonfinite": 0,
+     "sum": 0.0,
+     "min": 0.0,
+     "max": 0.0
+    }
+   }
+  }
+ ]
+}

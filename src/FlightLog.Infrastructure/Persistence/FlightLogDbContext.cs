@@ -1,5 +1,6 @@
 using FlightLog.Application.Abstractions;
 using FlightLog.Domain.Fleet;
+using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
 using FlightLog.Domain.Projects;
 using FlightLog.Domain.Teams;
@@ -25,6 +26,18 @@ public sealed class FlightLogDbContext(DbContextOptions<FlightLogDbContext> opti
     public DbSet<Flight> Flights => Set<Flight>();
 
     public DbSet<FlightLogFile> FlightLogFiles => Set<FlightLogFile>();
+
+    public DbSet<LogProcessingJob> LogProcessingJobs => Set<LogProcessingJob>();
+
+    public DbSet<FlightSignalSeries> FlightSignalSeries => Set<FlightSignalSeries>();
+
+    public DbSet<SignalChunkInfo> SignalChunks => Set<SignalChunkInfo>();
+
+    public DbSet<FlightSignal> FlightSignals => Set<FlightSignal>();
+
+    public DbSet<FlightEvent> FlightEvents => Set<FlightEvent>();
+
+    public DbSet<FlightParameter> FlightParameters => Set<FlightParameter>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

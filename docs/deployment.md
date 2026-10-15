@@ -1,10 +1,10 @@
 # Dağıtım
 
-Bu doküman Aşama 2 itibarıyla geçerli durumu anlatır; Aşama 8'de sunucu dağıtımı, yedekleme ve geri yükleme adımları gerçek bir ortamda doğrulanarak genişletilecek.
+Bu doküman Aşama 3 itibarıyla geçerli durumu anlatır; Aşama 8'de sunucu dağıtımı, yedekleme ve geri yükleme adımları gerçek bir ortamda doğrulanarak genişletilecek.
 
 ## Hedef ortam (varsayım)
 
-Tek Linux VM üzerinde Docker Compose; önünde TLS sonlandıran bir reverse proxy (ör. Caddy veya Nginx). API konteyneri yalnızca `127.0.0.1` üzerinden yayınlanır.
+Tek Linux VM üzerinde Docker Compose; önünde TLS sonlandıran bir reverse proxy (ör. Caddy veya Nginx). API konteyneri yalnızca `127.0.0.1` üzerinden yayınlanır. `worker` konteyneri dışarıya port açmaz; veritabanı ve depolamaya API ile aynı ayarlarla bağlanır. Birden çok worker çalıştırılabilir (iş alma veritabanında compare-and-set ile yapılır).
 
 ## Yapılandırma ve gizli bilgiler
 
@@ -25,6 +25,10 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Uploads__MaxFileSizeBytes` | Maksimum log dosyası boyutu (`.env`: `UPLOAD_MAX_BYTES`, varsayılan 512 MiB). Önündeki reverse proxy'nin gövde sınırı da en az bu kadar olmalı |
 | `Uploads__TempDirectory` | Yükleme sırasında kullanılan geçici dizin (boşsa sistem geçici dizini); en büyük dosya kadar boş alan gerekir |
 | `ASPNETCORE_ENVIRONMENT` | `Production` ortamında Swagger UI kapalıdır |
+| `Processing__Enabled` | API'nin logları kendi içinde işlemesi (yalnızca geliştirme; Compose'da `false`, işleme `worker` servisinde) |
+| `Processing__PollInterval`, `Processing__CancellationCheckInterval` | Kuyruk yoklama aralığı (2 s) ve çalışan işin iptal kontrolü (5 s) |
+| `Processing__ParserTimeout`, `Processing__StaleAfter` | Dosya başına parse süresi sınırı (15 dk); bu süreden uzun `Processing` kalan dosya çöken worker sayılıp `Failed` olur (30 dk) |
+| `Processing__TempDirectory`, `Processing__MaxParallelUploads` | Worker'ın ham dosyayı ve blokları koyduğu geçici dizin (en büyük log + blokları kadar alan); blok yükleme paralelliği (8) |
 
 Data Protection anahtarları (bearer token şifreleme) PostgreSQL'deki `DataProtectionKeys` tablosunda saklanır; böylece token'lar yeniden başlatmada ve birden fazla API örneğinde geçerli kalır. Bu anahtarlar şu an şifrelenmeden saklanır (log uyarısı bunu belirtir); üretimde bir sertifika veya KMS ile `ProtectKeysWith...` yapılandırması Aşama 8'de eklenecek.
 

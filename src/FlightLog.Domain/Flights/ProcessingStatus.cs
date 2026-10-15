@@ -25,7 +25,8 @@ public static class ProcessingStatusTransitions
         [ProcessingStatus.Uploaded] = [ProcessingStatus.Validating],
         [ProcessingStatus.Validating] = [ProcessingStatus.Queued, ProcessingStatus.Failed],
         [ProcessingStatus.Queued] = [ProcessingStatus.Processing, ProcessingStatus.Cancelled],
-        [ProcessingStatus.Processing] = [ProcessingStatus.Processed, ProcessingStatus.Failed, ProcessingStatus.Cancelled],
+        // Back to Queued when a worker shuts down in the middle of a file, so that another worker picks it up.
+        [ProcessingStatus.Processing] = [ProcessingStatus.Processed, ProcessingStatus.Failed, ProcessingStatus.Cancelled, ProcessingStatus.Queued],
         [ProcessingStatus.Processed] = [ProcessingStatus.AnalysisPending],
         [ProcessingStatus.AnalysisPending] = [ProcessingStatus.Analyzing, ProcessingStatus.Cancelled],
         [ProcessingStatus.Analyzing] = [ProcessingStatus.Completed, ProcessingStatus.Failed],

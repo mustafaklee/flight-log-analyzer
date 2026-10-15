@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Format decoding for PX4 ULog and ArduPilot DataFlash logs. Depends on the base class library only. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="FlightLog.UnitTests" />
+    <InternalsVisibleTo Include="FlightLog.ParserTests" />
+  </ItemGroup>
+</Project>

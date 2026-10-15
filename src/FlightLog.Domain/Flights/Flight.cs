@@ -49,6 +49,21 @@ public sealed class Flight
 
     public string? FirmwareVersion { get; private set; }
 
+    /// <summary>Vehicle class as the log reports it (for example Copter, RotaryWing, Vtol).</summary>
+    public string? VehicleType { get; private set; }
+
+    /// <summary>Flight controller board as the log reports it.</summary>
+    public string? Hardware { get; private set; }
+
+    /// <summary>UTC time of the log's timestamp zero, derived from GPS time; null without a GPS time fix.</summary>
+    public DateTimeOffset? BootTimeUtc { get; private set; }
+
+    /// <summary>Log timestamp (µs, the log's own clock) at which the flight starts; signal times are on this clock.</summary>
+    public long? LogStartTimestampUs { get; private set; }
+
+    /// <summary>Key/value facts from the log (software versions, board ids). Empty until the log is processed.</summary>
+    public IReadOnlyDictionary<string, string> LogMetadata { get; private set; } = new Dictionary<string, string>();
+
     /// <summary>
     /// The date used for listing and filtering: <see cref="StartedAt"/> when known, otherwise the upload time.
     /// Stored so that it can be indexed.
@@ -84,17 +99,50 @@ public sealed class Flight
     }
 
     /// <summary>Records what the log parser found. Unknown values stay null.</summary>
-    public void RecordLogMetadata(DateTimeOffset? startedAt, long? durationUs, string? firmwareVersion, DateTimeOffset now)
+    public void RecordLogDetails(FlightLogDetails details, DateTimeOffset now)
     {
-        if (durationUs < 0)
+        ArgumentNullException.ThrowIfNull(details);
+        if (details.DurationUs < 0)
         {
             throw new DomainRuleViolationException("flight.negative_duration", "Flight duration cannot be negative.");
         }
 
-        StartedAt = startedAt;
-        DurationUs = durationUs;
-        FirmwareVersion = Guard.OptionalText(firmwareVersion, 200, "firmwareVersion");
-        OccurredAt = startedAt ?? CreatedAt;
+        StartedAt = details.StartedAt;
+        DurationUs = details.DurationUs;
+        FirmwareVersion = Truncate(details.FirmwareVersion, 200);
+        VehicleType = Truncate(details.VehicleType, 50);
+        Hardware = Truncate(details.Hardware, 200);
+        BootTimeUtc = details.BootTimeUtc;
+        LogStartTimestampUs = details.LogStartTimestampUs;
+        LogMetadata = new Dictionary<string, string>(details.Metadata ?? new Dictionary<string, string>(), StringComparer.Ordinal);
+        OccurredAt = details.StartedAt ?? CreatedAt;
         UpdatedAt = now;
     }
+
+    // Values come from the log file, not from a user, so they are shortened rather than rejected.
+    private static string? Truncate(string? value, int maxLength)
+    {
+        var trimmed = value?.Trim();
+        return string.IsNullOrEmpty(trimmed) ? null : trimmed.Length > maxLength ? trimmed[..maxLength] : trimmed;
+    }
+}
+
+/// <summary>What processing a log found out about its flight. Null means the log does not say.</summary>
+public sealed record FlightLogDetails
+{
+    public DateTimeOffset? StartedAt { get; init; }
+
+    public long? DurationUs { get; init; }
+
+    public string? FirmwareVersion { get; init; }
+
+    public string? VehicleType { get; init; }
+
+    public string? Hardware { get; init; }
+
+    public DateTimeOffset? BootTimeUtc { get; init; }
+
+    public long? LogStartTimestampUs { get; init; }
+
+    public IReadOnlyDictionary<string, string>? Metadata { get; init; }
 }

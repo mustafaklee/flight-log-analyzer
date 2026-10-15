@@ -29,15 +29,30 @@ public sealed class FlightTests
         var flight = NewFlight();
         var started = Now.AddDays(-3);
 
-        flight.RecordLogMetadata(started, 90_000_000, "v1.15.0", Now.AddMinutes(5));
+        flight.RecordLogDetails(
+            new FlightLogDetails
+            {
+                StartedAt = started,
+                DurationUs = 90_000_000,
+                FirmwareVersion = " v1.15.0 ",
+                VehicleType = "Copter",
+                LogStartTimestampUs = 1_000,
+                Metadata = new Dictionary<string, string> { ["frame"] = "QUAD" },
+            },
+            Now.AddMinutes(5));
 
         flight.OccurredAt.Should().Be(started);
         flight.DurationUs.Should().Be(90_000_000);
         flight.FirmwareVersion.Should().Be("v1.15.0");
+        flight.VehicleType.Should().Be("Copter");
+        flight.LogStartTimestampUs.Should().Be(1_000);
+        flight.LogMetadata.Should().Contain("frame", "QUAD");
         flight.UpdatedAt.Should().Be(Now.AddMinutes(5));
 
-        flight.RecordLogMetadata(null, null, null, Now.AddMinutes(6));
+        flight.RecordLogDetails(new FlightLogDetails(), Now.AddMinutes(6));
         flight.OccurredAt.Should().Be(Now, "an unknown start time falls back to the upload time");
+        flight.FirmwareVersion.Should().BeNull();
+        flight.LogMetadata.Should().BeEmpty();
     }
 
     [Fact]
@@ -45,8 +60,19 @@ public sealed class FlightTests
     {
         var flight = NewFlight();
 
-        var act = () => flight.RecordLogMetadata(null, -1, null, Now);
+        var act = () => flight.RecordLogDetails(new FlightLogDetails { DurationUs = -1 }, Now);
 
         act.Should().Throw<DomainRuleViolationException>().Which.Code.Should().Be("flight.negative_duration");
+    }
+
+    [Fact]
+    public void Overlong_values_from_the_log_are_shortened()
+    {
+        var flight = NewFlight();
+
+        flight.RecordLogDetails(new FlightLogDetails { FirmwareVersion = new string('v', 300), Hardware = new string('h', 300) }, Now);
+
+        flight.FirmwareVersion.Should().HaveLength(200);
+        flight.Hardware.Should().HaveLength(200);
     }
 }
