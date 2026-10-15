@@ -1,5 +1,6 @@
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Fleet;
+using FlightLog.Application.FlightData;
 using FlightLog.Application.Flights;
 using FlightLog.Application.Logs;
 using FlightLog.Application.Processing;
@@ -22,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IFlightService, FlightService>();
         services.AddScoped<ILogFileService, LogFileService>();
         services.AddScoped<ILogProcessingService, LogProcessingService>();
+        services.AddScoped<IFlightDataService, FlightDataService>();
         services.AddSingleton<LogProcessingRunner>();
         return services;
     }
