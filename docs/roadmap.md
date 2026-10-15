@@ -93,7 +93,21 @@ Ertelenenler: IMU tutarsızlığı, sensörler arası tutarsızlık, gecikme ve 
 
 ## Aşama 5 — Arayüz
 
-React + TypeScript (Vite), UI kütüphanesi seçimi (lisans kontrolüyle), uçuş listesi, uçuş detay, zaman serisi grafikleri (büyük veri için canvas tabanlı kütüphane), olay işaretleme, SignalR durum güncellemeleri.
+Hedef: Kullanıcı bir uçuşu açıp mevcut sinyalleri, olayları ve bulguları inceleyebilir.
+
+- [x] React 19 + TypeScript + Vite, Mantine 8, uPlot, TanStack Query/Virtual, Leaflet (ADR-0010, lisans kontrolüyle)
+- [x] API sözleşmesi: OpenAPI belgesi repoda (`web/src/api/openapi.json`), entegrasyon testiyle canlı belgeyle karşılaştırılır; TypeScript tipleri bundan üretilir, CI güncelliğini kontrol eder
+- [x] Canlı durum: PostgreSQL LISTEN/NOTIFY → SignalR hub (`/hubs/processing`), ekip grupları; bağlantı koparsa yavaş yoklama (ADR-0011)
+- [x] Dashboard API'si ve ekranı: uçuş/araç/proje sayıları, toplam uçuş süresi, işleme durumu dağılımı, son analizlerdeki bulgular, son uçuşlar ve dikkat gerektiren bulgular
+- [x] Giriş/kayıt, ekip seçimi, ekip yoksa ekip oluşturma; proje, filo, araç, ekip üyeleri ve yönetici (kullanıcılar, işleme istatistikleri) ekranları
+- [x] Log yükleme: çoklu dosya, ilerleme, iptal, tekrar dosya bağlantısı, canlı işleme durumu
+- [x] Uçuş geçmişi: filtreler (proje, araç, otopilot, durum, tarih, arama), sıralama, sayfalama; filtreler adreste
+- [x] Uçuş sayfası: senkron zaman serisi grafikleri (birim başına grafik, en fazla 8 sinyal, sürükleyerek yakınlaştırma, kaydırma), olay işaretleri ve bulgu aralıkları, mod/arm/bulgu zaman çizelgesi, sanallaştırılmış olay listesi, bulgular (ölçülen değer, eşik, eşik kaynağı, güven, kapsam, sınırlama, "grafikte göster"), kural sonuçları, yeniden analiz, sinyal kataloğu (kaynak ve dönüşüm), parametreler, GPS haritası (yalnızca konum verisi varsa), işleme geçmişi, iptal/yeniden deneme, orijinal dosyayı indirme, uçuş bilgisi düzenleme ve silme
+- [x] Boş, yükleniyor ve hata durumları; koyu tema; mobil uyumlu yerleşim; klavye ve ekran okuyucu etiketleri
+- [x] `web` konteyneri (nginx): statik dosyalar, `/api` ve `/hubs` proxy'si, CSP ve güvenlik başlıkları, sorgu dizesi loglanmaz
+- [x] Testler: Vitest birim ve bileşen testleri, Compose'a karşı Playwright uçtan uca testleri (gerçek PX4 ve ArduPilot loglarıyla); CI'da `web` işi
+
+Ertelenenler: yorumlar, etiketler ve bulgu inceleme iş akışı (Aşama 7), uçuş karşılaştırma (Aşama 7), AI analiz raporu (Aşama 6), kural metinlerinin Türkçeleştirilmesi (kurallar backend'de İngilizce açıklama üretiyor), HttpOnly çerezli oturum (Aşama 8).
 
 ## Aşama 6 — AI analizi
 

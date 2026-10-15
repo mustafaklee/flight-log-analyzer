@@ -1,10 +1,10 @@
 # Dağıtım
 
-Bu doküman Aşama 3 itibarıyla geçerli durumu anlatır; Aşama 8'de sunucu dağıtımı, yedekleme ve geri yükleme adımları gerçek bir ortamda doğrulanarak genişletilecek.
+Bu doküman Aşama 5 itibarıyla geçerli durumu anlatır; Aşama 8'de sunucu dağıtımı, yedekleme ve geri yükleme adımları gerçek bir ortamda doğrulanarak genişletilecek.
 
 ## Hedef ortam (varsayım)
 
-Tek Linux VM üzerinde Docker Compose; önünde TLS sonlandıran bir reverse proxy (ör. Caddy veya Nginx). API konteyneri yalnızca `127.0.0.1` üzerinden yayınlanır. `worker` konteyneri dışarıya port açmaz; veritabanı ve depolamaya API ile aynı ayarlarla bağlanır. Birden çok worker çalıştırılabilir (iş alma veritabanında compare-and-set ile yapılır).
+Tek Linux VM üzerinde Docker Compose; önünde TLS sonlandıran bir reverse proxy (ör. Caddy veya Nginx). API ve `web` konteynerleri yalnızca `127.0.0.1` üzerinden yayınlanır; reverse proxy `web` konteynerine (`127.0.0.1:8081`) yönlendirir, `web` de `/api` ve `/hubs` isteklerini API'ye iletir. Reverse proxy WebSocket yükseltmesine izin vermelidir (`/hubs/processing`); vermezse arayüz yoklamaya düşer. `worker` konteyneri dışarıya port açmaz; veritabanı ve depolamaya API ile aynı ayarlarla bağlanır. Birden çok worker çalıştırılabilir (iş alma veritabanında compare-and-set ile yapılır).
 
 ## Yapılandırma ve gizli bilgiler
 
@@ -24,6 +24,10 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Storage__CreateBucketIfMissing` | Açılışta bucket yoksa oluştur (yerel kurulum için `true`) |
 | `Uploads__MaxFileSizeBytes` | Maksimum log dosyası boyutu (`.env`: `UPLOAD_MAX_BYTES`, varsayılan 512 MiB). Önündeki reverse proxy'nin gövde sınırı da en az bu kadar olmalı |
 | `Uploads__TempDirectory` | Yükleme sırasında kullanılan geçici dizin (boşsa sistem geçici dizini); en büyük dosya kadar boş alan gerekir |
+| `WEB_PORT` | Arayüzün yayınlandığı port (8081) |
+| `MAP_TILE_URL`, `MAP_TILE_ATTRIBUTION` | Harita karo adresi ve atıf metni; imaj derlenirken gömülür (boşsa OpenStreetMap). OpenStreetMap'in kullanım politikası yoğun kullanıma izin vermez; üretimde kendi karo sunucunuzu kullanın |
+| `MAP_TILE_ORIGIN` | Karo sunucusunun origin'i; CSP `img-src` buna izin verir (`web` konteyneri, çalışma zamanında) |
+| `API_UPSTREAM` | `web` konteynerinin istekleri ileteceği API adresi (Compose'da `http://api:8080`) |
 | `ASPNETCORE_ENVIRONMENT` | `Production` ortamında Swagger UI kapalıdır |
 | `Processing__Enabled` | API'nin logları kendi içinde işlemesi (yalnızca geliştirme; Compose'da `false`, işleme `worker` servisinde) |
 | `Processing__PollInterval`, `Processing__CancellationCheckInterval` | Kuyruk yoklama aralığı (2 s) ve çalışan işin iptal kontrolü (5 s) |
@@ -76,6 +80,10 @@ Geri yükleme testi Aşama 8 kabul kriteridir; henüz doğrulanmadı.
 ## Loglar
 
 API JSON (Compact) formatında stdout'a log yazar. Docker log sürücüsünde boyut sınırı ayarlayın (ör. `max-size: 50m`, `max-file: 5`) veya merkezi bir log sistemine yönlendirin. Loglara parola, token veya API anahtarı yazılmaz.
+
+## Arayüz (`web`)
+
+nginx (`nginxinc/nginx-unprivileged`, root olmayan kullanıcı) derlenmiş arayüzü sunar. `index.html` önbelleğe alınmaz, `/assets/` altındaki hash'li dosyalar bir yıl önbelleğe alınır. Yanıtlarda CSP, `X-Content-Type-Options`, `Referrer-Policy` ve `Permissions-Policy` başlıkları vardır. Yüklemeler `/api` üzerinden tamponlanmadan API'ye akar; boyut sınırını API uygular. Erişim loglarına sorgu dizesi yazılmaz (SignalR token'ı orada taşınır). Sağlık kontrolü `GET /healthz`.
 
 ## Sağlık kontrolleri
 

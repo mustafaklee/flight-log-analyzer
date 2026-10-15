@@ -25,5 +25,7 @@ Bilinçli olarak kullanılmayanlar:
 - **FluentAssertions** (v8+ ticari lisans) — Apache-2.0 lisanslı fork **AwesomeAssertions** kullanılır.
 - **Moq** — 2023'teki SponsorLink olayı nedeniyle; **NSubstitute** kullanılır.
 
+Arayüz (Aşama 5) kütüphaneleri ve lisansları ADR-0010'dadır: React, Vite, Mantine, uPlot, TanStack Query/Virtual, React Router, Leaflet, `@microsoft/signalr`, `@tabler/icons-react`, dayjs (hepsi MIT, Leaflet BSD-2-Clause). `react-leaflet` Hippocratic lisansı nedeniyle kullanılmadı. Backend'e eklenen tek paket `Microsoft.AspNetCore.SignalR.Client` (MIT, yalnızca entegrasyon testi).
+
 ## Sonuçlar
-- Yeni bağımlılık eklenirken bu tablo güncellenir; CI'da `dotnet list package --vulnerable` çalıştırılır.
+- Yeni bağımlılık eklenirken bu tablo güncellenir; CI'da `dotnet list package --vulnerable` ve arayüz için `npm audit --omit=dev --audit-level=high` çalıştırılır.

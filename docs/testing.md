@@ -6,6 +6,8 @@
 |---|---|---|
 | `FlightLog.UnitTests` | Domain kuralları (ekip üyelik değişmezleri, rol sıralaması, proje doğrulaması, araç ve etiket kuralları, işleme durum makinesinin tüm durum çiftleri, log dosyası ve uçuş kuralları, analiz run'ı ve otomatik deneme), analiz kuralları ve kural motoru, zaman serisi aralık hesapları, outbox mesajları ve teslim kararları, geçici hata sınıflandırması, format algılama, dosya adı temizleme, FluentValidation kuralları, sayfalama, Clean Architecture katman bağımlılıkları | Yok |
 | `FlightLog.IntegrationTests` | Gerçek API (`WebApplicationFactory`) + gerçek PostgreSQL 17, SeaweedFS ve RabbitMQ 4.1 (Testcontainers); migration'lar her test sınıfı için temiz bir veritabanında, dosyalar her fabrika için ayrı bucket'ta, mesajlar ayrı virtual host'ta | Docker |
+| `web` (Vitest) | API istemcisi (token yenileme, Problem Details), GPS izi eşleme, zaman penceresi hesapları, bulgular paneli, yönlendirme ve oturum geri yükleme | Yok (`npm test`) |
+| `web/e2e` (Playwright) | Docker Compose ortamına karşı tarayıcıda: kayıt, ekip ve proje oluşturma, gerçek PX4 ve ArduPilot logu yükleme, canlı durum, grafikler, olay seçme, sinyal ekleme, bulgunun eşik ve kaynağı, "grafikte göster", parametreler, işleme geçmişi, harita; telefon genişliğinde giriş ekranı | Çalışan Compose (`npm run e2e`) |
 | `FlightLog.ParserTests` | ULog ve DataFlash parser'larının pyulog/pymavlink çıktısıyla birebir karşılaştırılması (her seri, her alan), bozuk/kesik/rastgele girdi, sınırlar, zaman aşımı, iptal; yorumlayıcılar (firmware, modlar, arm, UTC zamanı); normalizasyon kuralları; blok formatı ve bloklardan geri okunan değerlerin oracle ile eşleşmesi | Yok |
 
 ## Çalıştırma
@@ -62,6 +64,10 @@ Beklenen JSON'lar elle düzenlenmez. Parser bir oracle'dan bilerek farklı davra
 - **Geçici hata**: nesne depolama okuması yapay olarak hata verdirilir; bir hatadan sonra dosya otomatik denenip tamamlanır, sürekli hatada 4 denemeden sonra `processing.retries_exhausted` ile `Failed` olur ve elle yeniden deneme çalışır.
 - **RabbitMQ (Testcontainers ile gerçek broker, her test sınıfı kendi virtual host'unda)**: yükleme outbox → RabbitMQ → arka plan worker'ı yoluyla işlenip analiz edilir; outbox satırları bir kez yayınlanır; okunamayan mesajlar DLQ'ya gider; tekrar gelen mesajlar ack'lenir ve yeni iş açmaz; hazır olma kontrolü broker'ı içerir.
 
+- **Canlı durum**: SignalR hub'ına gerçek token ile bağlanılır; işleme ve analiz durum değişiklikleri kullanıcıya gelir, başka ekibin bildirimi gelmez; token'sız bağlantı reddedilir.
+- **Dashboard**: sayılar, uçuş süresi, durum dağılımı ve son analizlerdeki bulgular; ekip dışı kullanıcı 404 alır.
+- **API sözleşmesi**: canlı OpenAPI belgesi `web/src/api/openapi.json` ile aynıdır (`OpenApiContractTests`). API değiştiyse `UPDATE_OPENAPI_SNAPSHOT=1` ile dosyayı yeniden yazın ve `cd web && npm run api:types` çalıştırın.
+
 Kural mantığı unit testlerde sahte sinyal kaynağıyla (`RuleTestContext`) test edilir: eşik kaynağı, aralık birleştirme, arm pencereleri, uygulanamama gerekçeleri.
 
 Docker Compose ile uçtan uca kontrol (CI'daki `docker` işi de bunu çalıştırır):
@@ -70,6 +76,8 @@ Docker Compose ile uçtan uca kontrol (CI'daki `docker` işi de bunu çalıştı
 docker compose up -d --build --wait
 scripts/smoke-test.sh                                                   # PX4 örneği
 LOG_FILE=tests/fixtures/ardupilot/sitl-copter-4.6.3.bin scripts/smoke-test.sh
+scripts/smoke-test.sh http://127.0.0.1:8081                             # web konteyneri (nginx) üzerinden
+cd web && npm ci && npx playwright install chromium && npm run e2e      # tarayıcı testleri
 ```
 
 ## Kurallar
