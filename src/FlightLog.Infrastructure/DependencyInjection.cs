@@ -1,9 +1,11 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Ai;
 using FlightLog.Application.Logs;
 using FlightLog.Application.Messaging;
 using FlightLog.Application.Processing;
+using FlightLog.Infrastructure.Ai;
 using FlightLog.Infrastructure.Identity;
 using FlightLog.Infrastructure.Messaging;
 using FlightLog.Infrastructure.Persistence;
@@ -62,6 +64,16 @@ public static class DependencyInjection
         services.Configure<ProcessingOptions>(configuration.GetSection(ProcessingOptions.SectionName));
         services.AddMetrics();
         services.AddSingleton<ITransientErrorClassifier, TransientErrorClassifier>();
+
+        // AI analysis (ADR-0008): only the worker calls the provider; the key is only given to the worker.
+        services.Configure<AiOptions>(configuration.GetSection(AiOptions.SectionName));
+        services.AddSingleton<IFlightAnalysisProvider>(sp =>
+        {
+            var ai = sp.GetRequiredService<IOptions<AiOptions>>();
+            return string.Equals(ai.Value.Provider, "Anthropic", StringComparison.OrdinalIgnoreCase)
+                ? new AnthropicFlightAnalysisProvider(ai)
+                : new UnknownFlightAnalysisProvider(ai.Value.Provider, ai.Value.Model);
+        });
 
         AddStorage(services, configuration);
 

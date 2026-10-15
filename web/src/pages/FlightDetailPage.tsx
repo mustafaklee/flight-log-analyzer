@@ -2,10 +2,11 @@ import { Alert, Anchor, Badge, Card, Grid, Group, SegmentedControl, Stack, Tabs,
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { isActive, useAnalysisRuns, useEvents, useFindings, useFlight, useSignals } from '../api/queries';
-import type { Finding, FlightEvent, FlightEventKind } from '../api/types';
+import type { AiEvidence, Finding, FlightEvent, FlightEventKind } from '../api/types';
 import { PageHeader } from '../components/PageHeader';
 import { SeverityBadge, StatusBadge } from '../components/StatusBadge';
 import { EmptyState, ErrorState, LoadingState } from '../components/States';
+import { AiReportPanel } from '../flight/AiReportPanel';
 import { ChartWorkspace, MAX_SIGNALS } from '../flight/ChartWorkspace';
 import { EventsPanel } from '../flight/EventsPanel';
 import { FindingsPanel } from '../flight/FindingsPanel';
@@ -19,7 +20,7 @@ import { windowAround, type TimeWindow } from '../flight/view';
 import { formatDateTime, formatDuration } from '../lib/format';
 import { autopilotLabels } from '../lib/labels';
 
-const TABS = ['analysis', 'findings', 'signals', 'parameters', 'map', 'processing', 'details'] as const;
+const TABS = ['analysis', 'findings', 'ai', 'signals', 'parameters', 'map', 'processing', 'details'] as const;
 type Tab = (typeof TABS)[number];
 const DEFAULT_SIGNALS = ['attitude.roll', 'attitude.pitch', 'battery.voltage', 'gps.alt_msl'];
 const DEFAULT_MARKERS: FlightEventKind[] = ['ModeChange', 'Armed', 'Disarmed', 'Failsafe', 'Error', 'Dropout'];
@@ -107,6 +108,26 @@ export function FlightDetailPage() {
     setSide('findings');
   };
 
+  // Evidence of an AI report item: a finding opens like from the findings list; other evidence shows its time range.
+  const showEvidence = (e: AiEvidence) => {
+    const finding = e.findingId ? findingList.find((x) => x.id === e.findingId) : undefined;
+    if (finding) {
+      showFinding(finding);
+      return;
+    }
+
+    if (e.startUs == null) {
+      return;
+    }
+
+    const signal = e.signal && names.has(e.signal) && !selected.includes(e.signal) ? e.signal : null;
+    update({ tab: null, ...(signal ? { signals: [...selected, signal].slice(-MAX_SIGNALS).join(',') } : {}) });
+    setWindow(windowAround(e.startUs, e.endUs ?? e.startUs, logFromUs, logToUs));
+    if (e.kind === 'Event' || e.kind === 'Parameter') {
+      setPickedUs(e.startUs);
+    }
+  };
+
   const selectEvent = (e: FlightEvent) => {
     setPickedUs(e.timestampUs);
     setWindow(windowAround(e.timestampUs, e.timestampUs, logFromUs, logToUs));
@@ -173,6 +194,7 @@ export function FlightDetailPage() {
         <Tabs.List mb="md">
           <Tabs.Tab value="analysis">İnceleme</Tabs.Tab>
           <Tabs.Tab value="findings">Bulgular {f.latestAnalysis ? `(${f.latestAnalysis.findingCount})` : ''}</Tabs.Tab>
+          <Tabs.Tab value="ai">AI raporu</Tabs.Tab>
           <Tabs.Tab value="signals">Sinyaller</Tabs.Tab>
           <Tabs.Tab value="parameters">Parametreler</Tabs.Tab>
           {hasGps && <Tabs.Tab value="map">Harita</Tabs.Tab>}
@@ -255,6 +277,10 @@ export function FlightDetailPage() {
         </Tabs.Panel>
 
         <Tabs.Panel value="findings">{findingsPanel}</Tabs.Panel>
+
+        <Tabs.Panel value="ai">
+          <AiReportPanel flightId={f.id} teamId={f.teamId} logFromUs={logFromUs} hasRuleAnalysis={!!lastSucceeded} onShowEvidence={showEvidence} />
+        </Tabs.Panel>
 
         <Tabs.Panel value="signals">
           {!dataReady ? (

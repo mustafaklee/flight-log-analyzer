@@ -93,3 +93,41 @@ internal sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outb
         builder.HasIndex(m => m.PublishedAt);
     }
 }
+
+internal sealed class AiAnalysisConfiguration : IEntityTypeConfiguration<AiAnalysis>
+{
+    public void Configure(EntityTypeBuilder<AiAnalysis> builder)
+    {
+        builder.ToTable("AiAnalyses");
+        builder.HasKey(a => a.Id);
+        builder.Property(a => a.Id).ValueGeneratedNever();
+        builder.Property(a => a.Status).HasConversion<string>().HasMaxLength(32);
+        builder.Property(a => a.Provider).HasMaxLength(50).IsRequired();
+        builder.Property(a => a.Model).HasMaxLength(100).IsRequired();
+        builder.Property(a => a.ResponseModel).HasMaxLength(100);
+        builder.Property(a => a.PromptVersion).HasMaxLength(50).IsRequired();
+        builder.Property(a => a.ContextVersion).HasMaxLength(50);
+        builder.Property(a => a.ContextHash).HasMaxLength(64);
+        // Text, not jsonb: the stored context must stay byte-identical to what was hashed and sent.
+        builder.Property(a => a.Context).HasColumnType("text");
+        builder.Property(a => a.ContextSummary).AsRequiredJsonb().HasDefaultValueSql("'{}'::jsonb");
+        builder.Property(a => a.CorrelationId).HasMaxLength(100).IsRequired();
+        builder.Property(a => a.WorkerId).HasMaxLength(200);
+        builder.Property(a => a.CostUsd).HasPrecision(18, 6);
+        builder.Property(a => a.StopReason).HasMaxLength(50);
+        builder.Property(a => a.RawOutput).HasMaxLength(AiAnalysis.RawOutputMaxLength);
+        builder.Property(a => a.Report).HasColumnType("jsonb");
+        builder.Property(a => a.FailureCode).HasMaxLength(100);
+        builder.Property(a => a.FailureMessage).HasMaxLength(AiAnalysis.FailureMessageMaxLength);
+        builder.Property(a => a.Version).IsRowVersion();
+        builder.Ignore(a => a.DomainEvents);
+
+        builder.HasIndex(a => new { a.FlightId, a.CreatedAt });
+        builder.HasIndex(a => new { a.Status, a.CreatedAt });
+        builder.HasIndex(a => new { a.TeamId, a.CreatedAt });
+        builder.HasIndex(a => a.AnalysisRunId);
+        builder.HasOne<Flight>().WithMany().HasForeignKey(a => a.FlightId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne<AnalysisRun>().WithMany().HasForeignKey(a => a.AnalysisRunId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne<Team>().WithMany().HasForeignKey(a => a.TeamId).OnDelete(DeleteBehavior.Restrict);
+    }
+}

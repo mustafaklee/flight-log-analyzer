@@ -162,24 +162,13 @@ internal sealed partial class AnalysisService(
         var run = await db.AnalysisRuns.SingleAsync(r => r.Id == claim.RunId, cancellationToken);
         var file = await db.FlightLogFiles.SingleAsync(f => f.Id == claim.LogFileId, cancellationToken);
         var flight = await db.Flights.AsNoTracking().SingleAsync(f => f.Id == claim.FlightId, cancellationToken);
-        var events = await db.FlightEvents.AsNoTracking().Where(e => e.FlightId == flight.Id).ToListAsync(cancellationToken);
-        var parameters = await db.FlightParameters.AsNoTracking().Where(p => p.FlightId == flight.Id).ToListAsync(cancellationToken);
-        var span = await db.FlightSignalSeries.AsNoTracking().Where(s => s.FlightId == flight.Id && s.FirstTimestampUs != null)
-            .GroupBy(s => 1).Select(g => new { First = g.Min(s => s.FirstTimestampUs), Last = g.Max(s => s.LastTimestampUs) })
-            .SingleOrDefaultAsync(cancellationToken);
+        var (signals, log, events, parameters) = await AnalysisInputs.LoadAsync(db, storage, flight, cancellationToken);
         var processingJob = await db.LogProcessingJobs.AsNoTracking()
             .Where(j => j.LogFileId == file.Id && j.Outcome == ProcessingJobOutcome.Succeeded)
             .OrderByDescending(j => j.FinishedAt)
             .Select(j => new { j.Id, j.NormalizationVersion, j.ParserName, j.ParserVersion })
             .FirstOrDefaultAsync(cancellationToken);
 
-        // The log start the parser determined (PX4: header timestamp); some topics are logged with timestamp 0.
-        var firstUs = flight.LogStartTimestampUs
-            ?? Math.Min(span?.First ?? long.MaxValue, events.Count > 0 ? events.Min(e => e.TimestampUs) : long.MaxValue);
-        var lastUs = Math.Max(span?.Last ?? long.MinValue, events.Count > 0 ? events.Max(e => e.TimestampUs) : long.MinValue);
-        var log = firstUs <= lastUs ? new TimeRange(firstUs, lastUs) : new TimeRange(0, 0);
-
-        var signals = await FlightSignalSource.CreateAsync(db, storage, flight.Id, cancellationToken);
         var context = new AnalysisContext(flight.Autopilot, flight.VehicleType, log, events, parameters, signals);
         var result = await engine.RunAsync(context, run.Id, flight.Id, cancellationToken);
 
@@ -302,4 +291,26 @@ internal sealed partial class AnalysisService(
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Recovered {Count} analysis runs abandoned while running")]
     private partial void LogRecovered(int count);
+}
+
+/// <summary>What the rules (and the AI context) read about a flight besides the findings.</summary>
+internal static class AnalysisInputs
+{
+    public static async Task<(FlightSignalSource Signals, TimeRange Log, List<FlightEvent> Events, List<FlightParameter> Parameters)> LoadAsync(
+        IApplicationDbContext db, IFileStorage storage, Flight flight, CancellationToken cancellationToken)
+    {
+        var events = await db.FlightEvents.AsNoTracking().Where(e => e.FlightId == flight.Id).ToListAsync(cancellationToken);
+        var parameters = await db.FlightParameters.AsNoTracking().Where(p => p.FlightId == flight.Id).ToListAsync(cancellationToken);
+        var span = await db.FlightSignalSeries.AsNoTracking().Where(s => s.FlightId == flight.Id && s.FirstTimestampUs != null)
+            .GroupBy(s => 1).Select(g => new { First = g.Min(s => s.FirstTimestampUs), Last = g.Max(s => s.LastTimestampUs) })
+            .SingleOrDefaultAsync(cancellationToken);
+
+        // The log start the parser determined (PX4: header timestamp); some topics are logged with timestamp 0.
+        var firstUs = flight.LogStartTimestampUs
+            ?? Math.Min(span?.First ?? long.MaxValue, events.Count > 0 ? events.Min(e => e.TimestampUs) : long.MaxValue);
+        var lastUs = Math.Max(span?.Last ?? long.MinValue, events.Count > 0 ? events.Max(e => e.TimestampUs) : long.MinValue);
+        var log = firstUs <= lastUs ? new TimeRange(firstUs, lastUs) : new TimeRange(0, 0);
+        var signals = await FlightSignalSource.CreateAsync(db, storage, flight.Id, cancellationToken);
+        return (signals, log, events, parameters);
+    }
 }

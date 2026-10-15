@@ -43,6 +43,10 @@ public sealed class ProcessingMetrics
     private readonly Counter<long> _analysisRuns;
     private readonly Histogram<double> _analysisDuration;
     private readonly Counter<long> _findings;
+    private readonly Counter<long> _aiAnalyses;
+    private readonly Histogram<double> _aiDuration;
+    private readonly Counter<long> _aiTokens;
+    private readonly Counter<double> _aiCost;
 
     public ProcessingMetrics(IMeterFactory meterFactory)
     {
@@ -56,6 +60,10 @@ public sealed class ProcessingMetrics
         _analysisRuns = meter.CreateCounter<long>("flightlog.analysis.runs", description: "Analysis runs by outcome");
         _analysisDuration = meter.CreateHistogram<double>("flightlog.analysis.duration", "s", "Duration of an analysis run");
         _findings = meter.CreateCounter<long>("flightlog.analysis.findings", description: "Findings by rule and severity");
+        _aiAnalyses = meter.CreateCounter<long>("flightlog.ai.analyses", description: "AI analysis attempts by outcome and failure code");
+        _aiDuration = meter.CreateHistogram<double>("flightlog.ai.duration", "s", "Duration of an AI analysis attempt");
+        _aiTokens = meter.CreateCounter<long>("flightlog.ai.tokens", description: "Tokens used by AI analyses, by model and direction");
+        _aiCost = meter.CreateCounter<double>("flightlog.ai.cost", "USD", "Estimated cost of AI analyses by model");
     }
 
     public void JobStarted(TimeSpan queueWait) => _queueWait.Record(Math.Max(0, queueWait.TotalSeconds));
@@ -83,4 +91,25 @@ public sealed class ProcessingMetrics
     }
 
     public void Finding(string ruleId, string severity) => _findings.Add(1, new TagList { { "rule", ruleId }, { "severity", severity } });
+
+    public void AiAnalysisEnded(WorkOutcome outcome, string? code, TimeSpan duration)
+    {
+        _aiAnalyses.Add(1, new TagList { { "outcome", outcome.ToString() }, { "code", code ?? "" } });
+        _aiDuration.Record(duration.TotalSeconds);
+        if (outcome == WorkOutcome.RetryScheduled)
+        {
+            _retries.Add(1, new TagList { { "stage", "ai" } });
+        }
+    }
+
+    public void AiCall(string model, Domain.Analysis.AiUsage usage, decimal? cost)
+    {
+        ArgumentNullException.ThrowIfNull(usage);
+        _aiTokens.Add(usage.InputTokens, new TagList { { "model", model }, { "direction", "input" } });
+        _aiTokens.Add(usage.OutputTokens, new TagList { { "model", model }, { "direction", "output" } });
+        if (cost is { } c)
+        {
+            _aiCost.Add((double)c, new TagList { { "model", model } });
+        }
+    }
 }

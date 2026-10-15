@@ -91,6 +91,10 @@ services:
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
       # Logs are processed by the worker service below, not inside the API.
       Processing__Enabled: "false"
+      # AI reports (ADR-0008): the API only queues them and enforces the quota; it never gets the provider key.
+      Ai__Enabled: ${AI_ENABLED:-false}
+      Ai__Model: ${AI_MODEL:-claude-opus-5-5}
+      Ai__DailyLimitPerTeam: ${AI_DAILY_LIMIT_PER_TEAM:-20}
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     healthcheck:
@@ -123,6 +127,10 @@ services:
       RabbitMq__HostName: rabbitmq
       RabbitMq__UserName: ${RABBITMQ_USER}
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      # The worker writes AI reports; the key stays in .env and this container only.
+      Ai__Model: ${AI_MODEL:-claude-opus-5-5}
+      Ai__Effort: ${AI_EFFORT:-high}
+      Ai__ApiKey: ${ANTHROPIC_API_KEY:-}
 
   # React client (ADR-0010): static build behind nginx, which proxies /api and /hubs so the browser sees one origin.
   web:

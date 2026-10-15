@@ -51,3 +51,9 @@ RULES=$(echo "$DETAILS" | jq '.rules | length')
 FINDINGS=$(echo "$DETAILS" | jq .findingCount)
 echo "Analysis $RUN_STATUS: $RULES rules evaluated, $FINDINGS findings"
 [ "$RUN_STATUS" = "Succeeded" ] && [ "$RULES" -gt 0 ]
+
+# AI reports are off unless an operator enables them; a request must say so instead of failing obscurely.
+AI_ENABLED=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/teams/$TEAM/ai-status" | jq -r .enabled)
+AI_CODE=$(curl -sS "${AUTH[@]}" -X POST "$BASE/api/v1/flights/$FLIGHT/ai-analyses" | jq -r .code)
+echo "AI analysis enabled: $AI_ENABLED (request answered with ${AI_CODE})"
+[ "$AI_ENABLED" = "true" ] || [ "$AI_CODE" = "ai.disabled" ]

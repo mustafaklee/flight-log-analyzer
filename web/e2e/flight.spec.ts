@@ -39,6 +39,12 @@ test('a user uploads a PX4 log and inspects its signals, events and findings', a
   await expect(page).toHaveURL(/finding=/);
   await expect(page.locator('.uplot canvas').first()).toBeVisible();
 
+  // The AI report tab is labeled as model interpretation; this deployment has AI analysis switched off (the default).
+  await page.getByRole('tab', { name: 'AI raporu' }).click();
+  await expect(page.getByText('Model yorumu')).toBeVisible();
+  await expect(page.getByText('AI analizi kapalı')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'AI raporu oluştur' })).toBeDisabled();
+
   // Parameters, processing history and metadata.
   await page.getByRole('tab', { name: 'Parametreler' }).click();
   await page.getByLabel('Yalnızca uçuşta değişenler').check();

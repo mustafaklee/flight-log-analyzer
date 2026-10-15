@@ -2,6 +2,9 @@ import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClie
 import { api, type Query } from './client';
 import type {
   AdminUser,
+  AiAnalysis,
+  AiStatus,
+  AiUsage,
   Aircraft,
   AnalysisRun,
   Dashboard,
@@ -47,6 +50,10 @@ export const keys = {
   jobs: (logFileId: string) => ['log-file', logFileId, 'jobs'] as const,
   adminUsers: (query: Query) => ['admin-users', query] as const,
   stats: (hours: number) => ['processing-stats', hours] as const,
+  aiAnalyses: (flightId: string) => ['flight', flightId, 'ai-analyses'] as const,
+  aiAnalysis: (id: string) => ['ai-analysis', id] as const,
+  aiStatus: (teamId: string) => ['ai-status', teamId] as const,
+  aiUsage: (days: number) => ['ai-usage', days] as const,
 };
 
 const ACTIVE_STATUSES = new Set(['Uploaded', 'Validating', 'Queued', 'Processing', 'Processed', 'AnalysisPending', 'Analyzing']);
@@ -241,6 +248,42 @@ export function useProcessingStats(hours: number) {
   });
 }
 
+const isAiPending = (a: AiAnalysis | undefined) => a?.status === 'Queued' || a?.status === 'Running';
+
+/** AI analyses of a flight, newest first, without report bodies. */
+export function useAiAnalyses(flightId: string) {
+  return useQuery({
+    queryKey: keys.aiAnalyses(flightId),
+    queryFn: ({ signal }) => api<AiAnalysis[]>(`/flights/${flightId}/ai-analyses`, { signal }),
+    refetchInterval: (q) => (q.state.data?.some(isAiPending) ? FALLBACK_POLL_MS : false),
+  });
+}
+
+export function useAiAnalysis(id: string | undefined) {
+  return useQuery({
+    queryKey: keys.aiAnalysis(id ?? ''),
+    queryFn: ({ signal }) => api<AiAnalysis>(`/ai-analyses/${id}`, { signal }),
+    enabled: !!id,
+    refetchInterval: (q) => (isAiPending(q.state.data) ? FALLBACK_POLL_MS : false),
+  });
+}
+
+export function useAiStatus(teamId: string | undefined) {
+  return useQuery({
+    queryKey: keys.aiStatus(teamId ?? ''),
+    queryFn: ({ signal }) => api<AiStatus>(`/teams/${teamId}/ai-status`, { signal }),
+    enabled: !!teamId,
+  });
+}
+
+export function useAiUsage(days: number) {
+  return useQuery({
+    queryKey: keys.aiUsage(days),
+    queryFn: ({ signal }) => api<AiUsage>('/admin/ai/usage', { query: { days }, signal }),
+    refetchInterval: 60_000,
+  });
+}
+
 // ---- Mutations -------------------------------------------------------------------------------------------------
 
 export function useCreateTeam() {
@@ -354,6 +397,17 @@ export function useRequestAnalysis(flightId: string) {
     onSuccess: () => {
       client.invalidateQueries({ queryKey: keys.runs(flightId) });
       client.invalidateQueries({ queryKey: keys.flight(flightId) });
+    },
+  });
+}
+
+export function useRequestAiAnalysis(flightId: string, teamId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: () => api<AiAnalysis>(`/flights/${flightId}/ai-analyses`, { method: 'POST' }),
+    onSettled: () => {
+      client.invalidateQueries({ queryKey: keys.aiAnalyses(flightId) });
+      client.invalidateQueries({ queryKey: keys.aiStatus(teamId) });
     },
   });
 }

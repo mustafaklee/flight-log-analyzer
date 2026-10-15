@@ -37,6 +37,9 @@ export function useRealtime(enabled: boolean): RealtimeState {
           // New processing output: signals, events and parameters were replaced.
           client.invalidateQueries({ queryKey: ['flight', n.flightId] });
         }
+      } else if (n.kind === 'aiAnalysis') {
+        client.invalidateQueries({ queryKey: keys.aiAnalyses(n.flightId) });
+        client.invalidateQueries({ queryKey: keys.aiAnalysis(n.id) });
       } else {
         client.invalidateQueries({ queryKey: keys.runs(n.flightId) });
         client.invalidateQueries({ queryKey: keys.run(n.id) });

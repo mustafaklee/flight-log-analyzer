@@ -16,6 +16,7 @@ public static class OutboxMessages
     {
         LogFileQueued e => Create(new ProcessLogFileV1(e.LogFileId, e.TeamId, NewCorrelationId()), e.LogFileId, now, e.NotBefore),
         AnalysisRunQueued e => Create(new AnalyzeFlightV1(e.AnalysisRunId, e.FlightId, e.TeamId, NewCorrelationId()), e.AnalysisRunId, now, e.NotBefore),
+        AiAnalysisQueued e => Create(new AiAnalyzeFlightV1(e.AiAnalysisId, e.FlightId, e.TeamId, NewCorrelationId()), e.AiAnalysisId, now, e.NotBefore),
         _ => null,
     };
 

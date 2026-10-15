@@ -47,6 +47,8 @@ public interface IApplicationDbContext
 
     DbSet<AnalysisRuleResult> AnalysisRuleResults { get; }
 
+    DbSet<AiAnalysis> AiAnalyses { get; }
+
     DbSet<OutboxMessage> OutboxMessages { get; }
 
     /// <summary>Transactions for multi-statement writes (bulk delete + insert of derived flight data).</summary>

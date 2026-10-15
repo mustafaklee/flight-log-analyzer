@@ -179,6 +179,20 @@ public sealed class AnalysisTests(ApiFactory factory) : IClassFixture<ApiFactory
     }
 
     [Fact]
+    public async Task Ai_analysis_is_off_unless_an_operator_enables_it()
+    {
+        var client = await factory.CreateUserClientAsync();
+        var (team, project) = await client.CreateTeamAndProjectAsync();
+        var upload = await (await client.UploadLogAsync(project.Id, Fixture("px4/sample_log_small.ulg"), "small.ulg")).ReadAsync<UploadResult>(HttpStatusCode.Created);
+        await factory.ProcessQueueAsync();
+
+        var status = await (await client.GetAsync($"/api/v1/teams/{team.Id}/ai-status", Ct)).ReadAsync<Application.Ai.AiStatusDto>(HttpStatusCode.OK);
+        status.Enabled.Should().BeFalse();
+        var problem = await (await client.PostAsync($"/api/v1/flights/{upload.Flight.Id}/ai-analyses", null, Ct)).ReadAsync<Problem>(HttpStatusCode.UnprocessableEntity);
+        problem.Code.Should().Be("ai.disabled");
+    }
+
+    [Fact]
     public async Task Processing_statistics_are_for_administrators()
     {
         var client = await factory.CreateUserClientAsync();
