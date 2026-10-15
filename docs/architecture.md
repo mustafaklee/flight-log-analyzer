@@ -133,9 +133,10 @@ erDiagram
 | `FlightSignal` | Id, FlightId, SeriesId, Name, Kind, Message, Instance, Field, Column, SourceType, Unit, Multiplier, SourceMessage/Instance/Fields, Conversion, NormalizationVersion, SampleCount, InvalidCount, Min, Max, First/LastTimestampUs | unique (FlightId, Name) | 3 |
 | `FlightEvent` | Id, FlightId, TimestampUs, Kind (Message/ModeChange/Armed/Disarmed/Failsafe/Error/Event/Dropout), Severity?, Source, Text, Data (jsonb) | idx (FlightId, TimestampUs) | 3 |
 | `FlightParameter` | Id, FlightId, Name, Value, DefaultValue?, TimestampUs? (null = log başındaki değer) | idx (FlightId, Name) | 3 |
-| `AnalysisRun` | Id, TeamId, FlightId, LogFileId, Kind (Rules; AI Aşama 6'da), Trigger (Automatic/Manual), Status (Queued/Running/Succeeded/Failed/Cancelled), EngineVersion, RequestedBy?, Attempt, RetryCount, NextAttemptAt?, WorkerId, CorrelationId, CreatedAt, StartedAt, FinishedAt, DurationMs, bulgu ve kural sayıları, InputSummary (jsonb), FailureCode/Message, Version (xmin) | idx (FlightId, CreatedAt), (Status, CreatedAt), LogFileId | 4 |
+| `AnalysisRun` | Id, TeamId, FlightId, LogFileId, Kind (Rules), Trigger (Automatic/Manual), Status (Queued/Running/Succeeded/Failed/Cancelled), EngineVersion, RequestedBy?, Attempt, RetryCount, NextAttemptAt?, WorkerId, CorrelationId, CreatedAt, StartedAt, FinishedAt, DurationMs, bulgu ve kural sayıları, InputSummary (jsonb), FailureCode/Message, Version (xmin) | idx (FlightId, CreatedAt), (Status, CreatedAt), LogFileId | 4 |
 | `AnalysisRuleResult` | RunId, RuleId, RuleVersion, Status (Applied/NotApplicable/Failed), Reason, FindingCount, Signals (text[]), DurationMs | PK (RunId, RuleId) | 4 |
 | `AnalysisFinding` | Id, RunId, FlightId, RuleId, RuleVersion, Category, Title, Description, Severity (Info/Warning/Critical), Confidence (Low/Medium/High), StartUs, EndUs, Signals (text[]), Measured (jsonb), Threshold (jsonb), ThresholdSource, DataCoverage?, OccurrenceCount, Limitations? | idx (RunId, StartUs), FlightId | 4 |
+| `AiAnalysis` | Id, TeamId, FlightId, AnalysisRunId (dayandığı kural analizi), RequestedBy, Status (Queued/Running/Succeeded/Failed), Provider, Model, ResponseModel, PromptVersion, ContextVersion, ContextHash, Context (text; byte olarak korunur), ContextSummary (jsonb), Attempt, RetryCount, NextAttemptAt?, WorkerId, ProviderCalls, LatencyMs, Input/Output/CacheRead/CacheWriteTokens, CostUsd?, StopReason, RawOutput, Report (jsonb, doğrulanmış), FailureCode/Message, Version (xmin) | idx (FlightId, CreatedAt), (Status, CreatedAt), (TeamId, CreatedAt), AnalysisRunId | 6 |
 | `OutboxMessage` | Id, Type, AggregateId, Payload (jsonb), CorrelationId, CreatedAt, AvailableAt, PublishedAt?, PublishAttempts, LastError | kısmi idx (AvailableAt, Id) where PublishedAt is null; idx AggregateId, PublishedAt | 4 |
 | `AnalysisEvidence`, inceleme durumu (`ReviewStatus`) | FindingId, SignalId?/EventId?, StartUs, EndUs, Value (jsonb) | — | 7 (ertelendi) |
 | `Comment` | Id, FlightId, AuthorId, Body, StartUs?, EndUs?, CreatedAt, EditedAt | idx (FlightId, CreatedAt) | 7 |
@@ -204,7 +205,8 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Signals | `GET /api/v1/flights/{id}/signals?kind&search`, `GET /api/v1/flights/{id}/signals/data?names&fromUs&toUs&maxPoints` | 3 |
 | Events | `GET /api/v1/flights/{id}/events?kind&maxSeverity&fromUs&toUs&search&page&pageSize` | 3 |
 | Parameters | `GET /api/v1/flights/{id}/parameters?search&changedOnly` | 3 |
-| Analysis | `POST/GET /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings?minSeverity&category&ruleId&page&pageSize`, `GET /api/v1/analysis-rules` | 4 (AI: 6) |
+| Analysis | `POST/GET /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings?minSeverity&category&ruleId&page&pageSize`, `GET /api/v1/analysis-rules` | 4 |
+| AI analysis | `POST/GET /api/v1/flights/{id}/ai-analyses`, `GET /api/v1/ai-analyses/{id}`, `/context`, `/report.md`, `GET /api/v1/teams/{teamId}/ai-status`, `GET /api/v1/admin/ai/usage?days` | 6 |
 | Processing stats | `GET /api/v1/admin/processing/stats?hours` (yalnızca Administrator) | 4 |
 | Dashboard | `GET /api/v1/teams/{teamId}/dashboard` | 5 |
 | Realtime | SignalR `/hubs/processing` (`StatusChanged`; ekip grupları, yöneticiler için ayrı grup) | 5 |
@@ -312,9 +314,19 @@ Kod: `src/FlightLog.Application/Analysis`. Motor sürümü `rules-1`; her kural�
 
 Kuralların tam açıklaması, gereken veriler ve uygulanamadığı durumlar `GET /api/v1/analysis-rules` ile okunur. Aynı girdi aynı bulguları üretir (entegrasyon testiyle doğrulandı).
 
-### 8.2 Canlı durum güncellemeleri (ADR-0011)
+### 8.2 AI raporu (ADR-0008)
 
-Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı commit edildikten sonra `pg_notify('flightlog_status', ...)` gönderilir (`StatusNotificationInterceptor`). Bildirim worker'dan da gelse API'ye ulaşır: API'deki `StatusNotificationListener` PostgreSQL'i `LISTEN` ile dinler ve bildirimi SignalR hub'ında yalnızca ilgili ekibin grubuna (ve yöneticilere) iletir. Bildirim yalnızca neyin değiştiğini söyler (tür, kimlik, durum, hata kodu); arayüz ayrıntıyı API'den yeniden okur. Bağlantı koparsa arayüz etkin işleri 15 saniyede bir yoklar, yeniden bağlanınca listeleri yeniler. Ayrı bir broker veya Redis backplane gerekmez; birden çok API örneği aynı kanalı dinler.
+Kod: `src/FlightLog.Application/Ai`, adaptör `src/FlightLog.Infrastructure/Ai`. Kural analizinin üzerine kurulur, onu değiştirmez.
+
+1. **İstek** (Engineer): özellik açık mı, aynı uçuşta bekleyen istek var mı, son kural analizi başarılı mı ve ekibin günlük kotası dolmuş mu kontrol edilir. `AiAnalysis` satırı ve outbox mesajı (`flightlog.ai-analyze-flight.v1`) aynı transaction'da yazılır.
+2. **Bağlam** (worker): `FlightContextLoader` bulguları, kural sonuçlarını, olayları, parametreleri ve anahtar sinyallerin (batarya, GPS kalitesi, tutum; enlem/boylam hariç) tüm uçuş ve bulgu pencerelerindeki istatistiklerini okur. `FlightContextBuilder` bunları referanslı (`F`, `R`, `S`, `E`, `P`), deterministik bir JSON'a çevirir, sınırı aşarsa kırpar ve hash'ler.
+3. **Çağrı:** `flight-report-v1` sistem talimatı, `<flight_context>` içinde bağlam ve JSON şemasıyla yapılandırılmış çıktı. Her çağrı (başarısız olanlar dahil) token, gecikme ve maliyetle hemen kaydedilir.
+4. **Doğrulama:** `FlightReportValidator` şemayı, referansları ve sayıları kontrol eder. Geçersiz yanıt için tek onarım çağrısı yapılır. Sonuç `Report` (jsonb) olarak saklanır; Markdown çıktısı istekte üretilir.
+5. **Hatalar:** reddetme, kesilme, bağlam penceresi, kimlik doğrulama ve istek reddi yeniden denenmez. 429/5xx/ağ hataları `Ai:MaxAutomaticRetries` kadar yeniden kuyruğa alınır. Takılı çalıştırmalar ve kaybolan mesajlar bakımda kurtarılır.
+
+### 8.3 Canlı durum güncellemeleri (ADR-0011)
+
+Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı commit edildikten sonra `pg_notify('flightlog_status', ...)` gönderilir (`StatusNotificationInterceptor`). Bildirim worker'dan da gelse API'ye ulaşır: API'deki `StatusNotificationListener` PostgreSQL'i `LISTEN` ile dinler ve bildirimi SignalR hub'ında yalnızca ilgili ekibin grubuna (ve yöneticilere) iletir. Bildirim yalnızca neyin değiştiğini söyler (tür: dosya, analiz veya AI raporu; kimlik, durum, hata kodu); arayüz ayrıntıyı API'den yeniden okur. Bağlantı koparsa arayüz etkin işleri 15 saniyede bir yoklar, yeniden bağlanınca listeleri yeniler. Ayrı bir broker veya Redis backplane gerekmez; birden çok API örneği aynı kanalı dinler.
 
 ## 9. Güvenlik özeti
 
@@ -322,7 +334,7 @@ Dosya veya analiz durumu değiştiğinde, değişikliği yazan EF transaction'ı
 - Yetkilendirme backend'de, Application katmanında kaynak bazlı: her sorgu kullanıcının ekip üyeliğine göre filtrelenir.
 - Ham log güvenilmeyen girdi: içerik doğrulama, boyut sınırı, parser zaman/bellek sınırı, depolama anahtarı sunucuda üretilir.
 - Gizli bilgiler environment variable / secret store; `.env` dosyası git dışında.
-- LLM'e giden veri minimize edilir; log içindeki metinler talimat olarak yorumlanmaz.
+- LLM'e giden veri minimize edilir (ham log, konum, uçuş adı/notu ve kullanıcı bilgisi gönderilmez); log içindeki metinler ayrı, "güvenilmeyen" bölümde gönderilir ve talimat olarak yorumlanmaz. API anahtarı yalnızca worker'dadır. Modelin yanıtı kanıt referansları ve sayılar açısından sunucuda doğrulanır; arayüzde "model yorumu" olarak, kural bulgularından ayrı gösterilir.
 - Arayüz: access token yalnızca bellekte, refresh token `localStorage`'da (ADR-0010). nginx CSP ile satır içi script'i yasaklar, yalnızca aynı origin'e bağlantıya ve yapılandırılan harita karo sunucusuna izin verir. SignalR WebSocket'i token'ı sorgu dizesinde taşıdığı için nginx sorgu dizesini loglamaz. Log içindeki metinler (mesajlar, parametre adları) arayüzde düz metin olarak gösterilir, HTML olarak işlenmez.
 
 ## 10. Gözlemlenebilirlik

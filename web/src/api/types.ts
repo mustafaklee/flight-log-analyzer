@@ -40,6 +40,13 @@ export type DashboardFinding = Schemas['DashboardFindingDto'];
 export type AdminUser = Schemas['AdminUserDto'];
 export type ProcessingStats = Schemas['ProcessingStatsDto'];
 export type DurationStats = Schemas['DurationStats'];
+export type AiAnalysis = Schemas['AiAnalysisDto'];
+export type AiAnalysisStatus = Schemas['AiAnalysisStatus'];
+export type AiReport = Schemas['AiReportDto'];
+export type AiReportItem = Schemas['AiReportItemDto'];
+export type AiEvidence = Schemas['AiEvidenceDto'];
+export type AiStatus = Schemas['AiStatusDto'];
+export type AiUsage = Schemas['AiUsageDto'];
 
 export interface Paged<T> {
   items: T[];
@@ -64,7 +71,7 @@ export interface Problem {
 
 /** A status change pushed by the processing hub (ADR-0011). */
 export interface StatusNotification {
-  kind: 'logFile' | 'analysisRun';
+  kind: 'logFile' | 'analysisRun' | 'aiAnalysis';
   teamId: string;
   flightId: string;
   id: string;

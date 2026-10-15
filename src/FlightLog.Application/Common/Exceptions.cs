@@ -29,3 +29,11 @@ public sealed class PayloadTooLargeException(long limitBytes)
 {
     public long LimitBytes { get; } = limitBytes;
 }
+
+/// <summary>A usage limit is reached (HTTP 429); <see cref="RetryAfter"/> says when it resets.</summary>
+public sealed class QuotaExceededException(string code, string message, TimeSpan retryAfter) : Exception(message)
+{
+    public string Code { get; } = code;
+
+    public TimeSpan RetryAfter { get; } = retryAfter;
+}

@@ -47,6 +47,8 @@ public sealed class FlightLogDbContext(DbContextOptions<FlightLogDbContext> opti
 
     public DbSet<AnalysisRuleResult> AnalysisRuleResults => Set<AnalysisRuleResult>();
 
+    public DbSet<AiAnalysis> AiAnalyses => Set<AiAnalysis>();
+
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();

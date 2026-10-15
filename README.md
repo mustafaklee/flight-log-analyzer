@@ -6,7 +6,7 @@ PX4 ve ArduPilot tabanlı İHA'ların uçuş loglarını yüklemek, arşivlemek,
 
 ## Durum
 
-Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–5: temel backend, araç/uçuş yönetimi, log yükleme, PX4/ArduPilot log işleme, RabbitMQ ile asenkron işleme, kural tabanlı teknik analiz ve web arayüzü**:
+Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çalışan kısım **Aşama 1–6: temel backend, araç/uçuş yönetimi, log yükleme, PX4/ArduPilot log işleme, RabbitMQ ile asenkron işleme, kural tabanlı teknik analiz, web arayüzü ve kanıta bağlı AI raporu**:
 
 | Özellik | Durum |
 |---|---|
@@ -28,7 +28,7 @@ Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çal�
 | Web arayüzü: dashboard, uçuş geçmişi, log yükleme, filo, projeler, ekip, yönetici ekranları | Çalışıyor; uçtan uca tarayıcı testli |
 | Uçuş inceleme: senkron grafikler, olay işaretleri, bulgu aralıkları, zaman çizelgesi, olay listesi, bulgular, sinyal kataloğu, parametreler, GPS haritası (konum verisi varsa) | Çalışıyor; gerçek PX4 ve ArduPilot loglarıyla testli |
 | Canlı işleme durumu (SignalR) | Çalışıyor, testli |
-| Yapay zekâ analizi | Aşama 6 |
+| AI raporu (Anthropic Claude): kural bulgularından hazırlanan bağlam, her iddia için kanıt referansı, desteklenmeyen iddia ve doğrulanamayan sayı işaretleme, kota, maliyet ve gecikme kaydı | Çalışıyor, testli (sahte HTTP uç noktası ve betikli sağlayıcıyla); varsayılan olarak kapalı, API anahtarı gerekir |
 
 Henüz yapılmamış özellikler çalışıyormuş gibi gösterilmez.
 
@@ -200,12 +200,16 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | GET | `/api/v1/analysis-runs/{id}` | Analiz durumu, sayılar ve her kuralın sonucu (uygulandı / uygulanamadı ve neden / hata) |
 | GET | `/api/v1/analysis-runs/{id}/findings` | Bulgular (`minSeverity`, `category`, `ruleId`, sayfalama): zaman aralığı, ölçülen değerler, eşik ve kaynağı, güven |
 | GET | `/api/v1/analysis-rules` | Kurallar: ne kontrol ettikleri, gereken veri, uygulanamadıkları durumlar |
+| POST/GET | `/api/v1/flights/{id}/ai-analyses` | AI raporu iste (Engineer, 202; kota 429) / AI rapor geçmişi |
+| GET | `/api/v1/ai-analyses/{id}`, `/context`, `/report.md` | Rapor ve doğrulama sonucu / modele gönderilen bağlam (Engineer) / Markdown rapor |
+| GET | `/api/v1/teams/{id}/ai-status` | AI açık mı, model, günlük kota ve kullanım |
+| GET | `/api/v1/admin/ai/usage?days=` | AI kullanımı: çağrılar, token'lar, tahmini maliyet, gecikme, hata kodları (Administrator) |
 | GET | `/api/v1/admin/processing/stats?hours=` | İşleme istatistikleri (Administrator) |
 | GET | `/api/v1/teams/{id}/dashboard` | Ekip özeti: sayılar, uçuş süresi, işleme durumu, son analizlerdeki bulgular, son uçuşlar |
 | WS | `/hubs/processing` | SignalR: dosya ve analiz durum değişiklikleri (`StatusChanged`), yalnızca kullanıcının ekipleri için |
 | GET | `/health/live`, `/health/ready` | Sağlık kontrolleri (hazırlık: veritabanı, depolama, RabbitMQ) |
 
-Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`, `analysis_run.already_pending`).
+Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`, `analysis_run.already_pending`, `ai.disabled`, `ai.quota_exceeded`).
 
 ## Dağıtım
 
@@ -224,5 +228,7 @@ Sunucu kurulumu, migration, gizli bilgi yönetimi, yedekleme ve log saklama: [do
 - Harita karoları varsayılan olarak OpenStreetMap'ten çekilir; yoğun kullanımda kendi karo sunucunuzu `MAP_TILE_URL` ile verin.
 - Devre dışı bırakılan kullanıcının daha önce aldığı access token süresi dolana kadar (`Auth:AccessTokenMinutes`) geçerli kalır; refresh ve giriş hemen engellenir.
 - Yönetici davet akışı ve e-posta doğrulama yok.
+- AI raporu gerçek sağlayıcıya karşı CI'da test edilmiyor (anahtar gerektirir); adaptör sahte HTTP uç noktasına karşı, akış betikli sağlayıcıyla test ediliyor. Sayı doğrulaması sezgiseldir: birim dönüşümü veya hesaplanmış farklar "doğrulanmamış" görünebilir ([ADR-0008](docs/adr/0008-ai-analysis-provider.md)).
+- AI kotası ekip başına ve günlüktür; kullanıcı başına kota ve parasal bütçe sınırı yok.
 - Denetim kaydı (audit log) Aşama 7'de eklenecek.
 - OpenTelemetry Aşama 8'de eklenecek; şu an yapılandırılmış loglar, korelasyon kimliği, `FlightLog.Processing` metrikleri (dışa aktarım yok) ve yönetici istatistik endpoint'i var.

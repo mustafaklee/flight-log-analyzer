@@ -6,7 +6,7 @@
 ## Bağlam
 Gereksiz bağımlılık eklenmemeli; sürüm ve lisanslar kontrol edilmeli. Son yıllarda bazı yaygın .NET kütüphaneleri ticari lisansa geçti.
 
-## Karar (Aşama 2 itibarıyla)
+## Karar (Aşama 6 itibarıyla)
 
 | Amaç | Paket | Sürüm | Lisans |
 |---|---|---|---|
@@ -17,6 +17,7 @@ Gereksiz bağımlılık eklenmemeli; sürüm ve lisanslar kontrol edilmeli. Son 
 | Doğrulama | FluentValidation | 12.x | Apache-2.0 |
 | Sağlık | Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore | 10.0.x | MIT |
 | Nesne depolama istemcisi | AWSSDK.S3 | 4.0.x | Apache-2.0 |
+| LLM istemcisi (Aşama 6, yalnızca Infrastructure) | Anthropic | 12.57.x | MIT |
 | Test | xunit.v3, AwesomeAssertions, NSubstitute, Testcontainers.PostgreSql, Microsoft.AspNetCore.Mvc.Testing | güncel | Apache-2.0 / Apache-2.0 / BSD-3 / MIT / MIT |
 
 Bilinçli olarak kullanılmayanlar:

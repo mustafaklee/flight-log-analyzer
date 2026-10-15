@@ -40,6 +40,14 @@ Tüm ayarlar ortam değişkeniyle verilir (`__` iç içe anahtar ayırıcıdır)
 | `Processing__MaxAutomaticRetries`, `Processing__RetryBaseDelay`, `Processing__RetryMaxDelay` | Geçici hatalarda otomatik deneme sayısı (3) ve üstel bekleme (30 s'den başlar, en fazla 10 dk) |
 | `Processing__AnalysisStaleAfter` | Bu süreden uzun `Running` kalan analiz çöken worker sayılır (10 dk) |
 | `Messaging__OrphanAfter`, `Messaging__OutboxRetention` | Bu süreden uzun kuyrukta bekleyen iş için mesaj yeniden yazılır (30 dk); yayınlanmış outbox satırlarının saklama süresi (7 gün) |
+| `Ai__Enabled` | AI raporu isteklerini kabul et (`api`; `.env`: `AI_ENABLED`, varsayılan `false`) |
+| `Ai__ApiKey` | Anthropic API anahtarı; **yalnızca `worker`** (`.env`: `ANTHROPIC_API_KEY`). API ve arayüz anahtarı görmez |
+| `Ai__Model`, `Ai__Effort`, `Ai__MaxOutputTokens` | Model (`claude-opus-5-5`; `api` ve `worker` aynı değeri almalı), effort (`high`), yanıt token sınırı (16000) |
+| `Ai__DailyLimitPerTeam` | Ekip başına günlük AI raporu sayısı (20; `.env`: `AI_DAILY_LIMIT_PER_TEAM`) |
+| `Ai__RequestTimeout`, `Ai__ClientMaxRetries` | Tek çağrı zaman aşımı (10 dk) ve SDK içi deneme (2) |
+| `Ai__MaxAutomaticRetries`, `Ai__RetryBaseDelay`, `Ai__RetryMaxDelay`, `Ai__StaleAfter` | 429/5xx/ağ hatasında worker'ın yeniden kuyruğa alma sayısı (2) ve bekleme (1 dk'dan başlar, en fazla 15 dk); takılı sayılma süresi (30 dk) |
+| `Ai__MaxContextCharacters` | Modele gönderilen bağlamın üst sınırı (60000 karakter); aşılırsa olaylar, parametreler, istatistikler ve bulgular kırpılır |
+| `Ai__Prices__<model>__InputPerMillion` vb. | Maliyet tahmini için fiyat tablosu (USD / milyon token); fiyatı olmayan modelin maliyeti boş kalır |
 
 Data Protection anahtarları (bearer token şifreleme) PostgreSQL'deki `DataProtectionKeys` tablosunda saklanır; böylece token'lar yeniden başlatmada ve birden fazla API örneğinde geçerli kalır. Bu anahtarlar şu an şifrelenmeden saklanır (log uyarısı bunu belirtir); üretimde bir sertifika veya KMS ile `ProtectKeysWith...` yapılandırması Aşama 8'de eklenecek.
 
@@ -96,3 +104,12 @@ nginx (`nginxinc/nginx-unprivileged`, root olmayan kullanıcı) derlenmiş aray�
 - DLQ'daki mesajlar okunamayan veya otomatik denemeleri tükenen işlerdir; ilgili dosya zaten `Failed` durumundadır ve kullanıcı API'den yeniden deneyebilir. DLQ'yu yönetim arayüzünden (Compose'da `127.0.0.1:15672`) izleyin ve inceledikten sonra boşaltın.
 - Broker verisi (`rabbitmq-data` volume) kaybolursa iş kaybolmaz: kuyrukta 30 dakikadan uzun bekleyen işler için mesaj yeniden yazılır.
 - Kuyruk derinliği ve bekleyen outbox sayısı `GET /api/v1/admin/processing/stats` ile görülür.
+
+## AI raporu
+
+Varsayılan olarak kapalıdır. Açmak için `.env` içinde `AI_ENABLED=true` ve `ANTHROPIC_API_KEY=<anahtar>` verin, ardından `docker compose up -d` çalıştırın. Anahtar yalnızca `worker` konteynerine geçer; anahtar olmadan açılırsa istekler `ai.not_configured` koduyla başarısız olur ve kural bulguları etkilenmez.
+
+- Modele giden veri: kural bulguları, kural sonuçları, sinyal istatistikleri, olaylar ve ilgili parametreler (`GET /api/v1/ai-analyses/{id}/context` ile tam hâli indirilebilir). Ham log, ham örnekler, GPS konumu, uçuş adı/notları ve kullanıcı bilgileri gönderilmez ([ADR-0008](adr/0008-ai-analysis-provider.md)).
+- Maliyet ve kullanım: yönetici ekranında "AI kullanımı" sekmesi veya `GET /api/v1/admin/ai/usage?days=30`. Metrikler `flightlog.ai.*` adıyla `FlightLog.Processing` meter'ında.
+- Model değiştirirken fiyat tablosuna (`Ai__Prices__...`) girdi ekleyin; aksi hâlde maliyet "fiyatsız" olarak sayılır.
+- Anahtarı döndürmek için `.env` değerini değiştirip `docker compose up -d worker` yeterlidir.

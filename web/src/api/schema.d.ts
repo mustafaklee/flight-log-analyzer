@@ -286,6 +286,509 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/flights/{flightId}/ai-analyses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AI analyses of a flight, newest first (without report body). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AiAnalysisDto"][];
+                        "application/json": components["schemas"]["AiAnalysisDto"][];
+                        "text/json": components["schemas"]["AiAnalysisDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Queues an AI report of the flight's latest successful rule analysis (Engineer). Fails with
+         *     `ai.disabled` when AI analysis is off, `ai.already_pending` while one is running and
+         *     `ai.quota_exceeded` (429) when the team's daily limit is used up.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Accepted */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AiAnalysisDto"];
+                        "application/json": components["schemas"]["AiAnalysisDto"];
+                        "text/json": components["schemas"]["AiAnalysisDto"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Too Many Requests */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ai-analyses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An AI analysis with its validated report, usage, cost and versions. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AiAnalysisDto"];
+                        "application/json": components["schemas"]["AiAnalysisDto"];
+                        "text/json": components["schemas"]["AiAnalysisDto"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ai-analyses/{id}/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The exact context the model received (JSON; Engineer). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ai-analyses/{id}/report.md": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The report as a Markdown file. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/markdown": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/markdown": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/markdown": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/markdown": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{teamId}/ai-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether AI analysis is enabled, with the model and the team's daily quota. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    teamId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AiStatusDto"];
+                        "application/json": components["schemas"]["AiStatusDto"];
+                        "text/json": components["schemas"]["AiStatusDto"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage of the last `days` days (1 to 365, default 30). */
+        get: {
+            parameters: {
+                query?: {
+                    days?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AiUsageDto"];
+                        "application/json": components["schemas"]["AiUsageDto"];
+                        "text/json": components["schemas"]["AiUsageDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teams/{teamId}/aircraft": {
         parameters: {
             query?: never;
@@ -3226,6 +3729,85 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        AiAnalysisDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            flightId: string;
+            /** Format: uuid */
+            analysisRunId: string;
+            status: components["schemas"]["AiAnalysisStatus"];
+            provider: string;
+            model: string;
+            responseModel: null | string;
+            promptVersion: string;
+            contextVersion: null | string;
+            contextHash: null | string;
+            contextSummary: {
+                [key: string]: string;
+            };
+            /** Format: int64 */
+            logStartUs: null | number;
+            /** Format: uuid */
+            requestedBy: string;
+            /** Format: int32 */
+            attempt: number;
+            /** Format: int32 */
+            retryCount: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            nextAttemptAt: null | string;
+            /** Format: date-time */
+            startedAt: null | string;
+            /** Format: date-time */
+            finishedAt: null | string;
+            /** Format: int64 */
+            durationMs: null | number;
+            /** Format: int32 */
+            providerCalls: number;
+            /** Format: int64 */
+            latencyMs: number;
+            /** Format: int64 */
+            inputTokens: number;
+            /** Format: int64 */
+            outputTokens: number;
+            /** Format: int64 */
+            cacheReadTokens: number;
+            /** Format: int64 */
+            cacheWriteTokens: number;
+            /** Format: double */
+            costUsd: null | number;
+            stopReason: null | string;
+            failureCode: null | string;
+            failureMessage: null | string;
+            correlationId: string;
+            report: null | components["schemas"]["AiReportDto"];
+        };
+        /** @enum {unknown} */
+        AiAnalysisStatus: "Queued" | "Running" | "Succeeded" | "Failed";
+        AiEvidenceDto: {
+            ref: string;
+            kind: components["schemas"]["EvidenceKind"];
+            label: string;
+            relevance: string;
+            /** Format: int64 */
+            startUs: null | number;
+            /** Format: int64 */
+            endUs: null | number;
+            /** Format: uuid */
+            findingId: null | string;
+            signal: null | string;
+        };
+        AiFailureCountDto: {
+            code: string;
+            /** Format: int32 */
+            count: number;
+        };
+        /** @enum {unknown} */
+        AiItemKind: "Issue" | "Observation" | "DataQuality";
+        /** @enum {unknown} */
+        AiOverallAssessment: "NoIssuesFound" | "MinorIssues" | "SignificantIssues" | "CriticalIssues" | "Inconclusive";
         AircraftDto: {
             /** Format: uuid */
             id: string;
@@ -3250,6 +3832,130 @@ export interface components {
         };
         /** @enum {unknown} */
         AircraftType: "Other" | "Multicopter" | "FixedWing" | "Vtol" | "Helicopter";
+        AiReportDto: {
+            summary: string;
+            plainSummary: string;
+            overallAssessment: components["schemas"]["AiOverallAssessment"];
+            items: components["schemas"]["AiReportItemDto"][];
+            followUpQuestions: string[];
+            limitations: string[];
+            validation: components["schemas"]["AiReportValidationDto"];
+        };
+        AiReportItemDto: {
+            /** Format: int32 */
+            index: number;
+            title: string;
+            kind: components["schemas"]["AiItemKind"];
+            statement: string;
+            severity: components["schemas"]["FindingSeverity"];
+            confidence: components["schemas"]["FindingConfidence"];
+            confidenceReason: string;
+            supported: boolean;
+            evidence: components["schemas"]["AiEvidenceDto"][];
+            unknownRefs: string[];
+            unverifiedNumbers: string[];
+            possibleCauses: string[];
+            alternativeExplanations: string[];
+            missingData: string[];
+            recommendedChecks: string[];
+        };
+        AiReportValidationDto: {
+            /** Format: int32 */
+            items: number;
+            /** Format: int32 */
+            supportedItems: number;
+            /** Format: int32 */
+            unsupportedItems: number;
+            unknownRefs: string[];
+            /** Format: int32 */
+            unverifiedNumbers: number;
+            summaryUnverifiedNumbers: string[];
+        };
+        AiStatusDto: {
+            enabled: boolean;
+            provider: string;
+            model: string;
+            promptVersion: string;
+            /** Format: int32 */
+            dailyLimit: number;
+            /** Format: int32 */
+            usedToday: number;
+        };
+        AiUsageByDayDto: {
+            /** Format: date */
+            day: string;
+            /** Format: int32 */
+            analyses: number;
+            /** Format: int32 */
+            failed: number;
+            /** Format: int64 */
+            inputTokens: number;
+            /** Format: int64 */
+            outputTokens: number;
+            /** Format: double */
+            costUsd: number;
+        };
+        AiUsageByModelDto: {
+            provider: string;
+            model: string;
+            /** Format: int32 */
+            analyses: number;
+            /** Format: int64 */
+            inputTokens: number;
+            /** Format: int64 */
+            outputTokens: number;
+            /** Format: double */
+            costUsd: number;
+            /** Format: int32 */
+            unpriced: number;
+        };
+        AiUsageByTeamDto: {
+            /** Format: uuid */
+            teamId: string;
+            teamName: string;
+            /** Format: int32 */
+            analyses: number;
+            /** Format: double */
+            costUsd: number;
+        };
+        AiUsageDto: {
+            /** Format: date-time */
+            from: string;
+            /** Format: date-time */
+            to: string;
+            enabled: boolean;
+            provider: string;
+            model: string;
+            /** Format: int32 */
+            dailyLimitPerTeam: number;
+            totals: components["schemas"]["AiUsageTotalsDto"];
+            byDay: components["schemas"]["AiUsageByDayDto"][];
+            byModel: components["schemas"]["AiUsageByModelDto"][];
+            byTeam: components["schemas"]["AiUsageByTeamDto"][];
+            failures: components["schemas"]["AiFailureCountDto"][];
+        };
+        AiUsageTotalsDto: {
+            /** Format: int32 */
+            analyses: number;
+            /** Format: int32 */
+            succeeded: number;
+            /** Format: int32 */
+            failed: number;
+            /** Format: int32 */
+            pending: number;
+            /** Format: int32 */
+            providerCalls: number;
+            /** Format: int64 */
+            inputTokens: number;
+            /** Format: int64 */
+            outputTokens: number;
+            /** Format: int64 */
+            cacheReadTokens: number;
+            /** Format: double */
+            costUsd: number;
+            /** Format: double */
+            averageLatencyMs: null | number;
+        };
         /** @enum {unknown} */
         AnalysisKind: "Rules";
         AnalysisRunDto: {
@@ -3400,6 +4106,8 @@ export interface components {
         };
         /** @enum {unknown} */
         EventSeverity: "Emergency" | "Alert" | "Critical" | "Error" | "Warning" | "Notice" | "Info" | "Debug";
+        /** @enum {unknown} */
+        EvidenceKind: "Finding" | "Event" | "Signal" | "Parameter" | "Rule";
         FileStreamResult: {
             fileStream?: components["schemas"]["Stream"];
             contentType?: null | string;

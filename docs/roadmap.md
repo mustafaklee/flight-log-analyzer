@@ -6,12 +6,12 @@ Süreler yaklaşık planlama aralığıdır; bir aşamanın bitişini kabul krit
 |---|---|---|
 | 0 | Repository incelemesi ve ürün tasarımı | Tamamlandı |
 | 1 | Temel backend ve altyapı | Tamamlandı |
-| 2 | Araç, uçuş ve dosya yönetimi | Tamamlandı (PR incelemesinde) |
-| 3 | PX4 ve ArduPilot parser entegrasyonu | Sırada |
-| 4 | Asenkron işleme ve teknik analiz | Planlandı |
-| 5 | Uçuş analiz arayüzü (React) | Planlandı |
-| 6 | Yapay zekâ analizi | Planlandı |
-| 7 | Ekip çalışması ve karşılaştırma | Planlandı |
+| 2 | Araç, uçuş ve dosya yönetimi | Tamamlandı |
+| 3 | PX4 ve ArduPilot parser entegrasyonu | Tamamlandı |
+| 4 | Asenkron işleme ve teknik analiz | Tamamlandı |
+| 5 | Uçuş analiz arayüzü (React) | Tamamlandı |
+| 6 | Yapay zekâ analizi | Tamamlandı (PR incelemesinde) |
+| 7 | Ekip çalışması ve karşılaştırma | Sırada |
 | 8 | Performans, güvenlik ve dağıtım | Planlandı |
 | 9 | Canlı izleme hazırlığı | Sonraki sürüm |
 
@@ -111,7 +111,22 @@ Ertelenenler: yorumlar, etiketler ve bulgu inceleme iş akışı (Aşama 7), uç
 
 ## Aşama 6 — AI analizi
 
-ADR-0008 kesinleştirme, Claude adaptörü, bağlam hazırlama, şema doğrulama, kanıt referans doğrulaması, maliyet/gecikme kaydı, hata ve kota yönetimi.
+Hedef: Mühendis, kural bulgularını özetleyen ve her iddiası bağlamdaki bir kanıta bağlanan bir model yorumu isteyebilir; desteklenmeyen iddialar ve doğrulanamayan sayılar işaretlenir; maliyet, gecikme ve hatalar kaydedilir.
+
+- [x] ADR-0008 kesinleşti: `IFlightAnalysisProvider`, Anthropic adaptörü (resmi C# SDK, MIT), varsayılan `claude-opus-5-5`, yapılandırılmış JSON çıktısı
+- [x] `AiAnalysis` modeli ve migration; outbox mesajı `ai-analyze-flight.v1`, worker'da sahiplenme (xmin), takılı çalıştırmaları kurtarma, kaybolan mesajları yeniden duyurma
+- [x] Bağlam `flight-context-v1`: bulgular, kural sonuçları, sinyal istatistikleri, olaylar, eşik parametreleri; referanslar (`F1`, `R1`, `S1`, `E1`, `P1`); boyut sınırı ve kırpma kaydı; konum, ad ve not gönderilmez; log metinleri "güvenilmeyen" bölümde; bağlam metni ve SHA-256 hash'i saklanır
+- [x] Prompt `flight-report-v1` (Türkçe çıktı, ölçüm ile hipotez ayrımı, uçuşa elverişlilik iddiası yok)
+- [x] Doğrulama: şema, referans çözümleme, desteklenmeyen maddeler, doğrulanamayan sayılar; tek onarım çağrısı
+- [x] Hata yönetimi: reddetme, kesilme, bağlam penceresi, kimlik doğrulama, istek reddi, 429/5xx/ağ hataları için sınırlı otomatik deneme (`retry-after` dikkate alınır)
+- [x] Ekip başına günlük kota (429 + `Retry-After`), bekleyen istek varken 409, yalnızca Engineer ve üstü
+- [x] Kayıt: çağrı sayısı, token'lar (önbellek dahil), gecikme, tahmini maliyet, yanıt modeli, durma nedeni; metrikler (`flightlog.ai.*`); yönetici kullanım API'si ve ekranı
+- [x] API: istek, liste, ayrıntı, bağlam indirme, Markdown rapor, ekip AI durumu
+- [x] Arayüz: uçuş sayfasında "AI raporu" sekmesi (model yorumu uyarısı, geçmiş, kota, kanıttan grafiğe geçiş, desteklenmeyen iddialar), yönetici "AI kullanımı" sekmesi
+- [x] Özellik varsayılan olarak kapalı; anahtar yalnızca worker'da (`ANTHROPIC_API_KEY`)
+- [x] Testler: bağlam, doğrulama ve maliyet birim testleri; adaptör için sahte HTTP uç noktası (istek gövdesi, hata eşlemesi); betikli sağlayıcıyla entegrasyon testleri (başarı, onarım, red, kesilme, yeniden deneme, kota, yetki, kullanım); Playwright'ta kapalı durum
+
+Ertelenenler: gerçek sağlayıcıyla otomatik test (anahtar gerektirir, CI'da çalıştırılmaz), rapor üzerinde yorum ve inceleme iş akışı (Aşama 7), kullanıcı başına kota ve bütçe sınırı (Aşama 8), ikinci sağlayıcı adaptörü.
 
 ## Aşama 7 — Ekip çalışması ve karşılaştırma
 

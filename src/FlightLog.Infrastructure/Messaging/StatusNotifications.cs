@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace FlightLog.Infrastructure.Messaging;
 
-/// <summary>A status change of a log file or analysis run, as sent on <see cref="StatusNotifications.Channel"/> (ADR-0011).</summary>
+/// <summary>A status change of a log file, analysis run or AI analysis, as sent on <see cref="StatusNotifications.Channel"/> (ADR-0011).</summary>
 public sealed record StatusNotification(
     string Kind,
     Guid TeamId,
@@ -19,6 +19,7 @@ public sealed record StatusNotification(
 {
     public const string LogFile = "logFile";
     public const string AnalysisRun = "analysisRun";
+    public const string AiAnalysis = "aiAnalysis";
 }
 
 public static class StatusNotifications
@@ -121,6 +122,15 @@ internal sealed class StatusNotificationInterceptor : SaveChangesInterceptor
             {
                 var r = entry.Entity;
                 notifications.Add(new StatusNotification(StatusNotification.AnalysisRun, r.TeamId, r.FlightId, r.Id, r.Status.ToString(), r.FailureCode));
+            }
+        }
+
+        foreach (var entry in context.ChangeTracker.Entries<AiAnalysis>())
+        {
+            if (entry.State == EntityState.Added || (entry.State == EntityState.Modified && entry.Property(a => a.Status).IsModified))
+            {
+                var a = entry.Entity;
+                notifications.Add(new StatusNotification(StatusNotification.AiAnalysis, a.TeamId, a.FlightId, a.Id, a.Status.ToString(), a.FailureCode));
             }
         }
 

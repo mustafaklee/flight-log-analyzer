@@ -60,6 +60,7 @@ internal sealed partial class RabbitMqWorker(
         {
             ProcessLogFileV1 m when m.LogFileId != Guid.Empty => await runner.ProcessFileAsync(m.LogFileId, _workerId, stoppingToken),
             AnalyzeFlightV1 m when m.AnalysisRunId != Guid.Empty => await runner.AnalyzeAsync(m.AnalysisRunId, _workerId, stoppingToken),
+            AiAnalyzeFlightV1 m when m.AiAnalysisId != Guid.Empty => await runner.AiAnalyzeAsync(m.AiAnalysisId, _workerId, stoppingToken),
             _ => (WorkOutcome?)null,
         };
         if (outcome is null)

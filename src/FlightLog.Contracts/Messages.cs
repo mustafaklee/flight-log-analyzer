@@ -17,15 +17,20 @@ public sealed record ProcessLogFileV1(Guid LogFileId, Guid TeamId, string Correl
 /// <summary>Run the analysis rules of a queued analysis run.</summary>
 public sealed record AnalyzeFlightV1(Guid AnalysisRunId, Guid FlightId, Guid TeamId, string CorrelationId) : IWorkMessage;
 
+/// <summary>Write the AI report of a queued AI analysis.</summary>
+public sealed record AiAnalyzeFlightV1(Guid AiAnalysisId, Guid FlightId, Guid TeamId, string CorrelationId) : IWorkMessage;
+
 public static class MessageTypes
 {
     public const string ProcessLogFileV1 = "flightlog.process-log-file.v1";
     public const string AnalyzeFlightV1 = "flightlog.analyze-flight.v1";
+    public const string AiAnalyzeFlightV1 = "flightlog.ai-analyze-flight.v1";
 
     public static string Of(IWorkMessage message) => message switch
     {
         Contracts.ProcessLogFileV1 => ProcessLogFileV1,
         Contracts.AnalyzeFlightV1 => AnalyzeFlightV1,
+        Contracts.AiAnalyzeFlightV1 => AiAnalyzeFlightV1,
         _ => throw new ArgumentException($"Unknown message {message?.GetType().Name}.", nameof(message)),
     };
 
@@ -33,6 +38,7 @@ public static class MessageTypes
     {
         ProcessLogFileV1 => typeof(ProcessLogFileV1),
         AnalyzeFlightV1 => typeof(AnalyzeFlightV1),
+        AiAnalyzeFlightV1 => typeof(AiAnalyzeFlightV1),
         _ => null,
     };
 }

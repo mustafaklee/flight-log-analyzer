@@ -31,6 +31,7 @@ internal sealed partial class GlobalExceptionHandler(
             ConflictException conflict => WithDetails(Problem(StatusCodes.Status409Conflict, "Conflict", conflict.Message, conflict.Code), conflict.Details),
             PayloadTooLargeException tooLarge => Problem(StatusCodes.Status413PayloadTooLarge, "File too large", tooLarge.Message, "upload.too_large"),
             BadHttpRequestException { StatusCode: StatusCodes.Status413PayloadTooLarge } => Problem(StatusCodes.Status413PayloadTooLarge, "Request too large", "The request body exceeds the allowed size.", "upload.too_large"),
+            QuotaExceededException quota => Problem(StatusCodes.Status429TooManyRequests, "Limit reached", quota.Message, quota.Code),
             DomainRuleViolationException rule => Problem(StatusCodes.Status422UnprocessableEntity, "Business rule violated", rule.Message, rule.Code),
             _ => null,
         };
@@ -42,6 +43,11 @@ internal sealed partial class GlobalExceptionHandler(
         }
 
         httpContext.Response.StatusCode = problem.Status!.Value;
+        if (exception is QuotaExceededException { RetryAfter: var retryAfter })
+        {
+            httpContext.Response.Headers.RetryAfter = ((int)Math.Ceiling(Math.Max(1, retryAfter.TotalSeconds))).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
         return await problemDetails.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,

@@ -52,7 +52,14 @@ internal sealed partial class OutboxMaintenance(
             .Select(r => new { r.Id, r.FlightId, r.TeamId, r.CorrelationId })
             .Take(BatchSize)
             .ToListAsync(cancellationToken);
-        if (files.Count == 0 && runs.Count == 0)
+        var aiAnalyses = await db.AiAnalyses.AsNoTracking()
+            .Where(a => a.Status == AiAnalysisStatus.Queued && a.CreatedAt < cutoff && (a.NextAttemptAt == null || a.NextAttemptAt < cutoff)
+                && !db.OutboxMessages.Any(m => m.AggregateId == a.Id && (m.CreatedAt >= cutoff || m.PublishedAt == null)))
+            .OrderBy(a => a.CreatedAt)
+            .Select(a => new { a.Id, a.FlightId, a.TeamId, a.CorrelationId })
+            .Take(BatchSize)
+            .ToListAsync(cancellationToken);
+        if (files.Count == 0 && runs.Count == 0 && aiAnalyses.Count == 0)
         {
             return;
         }
@@ -67,10 +74,15 @@ internal sealed partial class OutboxMaintenance(
             db.OutboxMessages.Add(OutboxMessages.Create(new AnalyzeFlightV1(r.Id, r.FlightId, r.TeamId, r.CorrelationId), r.Id, now, null));
         }
 
+        foreach (var a in aiAnalyses)
+        {
+            db.OutboxMessages.Add(OutboxMessages.Create(new AiAnalyzeFlightV1(a.Id, a.FlightId, a.TeamId, a.CorrelationId), a.Id, now, null));
+        }
+
         await db.SaveChangesAsync(cancellationToken);
-        LogReannounced(files.Count, runs.Count);
+        LogReannounced(files.Count, runs.Count, aiAnalyses.Count);
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Announced {Files} queued files and {Runs} queued analysis runs again (no message for them)")]
-    private partial void LogReannounced(int files, int runs);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Announced {Files} queued files, {Runs} queued analysis runs and {AiAnalyses} queued AI analyses again (no message for them)")]
+    private partial void LogReannounced(int files, int runs, int aiAnalyses);
 }

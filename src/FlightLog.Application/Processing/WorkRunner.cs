@@ -1,4 +1,5 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Ai;
 using FlightLog.Application.Analysis;
 using FlightLog.Application.Messaging;
 using FlightLog.Domain.Flights;
@@ -41,16 +42,32 @@ public sealed class WorkRunner(IServiceScopeFactory scopes, IOptions<ProcessingO
         {
             var analysis = scope.ServiceProvider.GetRequiredService<IAnalysisService>();
             var claim = await analysis.ClaimNextAsync(workerId, stoppingToken);
-            if (claim is null)
+            if (claim is not null)
             {
-                // A superseded run was closed, or nothing is queued; ask again only if runs remain queued.
-                var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
-                var now = clock.GetUtcNow();
-                return await db.AnalysisRuns.AnyAsync(
-                    r => r.Status == Domain.Analysis.AnalysisRunStatus.Queued && (r.NextAttemptAt == null || r.NextAttemptAt <= now), stoppingToken);
+                await analysis.RunAsync(claim, stoppingToken);
+                return true;
             }
 
-            await analysis.RunAsync(claim, stoppingToken);
+            // A superseded run was closed, or nothing is queued; ask again soon if runs remain queued.
+            var db = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+            var now = clock.GetUtcNow();
+            if (await db.AnalysisRuns.AnyAsync(
+                r => r.Status == Domain.Analysis.AnalysisRunStatus.Queued && (r.NextAttemptAt == null || r.NextAttemptAt <= now), stoppingToken))
+            {
+                return true;
+            }
+        }
+
+        await using (var scope = scopes.CreateAsyncScope())
+        {
+            var ai = scope.ServiceProvider.GetRequiredService<IAiAnalysisService>();
+            var claim = await ai.ClaimNextAsync(workerId, stoppingToken);
+            if (claim is null)
+            {
+                return false;
+            }
+
+            await ai.RunAsync(claim, stoppingToken);
             return true;
         }
     }
@@ -72,6 +89,15 @@ public sealed class WorkRunner(IServiceScopeFactory scopes, IOptions<ProcessingO
         return claim is null ? WorkOutcome.Skipped : await analysis.RunAsync(claim, stoppingToken);
     }
 
+    /// <summary>Writes the AI report a message announced. <see cref="WorkOutcome.Skipped"/> when it is not queued (anymore).</summary>
+    public async Task<WorkOutcome> AiAnalyzeAsync(Guid aiAnalysisId, string workerId, CancellationToken stoppingToken)
+    {
+        await using var scope = scopes.CreateAsyncScope();
+        var ai = scope.ServiceProvider.GetRequiredService<IAiAnalysisService>();
+        var claim = await ai.ClaimAsync(aiAnalysisId, workerId, stoppingToken);
+        return claim is null ? WorkOutcome.Skipped : await ai.RunAsync(claim, stoppingToken);
+    }
+
     /// <summary>Recovers work abandoned by crashed workers and re-announces lost messages; at most once a minute.</summary>
     public async Task RunMaintenanceIfDueAsync(CancellationToken stoppingToken)
     {
@@ -88,6 +114,11 @@ public sealed class WorkRunner(IServiceScopeFactory scopes, IOptions<ProcessingO
         await using (var scope = scopes.CreateAsyncScope())
         {
             await scope.ServiceProvider.GetRequiredService<IAnalysisService>().RecoverStaleAsync(stoppingToken);
+        }
+
+        await using (var scope = scopes.CreateAsyncScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<IAiAnalysisService>().RecoverStaleAsync(stoppingToken);
         }
 
         await using (var scope = scopes.CreateAsyncScope())
