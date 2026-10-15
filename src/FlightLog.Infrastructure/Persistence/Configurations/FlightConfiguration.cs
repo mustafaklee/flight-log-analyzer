@@ -22,12 +22,14 @@ internal sealed class FlightConfiguration : IEntityTypeConfiguration<Flight>
         builder.Property(f => f.VehicleType).HasMaxLength(50);
         builder.Property(f => f.Hardware).HasMaxLength(200);
         builder.Property(f => f.LogMetadata).AsRequiredJsonb();
+        builder.PrimitiveCollection(f => f.Tags).HasField("_tags").UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Property(f => f.Version).IsRowVersion();
 
         // Flight history queries: by team or project, newest first; by aircraft.
         builder.HasIndex(f => new { f.TeamId, f.OccurredAt });
         builder.HasIndex(f => new { f.ProjectId, f.OccurredAt });
         builder.HasIndex(f => new { f.AircraftId, f.OccurredAt });
+        builder.HasIndex(f => f.Tags).HasMethod("gin");
 
         builder.HasOne<Team>().WithMany().HasForeignKey(f => f.TeamId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<Project>().WithMany().HasForeignKey(f => f.ProjectId).OnDelete(DeleteBehavior.Restrict);

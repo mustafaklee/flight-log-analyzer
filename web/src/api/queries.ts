@@ -7,10 +7,14 @@ import type {
   AiUsage,
   Aircraft,
   AnalysisRun,
+  AuditEntry,
   Dashboard,
   Finding,
   Flight,
   FlightEvent,
+  FlightComment,
+  FlightComparison,
+  FindingReview,
   FlightListItem,
   FlightParameter,
   LogFile,
@@ -18,13 +22,16 @@ import type {
   ProcessingJob,
   ProcessingStats,
   Project,
+  ReviewListItem,
   RuleDescriptor,
   SaveAircraftRequest,
   Signal,
   SignalData,
+  TagCount,
   Team,
   TeamMember,
   TeamRole,
+  UpdateFindingReviewRequest,
 } from './types';
 
 /** Query keys; the realtime connection invalidates by these prefixes. */
@@ -54,7 +61,22 @@ export const keys = {
   aiAnalysis: (id: string) => ['ai-analysis', id] as const,
   aiStatus: (teamId: string) => ['ai-status', teamId] as const,
   aiUsage: (days: number) => ['ai-usage', days] as const,
+  comments: (flightId: string) => ['flight', flightId, 'comments'] as const,
+  activity: (flightId: string, query: Query) => ['flight', flightId, 'activity', query] as const,
+  history: (findingId: string) => ['finding-history', findingId] as const,
+  reviews: (teamId: string, query: Query) => ['finding-reviews', teamId, query] as const,
+  auditLog: (teamId: string, query: Query) => ['audit-log', teamId, query] as const,
+  tags: (teamId: string) => ['flight-tags', teamId] as const,
+  comparison: (ids: string[]) => ['comparison', ids] as const,
 };
+
+/** Query string with a repeated parameter (?ids=a&ids=b), which the compare endpoints bind as a list. */
+export function repeatedQuery(name: string, values: string[], extra: Record<string, string> = {}): string {
+  const params = new URLSearchParams();
+  values.forEach((v) => params.append(name, v));
+  Object.entries(extra).forEach(([k, v]) => params.set(k, v));
+  return `?${params.toString()}`;
+}
 
 const ACTIVE_STATUSES = new Set(['Uploaded', 'Validating', 'Queued', 'Processing', 'Processed', 'AnalysisPending', 'Analyzing']);
 
@@ -427,5 +449,139 @@ export function useSetUserDisabled() {
     mutationFn: ({ id, disabled }: { id: string; disabled: boolean }) =>
       api<AdminUser>(`/admin/users/${id}/${disabled ? 'disable' : 'enable'}`, { method: 'POST' }),
     onSuccess: () => client.invalidateQueries({ queryKey: ['admin-users'] }),
+  });
+}
+
+// ---- Collaboration (Stage 7) -------------------------------------------------------------------------------------
+
+/** All comments and notes of a flight, oldest first, including those on findings. */
+export function useComments(flightId: string) {
+  return useQuery({
+    queryKey: keys.comments(flightId),
+    queryFn: ({ signal }) => api<FlightComment[]>(`/flights/${flightId}/comments`, { signal }),
+  });
+}
+
+export function useAddComment(flightId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { body: string; startUs?: number | null; endUs?: number | null; findingId?: string | null }) =>
+      api<FlightComment>(`/flights/${flightId}/comments`, { method: 'POST', body }),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: keys.comments(flightId) });
+      client.invalidateQueries({ queryKey: ['analysis-run'] });
+      client.invalidateQueries({ queryKey: ['finding-history'] });
+    },
+  });
+}
+
+export function useEditComment(flightId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body, version }: { id: string; body: string; version: number }) =>
+      api<FlightComment>(`/comments/${id}`, { method: 'PUT', body: { body, version } }),
+    onSuccess: () => client.invalidateQueries({ queryKey: keys.comments(flightId) }),
+  });
+}
+
+export function useDeleteComment(flightId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<void>(`/comments/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: keys.comments(flightId) });
+      client.invalidateQueries({ queryKey: ['analysis-run'] });
+    },
+  });
+}
+
+/** Changes the review of a finding; the findings of the run are refreshed so lists show the new state. */
+export function useUpdateReview(runId: string | undefined) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ findingId, body }: { findingId: string; body: Partial<UpdateFindingReviewRequest> }) =>
+      api<FindingReview>(`/findings/${findingId}/review`, { method: 'PATCH', body }),
+    onSuccess: (_, { findingId }) => {
+      if (runId) {
+        client.invalidateQueries({ queryKey: keys.findings(runId) });
+      }
+
+      client.invalidateQueries({ queryKey: keys.history(findingId) });
+      client.invalidateQueries({ queryKey: ['finding-reviews'] });
+      client.invalidateQueries({ queryKey: ['flight'] });
+    },
+  });
+}
+
+/** Who changed the review of a finding and when, with its comments; newest first. */
+export function useFindingHistory(findingId: string | undefined) {
+  return useQuery({
+    queryKey: keys.history(findingId ?? ''),
+    queryFn: ({ signal }) => api<AuditEntry[]>(`/findings/${findingId}/history`, { signal }),
+    enabled: !!findingId,
+  });
+}
+
+export function useFlightActivity(flightId: string, query: Query) {
+  return useQuery({
+    queryKey: keys.activity(flightId, query),
+    queryFn: ({ signal }) => api<Paged<AuditEntry>>(`/flights/${flightId}/activity`, { query, signal }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useTeamAuditLog(teamId: string | undefined, query: Query) {
+  return useQuery({
+    queryKey: keys.auditLog(teamId ?? '', query),
+    queryFn: ({ signal }) => api<Paged<AuditEntry>>(`/teams/${teamId}/audit-log`, { query, signal }),
+    enabled: !!teamId,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useTeamReviews(teamId: string | undefined, query: Query) {
+  return useQuery({
+    queryKey: keys.reviews(teamId ?? '', query),
+    queryFn: ({ signal }) => api<Paged<ReviewListItem>>(`/teams/${teamId}/finding-reviews`, { query, signal }),
+    enabled: !!teamId,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useFlightTags(teamId: string | undefined) {
+  return useQuery({
+    queryKey: keys.tags(teamId ?? ''),
+    queryFn: ({ signal }) => api<TagCount[]>(`/teams/${teamId}/flight-tags`, { signal }),
+    enabled: !!teamId,
+  });
+}
+
+export function useSetFlightTags(flightId: string, teamId: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (tags: string[]) => api<Flight>(`/flights/${flightId}/tags`, { method: 'PUT', body: { tags } }),
+    onSuccess: (flight) => {
+      client.setQueryData(keys.flight(flight.id), flight);
+      client.invalidateQueries({ queryKey: ['flights'] });
+      client.invalidateQueries({ queryKey: keys.tags(teamId) });
+    },
+  });
+}
+
+export function useComparison(ids: string[]) {
+  return useQuery({
+    queryKey: keys.comparison(ids),
+    queryFn: ({ signal }) => api<FlightComparison>(`/flights/compare${repeatedQuery('ids', ids)}`, { signal }),
+    enabled: ids.length >= 2,
+    staleTime: 60_000,
+  });
+}
+
+/** Audit entries of all teams (administrators). */
+export function useAdminAuditLog(query: Query) {
+  return useQuery({
+    queryKey: ['admin-audit-log', query],
+    queryFn: ({ signal }) => api<Paged<AuditEntry>>('/admin/audit-log', { query, signal }),
+    placeholderData: keepPreviousData,
   });
 }

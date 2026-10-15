@@ -1,6 +1,7 @@
 using FlightLog.Application.Abstractions;
 using FlightLog.Application.Messaging;
 using FlightLog.Domain.Analysis;
+using FlightLog.Domain.Collaboration;
 using FlightLog.Domain.Fleet;
 using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
@@ -48,6 +49,12 @@ public sealed class FlightLogDbContext(DbContextOptions<FlightLogDbContext> opti
     public DbSet<AnalysisRuleResult> AnalysisRuleResults => Set<AnalysisRuleResult>();
 
     public DbSet<AiAnalysis> AiAnalyses => Set<AiAnalysis>();
+
+    public DbSet<FindingReview> FindingReviews => Set<FindingReview>();
+
+    public DbSet<FlightComment> FlightComments => Set<FlightComment>();
+
+    public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 

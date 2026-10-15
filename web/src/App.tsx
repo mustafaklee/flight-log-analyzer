@@ -11,17 +11,20 @@ import { Layout } from './components/Layout';
 import { NoTeam } from './components/NoTeam';
 import { EmptyState, LoadingState } from './components/States';
 import { AircraftPage } from './pages/AircraftPage';
+import { AuditLogPage } from './pages/AuditLogPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { FleetPage } from './pages/FleetPage';
 import { FlightsPage } from './pages/FlightsPage';
 import { LoginPage } from './pages/LoginPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { ReviewsPage } from './pages/ReviewsPage';
 import { TeamPage } from './pages/TeamPage';
 import { UploadPage } from './pages/UploadPage';
 import { theme } from './theme';
 
 // The flight page carries the chart and map libraries; load it on first use.
 const FlightDetailPage = lazy(() => import('./pages/FlightDetailPage').then((m) => ({ default: m.FlightDetailPage })));
+const ComparePage = lazy(() => import('./pages/ComparePage').then((m) => ({ default: m.ComparePage })));
 const AdminPage = lazy(() => import('./pages/AdminPage').then((m) => ({ default: m.AdminPage })));
 
 export function createQueryClient(): QueryClient {
@@ -75,6 +78,9 @@ export function AppRoutes() {
         <Route index element={<RequireTeam><DashboardPage /></RequireTeam>} />
         <Route path="flights" element={<RequireTeam><FlightsPage /></RequireTeam>} />
         <Route path="flights/:flightId" element={<Suspense fallback={<LoadingState />}><FlightDetailPage /></Suspense>} />
+        <Route path="compare" element={<Suspense fallback={<LoadingState />}><ComparePage /></Suspense>} />
+        <Route path="reviews" element={<RequireTeam><ReviewsPage /></RequireTeam>} />
+        <Route path="audit-log" element={<RequireTeam><AuditLogPage /></RequireTeam>} />
         <Route path="upload" element={<RequireTeam><UploadPage /></RequireTeam>} />
         <Route path="fleet" element={<RequireTeam><FleetPage /></RequireTeam>} />
         <Route path="fleet/:aircraftId" element={<AircraftPage />} />

@@ -6,9 +6,12 @@ import type { AiEvidence, Finding, FlightEvent, FlightEventKind } from '../api/t
 import { PageHeader } from '../components/PageHeader';
 import { SeverityBadge, StatusBadge } from '../components/StatusBadge';
 import { EmptyState, ErrorState, LoadingState } from '../components/States';
+import { ActivityPanel } from '../flight/ActivityPanel';
 import { AiReportPanel } from '../flight/AiReportPanel';
 import { ChartWorkspace, MAX_SIGNALS } from '../flight/ChartWorkspace';
+import { CommentsPanel } from '../flight/CommentsPanel';
 import { EventsPanel } from '../flight/EventsPanel';
+import { ExportMenu, FlightTags } from '../flight/FlightActions';
 import { FindingsPanel } from '../flight/FindingsPanel';
 import { FlightMap, GPS_SIGNALS } from '../flight/FlightMap';
 import { FlightTimeline } from '../flight/FlightTimeline';
@@ -20,7 +23,7 @@ import { windowAround, type TimeWindow } from '../flight/view';
 import { formatDateTime, formatDuration } from '../lib/format';
 import { autopilotLabels } from '../lib/labels';
 
-const TABS = ['analysis', 'findings', 'ai', 'signals', 'parameters', 'map', 'processing', 'details'] as const;
+const TABS = ['analysis', 'findings', 'comments', 'ai', 'signals', 'parameters', 'map', 'processing', 'activity', 'details'] as const;
 type Tab = (typeof TABS)[number];
 const DEFAULT_SIGNALS = ['attitude.roll', 'attitude.pitch', 'battery.voltage', 'gps.alt_msl'];
 const DEFAULT_MARKERS: FlightEventKind[] = ['ModeChange', 'Armed', 'Disarmed', 'Failsafe', 'Error', 'Dropout'];
@@ -136,6 +139,7 @@ export function FlightDetailPage() {
   const findingsPanel = (
     <FindingsPanel
       flightId={f.id}
+      teamId={f.teamId}
       runs={runs.data ?? []}
       findings={findingList}
       findingsLoading={findings.isPending && !!lastSucceeded}
@@ -162,7 +166,12 @@ export function FlightDetailPage() {
             )}
           </Group>
         }
-        actions={<StatusBadge status={file?.status} failureCode={file?.failureCode} />}
+        actions={
+          <Group gap="xs">
+            <StatusBadge status={file?.status} failureCode={file?.failureCode} />
+            <ExportMenu flight={f} />
+          </Group>
+        }
       />
 
       <Card withBorder mb="md" padding="sm">
@@ -172,6 +181,12 @@ export function FlightDetailPage() {
           <Summary label="Otopilot" value={`${autopilotLabels[f.autopilot]}${f.firmwareVersion ? ` ${f.firmwareVersion}` : ''}`} />
           <Summary label="Araç tipi" value={f.vehicleType ?? '—'} />
           <Summary label="Olay" value={dataReady ? String(eventTotal) : '—'} />
+          <div>
+            <Text size="xs" c="dimmed">
+              Etiketler
+            </Text>
+            <FlightTags flight={f} />
+          </div>
           <div>
             <Text size="xs" c="dimmed">
               Bulgular
@@ -194,11 +209,13 @@ export function FlightDetailPage() {
         <Tabs.List mb="md">
           <Tabs.Tab value="analysis">İnceleme</Tabs.Tab>
           <Tabs.Tab value="findings">Bulgular {f.latestAnalysis ? `(${f.latestAnalysis.findingCount})` : ''}</Tabs.Tab>
+          <Tabs.Tab value="comments">Yorumlar</Tabs.Tab>
           <Tabs.Tab value="ai">AI raporu</Tabs.Tab>
           <Tabs.Tab value="signals">Sinyaller</Tabs.Tab>
           <Tabs.Tab value="parameters">Parametreler</Tabs.Tab>
           {hasGps && <Tabs.Tab value="map">Harita</Tabs.Tab>}
           <Tabs.Tab value="processing">İşleme</Tabs.Tab>
+          <Tabs.Tab value="activity">Etkinlik</Tabs.Tab>
           <Tabs.Tab value="details">Bilgiler</Tabs.Tab>
         </Tabs.List>
 
@@ -277,6 +294,22 @@ export function FlightDetailPage() {
         </Tabs.Panel>
 
         <Tabs.Panel value="findings">{findingsPanel}</Tabs.Panel>
+
+        <Tabs.Panel value="comments">
+          <CommentsPanel
+            flightId={f.id}
+            logFromUs={logFromUs}
+            window={window}
+            onShowRange={(from, to) => {
+              update({ tab: null });
+              setWindow(windowAround(from, to, logFromUs, logToUs));
+            }}
+          />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="activity">
+          <ActivityPanel flightId={f.id} />
+        </Tabs.Panel>
 
         <Tabs.Panel value="ai">
           <AiReportPanel flightId={f.id} teamId={f.teamId} logFromUs={logFromUs} hasRuleAnalysis={!!lastSucceeded} onShowEvidence={showEvidence} />

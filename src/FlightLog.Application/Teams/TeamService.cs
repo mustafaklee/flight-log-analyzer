@@ -1,4 +1,5 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Collaboration;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Domain.Teams;
@@ -29,6 +30,7 @@ internal sealed class TeamService(
     ICurrentUser currentUser,
     ITeamAccessService access,
     IUserDirectory users,
+    IAuditTrail audit,
     TimeProvider clock,
     IValidator<CreateTeamRequest> createValidator,
     IValidator<AddTeamMemberRequest> addMemberValidator,
@@ -88,6 +90,8 @@ internal sealed class TeamService(
 
         var team = await LoadTeamAsync(teamId, cancellationToken);
         var member = team.AddMember(user.Id, request.Role, clock.GetUtcNow());
+        audit.Record(teamId, AuditActions.MemberAdded, AuditEntities.Team, teamId, null, $"{user.DisplayName}: {request.Role}",
+            new Dictionary<string, string?> { ["userId"] = user.Id.ToString(), ["role"] = request.Role.ToString() });
         await db.SaveChangesAsync(cancellationToken);
         return ToDto(member, user);
     }
@@ -103,7 +107,10 @@ internal sealed class TeamService(
             throw new NotFoundException("TeamMember", userId);
         }
 
+        var previousRole = team.RoleOf(userId);
         team.ChangeRole(userId, request.Role);
+        audit.Record(teamId, AuditActions.MemberRoleChanged, AuditEntities.Team, teamId, null, $"{previousRole} → {request.Role}",
+            new Dictionary<string, string?> { ["userId"] = userId.ToString(), ["from"] = previousRole?.ToString(), ["to"] = request.Role.ToString() });
         await db.SaveChangesAsync(cancellationToken);
 
         var directory = await users.GetByIdsAsync([userId], cancellationToken);
@@ -123,6 +130,7 @@ internal sealed class TeamService(
         }
 
         team.RemoveMember(userId);
+        audit.Record(teamId, AuditActions.MemberRemoved, AuditEntities.Team, teamId, null, null, new Dictionary<string, string?> { ["userId"] = userId.ToString() });
         await db.SaveChangesAsync(cancellationToken);
     }
 

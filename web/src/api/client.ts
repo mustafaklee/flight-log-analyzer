@@ -245,6 +245,25 @@ export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Beklenmeyen bir hata oluştu.';
 }
 
+/** The file name of a Content-Disposition header (RFC 6266; the UTF-8 form wins). */
+export function fileNameFrom(header: string | null): string | null {
+  if (!header) {
+    return null;
+  }
+
+  const extended = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (extended?.[1]) {
+    try {
+      return decodeURIComponent(extended[1]);
+    } catch {
+      // fall through to the plain name
+    }
+  }
+
+  const plain = /filename="?([^";]+)"?/i.exec(header);
+  return plain?.[1] ?? null;
+}
+
 /** Downloads a file the API serves behind authorization (a plain link would not carry the bearer token). */
 export async function download(path: string, fileName: string): Promise<void> {
   const send = async () => {
@@ -265,7 +284,7 @@ export async function download(path: string, fileName: string): Promise<void> {
   try {
     const link = document.createElement('a');
     link.href = url;
-    link.download = fileName;
+    link.download = fileNameFrom(response.headers.get('content-disposition')) ?? fileName;
     link.click();
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 1000);

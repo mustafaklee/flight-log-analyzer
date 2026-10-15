@@ -11,6 +11,8 @@ public sealed class Flight
     public const int NameMaxLength = 200;
     public const int NotesMaxLength = 4000;
 
+    private List<string> _tags = [];
+
     private Flight()
     {
         Name = null!;
@@ -70,6 +72,9 @@ public sealed class Flight
     /// </summary>
     public DateTimeOffset OccurredAt { get; private set; }
 
+    /// <summary>Team labels (for example "acceptance", "crash"); normalized like aircraft tags.</summary>
+    public IReadOnlyList<string> Tags => _tags;
+
     public Guid CreatedBy { get; private set; }
 
     public DateTimeOffset CreatedAt { get; private set; }
@@ -96,6 +101,20 @@ public sealed class Flight
         Notes = Guard.OptionalText(notes, NotesMaxLength, "notes");
         AircraftId = aircraftId == Guid.Empty ? null : aircraftId;
         UpdatedAt = now;
+    }
+
+    /// <summary>Replaces the tags; returns false when the normalized set is unchanged.</summary>
+    public bool SetTags(IEnumerable<string>? tags, DateTimeOffset now)
+    {
+        var normalized = Common.Tags.Normalize(tags);
+        if (normalized.SequenceEqual(_tags, StringComparer.Ordinal))
+        {
+            return false;
+        }
+
+        _tags = normalized;
+        UpdatedAt = now;
+        return true;
     }
 
     /// <summary>Records what the log parser found. Unknown values stay null.</summary>

@@ -28,6 +28,9 @@ Proje aşamalı geliştiriliyor ([yol haritası](docs/roadmap.md)). Şu an çal�
 | Web arayüzü: dashboard, uçuş geçmişi, log yükleme, filo, projeler, ekip, yönetici ekranları | Çalışıyor; uçtan uca tarayıcı testli |
 | Uçuş inceleme: senkron grafikler, olay işaretleri, bulgu aralıkları, zaman çizelgesi, olay listesi, bulgular, sinyal kataloğu, parametreler, GPS haritası (konum verisi varsa) | Çalışıyor; gerçek PX4 ve ArduPilot loglarıyla testli |
 | Canlı işleme durumu (SignalR) | Çalışıyor, testli |
+| Ekip çalışması: uçuş yorumları ve zaman aralığı notları, bulgu inceleme durumu, atama ve işaret (yeniden analizden sonra korunur), uçuş etiketleri, "bana atananlar" iş listesi | Çalışıyor, testli (rol matrisi dahil) |
+| Denetim kaydı: kim neyi ne zaman değiştirdi (değişiklikle aynı transaction'da), iz kimliği, saklama süresi; ekip kaydı Project Manager, uçuş etkinliği tüm üyeler | Çalışıyor, testli |
+| Uçuş karşılaştırma (2–6 uçuş) ve dışa aktarma (uçuş raporu JSON, bulgular/olaylar CSV, karşılaştırma CSV/JSON) | Çalışıyor; gerçek PX4 ve ArduPilot loglarıyla testli |
 | AI raporu (Anthropic Claude): kural bulgularından hazırlanan bağlam, her iddia için kanıt referansı, desteklenmeyen iddia ve doğrulanamayan sayı işaretleme, kota, maliyet ve gecikme kaydı | Çalışıyor, testli (sahte HTTP uç noktası ve betikli sağlayıcıyla); varsayılan olarak kapalı, API anahtarı gerekir |
 
 Henüz yapılmamış özellikler çalışıyormuş gibi gösterilmez.
@@ -187,7 +190,9 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | GET/POST | `/api/v1/teams/{id}/aircraft` | Araçlar (`search`, `autopilot`) / araç ekle (Engineer) |
 | GET/PUT/DELETE | `/api/v1/aircraft/{id}` | Araç oku / güncelle (`version`) / sil (Project Manager; uçuşlar kalır) |
 | POST | `/api/v1/projects/{id}/logs?aircraftId=&name=` | Log yükle (multipart, alan `file`); uçuş oluşturur, 201 |
-| GET | `/api/v1/flights` | Uçuş listesi (`teamId`, `projectId`, `aircraftId`, `autopilot`, `status`, `firmware`, `from`, `to`, `search`, `sort`, `page`, `pageSize`) |
+| GET | `/api/v1/flights` | Uçuş listesi (`teamId`, `projectId`, `aircraftId`, `autopilot`, `status`, `firmware`, `tag`, `from`, `to`, `search`, `sort`, `page`, `pageSize`) |
+| PUT | `/api/v1/flights/{id}/tags` | Uçuş etiketleri (Engineer; en fazla 20, her biri 40 karakter) |
+| GET | `/api/v1/teams/{id}/flight-tags` | Ekipte kullanılan etiketler ve uçuş sayıları |
 | GET/PUT/DELETE | `/api/v1/flights/{id}` | Uçuş ayrıntısı / ad, not, araç güncelle (`version`) / sil (Project Manager) |
 | GET | `/api/v1/log-files/{id}`, `/api/v1/log-files/{id}/content` | Dosya durumu / orijinal dosyayı indir |
 | POST | `/api/v1/log-files/{id}/cancel`, `/retry` | İşlemeyi iptal et / yeniden kuyruğa al |
@@ -198,7 +203,18 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | GET | `/api/v1/flights/{id}/parameters` | Başlangıç değerleri, varsayılanlar ve uçuştaki değişiklikler (`search`, `changedOnly`) |
 | POST/GET | `/api/v1/flights/{id}/analysis-runs` | Yeniden analiz iste (Engineer, 202) / analiz geçmişi |
 | GET | `/api/v1/analysis-runs/{id}` | Analiz durumu, sayılar ve her kuralın sonucu (uygulandı / uygulanamadı ve neden / hata) |
-| GET | `/api/v1/analysis-runs/{id}/findings` | Bulgular (`minSeverity`, `category`, `ruleId`, sayfalama): zaman aralığı, ölçülen değerler, eşik ve kaynağı, güven |
+| GET | `/api/v1/analysis-runs/{id}/findings` | Bulgular (`minSeverity`, `category`, `ruleId`, `reviewStatus`, `assigneeId`, `flagged`, sayfalama): zaman aralığı, ölçülen değerler, eşik ve kaynağı, güven, inceleme durumu |
+| GET/POST | `/api/v1/flights/{id}/comments` | Yorumlar (`findingId` ile bir bulgununkiler) / yorum veya zaman aralığı notu ekle (Engineer) |
+| PUT/DELETE | `/api/v1/comments/{id}` | Yorumu düzenle (yazarı, `version`) / sil (yazarı veya Project Manager) |
+| PATCH | `/api/v1/findings/{id}/review` | İnceleme durumu, atama, işaret, not (Engineer) |
+| GET | `/api/v1/findings/{id}/history` | Bulgunun inceleme ve yorum geçmişi |
+| GET | `/api/v1/teams/{id}/finding-reviews` | İncelenen bulgular (`assigneeId`, `status`, `flagged`, `openOnly`, sayfalama) |
+| GET | `/api/v1/flights/{id}/activity` | Uçuşun denetim kaydı (`action`, `from`, `to`, sayfalama) |
+| GET | `/api/v1/teams/{id}/audit-log` | Ekip denetim kaydı (Project Manager; `action` sonu `.` ise önek, `actorId`, `entityId`, `flightId`, `from`, `to`) |
+| GET | `/api/v1/admin/audit-log` | Tüm ekiplerin denetim kaydı (Administrator) |
+| GET | `/api/v1/flights/compare?ids=&ids=` | 2–6 uçuşun karşılaştırması ve karşılaştırılamayan noktalar |
+| GET | `/api/v1/flights/compare/export?ids=&format=Csv\|Json` | Karşılaştırma dosyası |
+| GET | `/api/v1/flights/{id}/export/report.json`, `findings.csv`, `events.csv` | Uçuş raporu ve tablolar (her indirme denetim kaydına yazılır) |
 | GET | `/api/v1/analysis-rules` | Kurallar: ne kontrol ettikleri, gereken veri, uygulanamadıkları durumlar |
 | POST/GET | `/api/v1/flights/{id}/ai-analyses` | AI raporu iste (Engineer, 202; kota 429) / AI rapor geçmişi |
 | GET | `/api/v1/ai-analyses/{id}`, `/context`, `/report.md` | Rapor ve doğrulama sonucu / modele gönderilen bağlam (Engineer) / Markdown rapor |
@@ -209,7 +225,7 @@ docs/                        Mimari, gereksinimler, ADR'ler, yol haritası, dağ
 | WS | `/hubs/processing` | SignalR: dosya ve analiz durum değişiklikleri (`StatusChanged`), yalnızca kullanıcının ekipleri için |
 | GET | `/health/live`, `/health/ready` | Sağlık kontrolleri (hazırlık: veritabanı, depolama, RabbitMQ) |
 
-Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`, `analysis_run.already_pending`, `ai.disabled`, `ai.quota_exceeded`).
+Hatalar RFC 9457 Problem Details biçimindedir ve sabit bir `code` alanı içerir (ör. `not_found`, `forbidden`, `project.version_mismatch`, `team.last_project_manager`, `log_file.duplicate`, `log_file.extension_mismatch`, `upload.too_large`, `analysis_run.already_pending`, `ai.disabled`, `ai.quota_exceeded`, `comment.version_mismatch`, `review.assignee_read_only`).
 
 ## Dağıtım
 
@@ -218,7 +234,8 @@ Sunucu kurulumu, migration, gizli bilgi yönetimi, yedekleme ve log saklama: [do
 ## Bilinen eksikler
 
 - Analiz kuralları ilk sürümde 13 kuraldır; IMU ve sensörler arası tutarsızlık, gecikme ve akım anomalisi kuralları belgelenmiş eşik ve gerçek uçuş verisi olmadan eklenmedi. PX4'ün titreşim metriği için belgelenmiş bir sınır olmadığından titreşim seviyesi kuralı yalnızca ArduPilot'ta uygulanır.
-- Bulgu inceleme durumu, atama ve kanıt bağlantıları Aşama 7'de (bulgu iş akışı).
+- Yorumlarda kişi etiketleme ve bildirim yok; atanan kişi işini "İncelemeler" sayfasından takip eder.
+- Kural eşiği veya motor sürümü değişip bir bulgunun zaman aralığı değişirse eski inceleme yeni bulguyla eşleşmez; iş listesinde "son analizde bu bulgu artık yok" olarak görünür ([ADR-0012](docs/adr/0012-collaboration-audit-comparison.md)).
 - GPS UTC zamanı olmayan loglarda uçuşun başlangıç tarihi bilinemez ve boş kalır (tahmin edilmez); liste tarihi yükleme zamanıdır.
 - Normalize sinyaller v1 yalnızca tutum, GPS ve batarya içerir; titreşim ve barometrik irtifa formatlar arasında farklı anlam taşıdığı için şimdilik ham sinyal olarak okunur ([mimari](docs/architecture.md#51-sinyaller-ve-normalizasyon-v1)).
 - Sinyal blok formatı ile Parquet'in ölçümlü karşılaştırması Aşama 8'e ertelendi ([ADR-0005](docs/adr/0005-time-series-storage.md)).

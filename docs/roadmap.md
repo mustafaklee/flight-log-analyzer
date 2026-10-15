@@ -10,9 +10,9 @@ Süreler yaklaşık planlama aralığıdır; bir aşamanın bitişini kabul krit
 | 3 | PX4 ve ArduPilot parser entegrasyonu | Tamamlandı |
 | 4 | Asenkron işleme ve teknik analiz | Tamamlandı |
 | 5 | Uçuş analiz arayüzü (React) | Tamamlandı |
-| 6 | Yapay zekâ analizi | Tamamlandı (PR incelemesinde) |
-| 7 | Ekip çalışması ve karşılaştırma | Sırada |
-| 8 | Performans, güvenlik ve dağıtım | Planlandı |
+| 6 | Yapay zekâ analizi | Tamamlandı |
+| 7 | Ekip çalışması ve karşılaştırma | Tamamlandı (PR incelemesinde) |
+| 8 | Performans, güvenlik ve dağıtım | Sırada |
 | 9 | Canlı izleme hazırlığı | Sonraki sürüm |
 
 ## Aşama 0 — İnceleme ve tasarım
@@ -130,7 +130,21 @@ Ertelenenler: gerçek sağlayıcıyla otomatik test (anahtar gerektirir, CI'da �
 
 ## Aşama 7 — Ekip çalışması ve karşılaştırma
 
-Yorumlar, bulgu atama, inceleme durumları, audit log, karşılaştırma, CSV/JSON raporlar.
+Hedef: Ekip bir uçuş üzerinde yorum ve zaman aralığı notu yazabilir, bulguları atayıp inceleme durumunu işaretleyebilir, uçuşları etiketleyip karşılaştırabilir, sonuçları CSV/JSON olarak dışa aktarabilir; kim neyi ne zaman değiştirdi denetim kaydında görünür.
+
+- [x] ADR-0012: bulgu incelemesinin kural ve zaman aralığına bağlanması, yorum ve not modeli, etiketler, transactional denetim kaydı, karşılaştırma ve dışa aktarma kuralları
+- [x] `FindingReview`, `FlightComment`, `AuditEntry` modelleri, uçuş etiketleri (`text[]` + GIN), migration `Collaboration`
+- [x] Yorumlar ve zaman aralığı notları: ekleme, sürüm kontrollü düzenleme, yumuşak silme; yazar düzenler, yazar veya Project Manager siler
+- [x] Bulgu incelemesi: durum, atama (yalnızca Engineer ve üstü), işaret, not; yeniden analizden sonra aynı bulguya bağlı kalır; bulgu listesinde inceleme filtreleri; ekip iş listesi ("bana atananlar")
+- [x] Denetim kaydı: uçuş, log dosyası, analiz, AI isteği, yorum, inceleme, ekip üyeliği, proje, araç ve dışa aktarma işlemleri; iz kimliği; silinen kayıtlardan sonra da kalır; saklama süresi (`Audit:RetentionDays`, varsayılan 730 gün)
+- [x] Okuma yetkileri: uçuş etkinliği Viewer, ekip kaydı Project Manager, tüm kayıt yönetici
+- [x] Karşılaştırma (`comparison-v1`): 2–6 uçuş; süreler, bulgular ve kural sonuçları, normalize sinyal istatistikleri, batarya, titreşim, mod süreleri, olay sayıları, son AI raporu; doğrudan karşılaştırılamayan noktalar için notlar
+- [x] Dışa aktarma: uçuş raporu JSON, bulgular ve olaylar CSV, karşılaştırma CSV/JSON; UTF-8 BOM, formül enjeksiyonu koruması, konum ve e-posta yok; her indirme denetlenir
+- [x] Arayüz: uçuş sayfasında Yorumlar ve Etkinlik sekmeleri, etiket düzenleyici, dışa aktarma menüsü, bulgu inceleme paneli ve geçmişi; uçuş listesinde etiket filtresi ve çoklu seçimle karşılaştırma; Karşılaştırma, İncelemeler ve Denetim kaydı sayfaları; yönetici ekranında genel denetim kaydı
+- [x] OpenAPI: boş değer içerebilen listeler (`IReadOnlyList<T?>`) artık sözleşmede "null veya T" olarak görünüyor
+- [x] Testler: rol matrisi, yorum ve inceleme akışı, yeniden analizde incelemenin korunması, etiketler, denetim kaydı ve saklama süresi, karşılaştırma ve dışa aktarma (entegrasyon); domain, karşılaştırma hesapları, CSV ve doğrulayıcılar (birim); arayüz bileşenleri (Vitest); Compose'a karşı Playwright senaryosu; smoke testi
+
+Ertelenenler: AI raporu maddeleri üzerinde ayrı inceleme durumu (şimdilik uçuş yorumlarıyla), yorumlarda kişi etiketleme ve bildirim (e-posta veya uygulama içi), karşılaştırmada zaman eksenini hizalanmış grafikler, denetim kaydının dış sisteme aktarımı (Aşama 8).
 
 ## Aşama 8 — Performans, güvenlik, dağıtım
 

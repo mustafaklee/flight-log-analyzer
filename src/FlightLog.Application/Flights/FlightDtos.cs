@@ -24,6 +24,7 @@ public sealed record FlightQuery(
     DateTimeOffset? From = null,
     DateTimeOffset? To = null,
     string? Search = null,
+    string? Tag = null,
     FlightSort Sort = FlightSort.OccurredAtDesc,
     int Page = 1,
     int PageSize = 20);
@@ -47,7 +48,8 @@ public sealed record FlightListItemDto(
     string? FileName,
     long? FileSizeBytes,
     DateTimeOffset CreatedAt,
-    AnalysisSummaryDto? LatestAnalysis);
+    AnalysisSummaryDto? LatestAnalysis,
+    IReadOnlyList<string> Tags);
 
 /// <summary>
 /// A flight. Signal and event times are microseconds on the log's own clock; <c>LogStartTimestampUs</c> is where the
@@ -77,9 +79,16 @@ public sealed record FlightDto(
     DateTimeOffset UpdatedAt,
     uint Version,
     LogFileDto? LogFile,
-    AnalysisSummaryDto? LatestAnalysis);
+    AnalysisSummaryDto? LatestAnalysis,
+    IReadOnlyList<string> Tags);
 
 public sealed record UpdateFlightRequest(string Name, string? Notes, Guid? AircraftId, uint Version);
+
+/// <summary>Replaces a flight's tags (at most 20, each at most 40 characters; duplicates ignored case-insensitively).</summary>
+public sealed record SetFlightTagsRequest(IReadOnlyList<string> Tags);
+
+/// <summary>A tag used in a team and on how many flights.</summary>
+public sealed record TagCountDto(string Tag, int Flights);
 
 public sealed record LogFileDto(
     Guid Id,

@@ -2,6 +2,8 @@ import { ActionIcon, AppShell, Burger, Group, Indicator, Menu, NavLink, ScrollAr
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconChartLine,
+  IconChecklist,
+  IconHistory,
   IconDrone,
   IconFolders,
   IconLayoutDashboard,
@@ -22,6 +24,7 @@ import { roleLabels } from '../lib/labels';
 const links = [
   { to: '/', label: 'Dashboard', icon: IconLayoutDashboard, end: true },
   { to: '/flights', label: 'Uçuş geçmişi', icon: IconChartLine },
+  { to: '/reviews', label: 'İncelemeler', icon: IconChecklist },
   { to: '/upload', label: 'Log yükleme', icon: IconUpload },
   { to: '/fleet', label: 'Filo', icon: IconDrone },
   { to: '/projects', label: 'Projeler', icon: IconFolders },
@@ -38,7 +41,7 @@ const realtimeLabels = {
 export function Layout() {
   const [opened, { toggle, close }] = useDisclosure();
   const { user, logout, isAdministrator } = useAuth();
-  const { teams, team, selectTeam } = useTeam();
+  const { teams, team, selectTeam, can } = useTeam();
   const realtime = useRealtime(true);
   const location = useLocation();
   const { setColorScheme } = useMantineColorScheme();
@@ -128,6 +131,16 @@ export function Layout() {
               onClick={close}
             />
           ))}
+          {team && can('ProjectManager') && (
+            <NavLink
+              component={RouterLink}
+              to="/audit-log"
+              label="Denetim kaydı"
+              leftSection={<IconHistory size={18} stroke={1.6} />}
+              active={location.pathname.startsWith('/audit-log')}
+              onClick={close}
+            />
+          )}
           {isAdministrator && (
             <NavLink
               component={RouterLink}

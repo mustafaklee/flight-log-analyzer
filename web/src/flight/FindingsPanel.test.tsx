@@ -31,7 +31,7 @@ describe('FindingsPanel', () => {
     const findings = [finding('a', 'Info', 'Mod değişimi', 1_000_000), finding('b', 'Warning', 'Düşük voltaj', 5_000_000)];
 
     renderWithApp(
-      <FindingsPanel flightId="f1" runs={[run]} findings={findings} findingsLoading={false} logFromUs={0} onSelect={() => {}} onShowOnChart={onShow} />,
+      <FindingsPanel flightId="f1" teamId="t1" runs={[run]} findings={findings} findingsLoading={false} logFromUs={0} onSelect={() => {}} onShowOnChart={onShow} />,
     );
 
     const items = screen.getAllByTestId('finding');
@@ -51,7 +51,7 @@ describe('FindingsPanel', () => {
 
   it('says when the flight has not been analyzed', () => {
     mockApi((url) => (url.pathname === '/api/v1/analysis-rules' ? { body: [] } : undefined));
-    renderWithApp(<FindingsPanel flightId="f1" runs={[]} findings={[]} findingsLoading={false} logFromUs={0} onSelect={() => {}} onShowOnChart={() => {}} />);
+    renderWithApp(<FindingsPanel flightId="f1" teamId="t1" runs={[]} findings={[]} findingsLoading={false} logFromUs={0} onSelect={() => {}} onShowOnChart={() => {}} />);
     expect(screen.getByText('Bu uçuş henüz analiz edilmedi.')).toBeInTheDocument();
   });
 });

@@ -57,3 +57,22 @@ AI_ENABLED=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/teams/$TEAM/ai
 AI_CODE=$(curl -sS "${AUTH[@]}" -X POST "$BASE/api/v1/flights/$FLIGHT/ai-analyses" | jq -r .code)
 echo "AI analysis enabled: $AI_ENABLED (request answered with ${AI_CODE})"
 [ "$AI_ENABLED" = "true" ] || [ "$AI_CODE" = "ai.disabled" ]
+
+# Stage 7: collaboration and comparison. A second (ArduPilot) flight is compared with the first.
+SECOND_LOG=${SECOND_LOG_FILE:-tests/fixtures/ardupilot/sitl-copter-4.6.3.bin}
+SECOND=$(curl --fail-with-body -sS "${AUTH[@]}" -F "file=@$SECOND_LOG" "$BASE/api/v1/projects/$PROJECT/logs" | jq -r .flight.id)
+for _ in $(seq 1 60); do
+  [ "$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/$SECOND" | jq -r .logFile.status)" = "Completed" ] && break
+  sleep 2
+done
+json "${AUTH[@]}" -X PUT -d '{"tags":["smoke","acceptance"]}' "$BASE/api/v1/flights/$FLIGHT/tags" > /dev/null
+json "${AUTH[@]}" -d '{"body":"Smoke note","startUs":0,"endUs":1000000}' "$BASE/api/v1/flights/$FLIGHT/comments" > /dev/null
+FINDING=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/analysis-runs/$RUN/findings" | jq -r '.items[0].id // empty')
+if [ -n "$FINDING" ]; then
+  json "${AUTH[@]}" -X PATCH -d '{"status":"Investigating","flagged":true,"note":"Smoke review"}' "$BASE/api/v1/findings/$FINDING/review" > /dev/null
+fi
+NOTES=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/compare?ids=$FLIGHT&ids=$SECOND" | jq -r '[.notes[].code] | join(",")')
+BOM=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/$FLIGHT/export/findings.csv" | head -c 3 | od -An -tx1 | tr -d ' ')
+AUDIT=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/teams/$TEAM/audit-log?pageSize=100" | jq .totalCount)
+echo "Comparison notes: $NOTES; findings CSV starts with $BOM; audit log has $AUDIT entries"
+[ "$BOM" = "efbbbf" ] && [ "$AUDIT" -gt 5 ] && [[ "$NOTES" == *different_autopilot* ]]

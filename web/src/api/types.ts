@@ -47,6 +47,18 @@ export type AiReportItem = Schemas['AiReportItemDto'];
 export type AiEvidence = Schemas['AiEvidenceDto'];
 export type AiStatus = Schemas['AiStatusDto'];
 export type AiUsage = Schemas['AiUsageDto'];
+export type UserRef = Schemas['UserRefDto'];
+export type FlightComment = Schemas['CommentDto'];
+export type FindingReview = Schemas['FindingReviewDto'];
+export type FindingReviewStatus = Schemas['FindingReviewStatus'];
+export type UpdateFindingReviewRequest = Schemas['UpdateFindingReviewRequest'];
+export type ReviewListItem = Schemas['ReviewListItemDto'];
+export type AuditEntry = Schemas['AuditEntryDto'];
+export type TagCount = Schemas['TagCountDto'];
+export type FlightComparison = Schemas['FlightComparisonDto'];
+export type ComparedFlight = Schemas['ComparedFlightDto'];
+export type ComparedSignal = Schemas['ComparedSignalDto'];
+export type ComparabilityNote = Schemas['ComparabilityNoteDto'];
 
 export interface Paged<T> {
   items: T[];

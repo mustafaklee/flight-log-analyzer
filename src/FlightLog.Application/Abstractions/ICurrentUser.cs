@@ -7,4 +7,7 @@ public interface ICurrentUser
     Guid UserId { get; }
 
     bool IsAdministrator { get; }
+
+    /// <summary>Correlation id of the current operation (request), recorded with audit entries.</summary>
+    string CorrelationId { get; }
 }

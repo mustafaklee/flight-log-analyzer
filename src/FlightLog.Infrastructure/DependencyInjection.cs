@@ -67,6 +67,7 @@ public static class DependencyInjection
 
         // AI analysis (ADR-0008): only the worker calls the provider; the key is only given to the worker.
         services.Configure<AiOptions>(configuration.GetSection(AiOptions.SectionName));
+        services.Configure<Application.Collaboration.AuditOptions>(configuration.GetSection(Application.Collaboration.AuditOptions.SectionName));
         services.AddSingleton<IFlightAnalysisProvider>(sp =>
         {
             var ai = sp.GetRequiredService<IOptions<AiOptions>>();

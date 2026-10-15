@@ -1,4 +1,5 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Collaboration;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
 using FlightLog.Domain.Projects;
@@ -24,6 +25,7 @@ public interface IProjectService
 internal sealed class ProjectService(
     IApplicationDbContext db,
     ITeamAccessService access,
+    IAuditTrail audit,
     TimeProvider clock,
     IValidator<CreateProjectRequest> createValidator,
     IValidator<UpdateProjectRequest> updateValidator) : IProjectService
@@ -70,6 +72,7 @@ internal sealed class ProjectService(
         await EnsureNameIsFreeAsync(teamId, project.Name, exceptProjectId: null, cancellationToken);
 
         db.Projects.Add(project);
+        audit.Record(teamId, AuditActions.ProjectCreated, AuditEntities.Project, project.Id, null, project.Name);
         await db.SaveChangesAsync(cancellationToken);
         return ToDto(project);
     }
@@ -107,6 +110,7 @@ internal sealed class ProjectService(
         }
 
         db.Projects.Remove(project);
+        audit.Record(project.TeamId, AuditActions.ProjectDeleted, AuditEntities.Project, project.Id, null, project.Name);
         await db.SaveChangesAsync(cancellationToken);
     }
 

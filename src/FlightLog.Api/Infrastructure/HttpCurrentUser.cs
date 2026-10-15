@@ -15,4 +15,9 @@ internal sealed class HttpCurrentUser(IHttpContextAccessor accessor) : ICurrentU
             : throw new InvalidOperationException("The current request is not authenticated.");
 
     public bool IsAdministrator => Principal.IsInRole(SystemRoles.Administrator);
+
+    public string CorrelationId =>
+        accessor.HttpContext is { } context
+            ? context.Items[CorrelationIdMiddleware.ItemKey] as string ?? context.TraceIdentifier
+            : Guid.NewGuid().ToString("N");
 }

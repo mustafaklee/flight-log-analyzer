@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mockApi } from '../test/render';
-import { api, ApiError, session, toQueryString } from './client';
+import { api, ApiError, fileNameFrom, session, toQueryString } from './client';
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -52,5 +52,13 @@ describe('api', () => {
     expect(error).toBeInstanceOf(ApiError);
     expect((error as ApiError).problem.code).toBe('validation');
     expect((error as ApiError).fieldErrors).toEqual(['Ad zorunlu.']);
+  });
+});
+
+describe('fileNameFrom', () => {
+  it('prefers the UTF-8 file name of Content-Disposition', () => {
+    expect(fileNameFrom(`attachment; filename=ucus-bulgular.csv; filename*=UTF-8''u%C3%A7u%C5%9F-bulgular.csv`)).toBe('uçuş-bulgular.csv');
+    expect(fileNameFrom('attachment; filename="rapor.json"')).toBe('rapor.json');
+    expect(fileNameFrom(null)).toBeNull();
   });
 });

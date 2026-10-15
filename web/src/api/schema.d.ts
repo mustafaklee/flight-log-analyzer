@@ -1354,6 +1354,9 @@ export interface paths {
                     MinSeverity?: components["schemas"]["FindingSeverity"];
                     Category?: string;
                     RuleId?: string;
+                    ReviewStatus?: components["schemas"]["FindingReviewStatus"];
+                    AssigneeId?: string;
+                    Flagged?: boolean;
                     Page?: number;
                     PageSize?: number;
                 };
@@ -1754,6 +1757,1140 @@ export interface paths {
                         "text/plain": components["schemas"]["UserProfileDto"];
                         "application/json": components["schemas"]["UserProfileDto"];
                         "text/json": components["schemas"]["UserProfileDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Comments of a flight in time order (deleted ones without text); with `findingId` only those on that finding. */
+        get: {
+            parameters: {
+                query?: {
+                    findingId?: string;
+                };
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CommentDto"][];
+                        "application/json": components["schemas"]["CommentDto"][];
+                        "text/json": components["schemas"]["CommentDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Adds a comment (Engineer). With `startUs`/`endUs` it is a note on that part of the flight; with `findingId` it goes on the finding. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateCommentRequest"];
+                    "text/json": components["schemas"]["CreateCommentRequest"];
+                    "application/*+json": components["schemas"]["CreateCommentRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CommentDto"];
+                        "application/json": components["schemas"]["CommentDto"];
+                        "text/json": components["schemas"]["CommentDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Edits a comment (its author only). `version` must be the version last read. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    commentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EditCommentRequest"];
+                    "text/json": components["schemas"]["EditCommentRequest"];
+                    "application/*+json": components["schemas"]["EditCommentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CommentDto"];
+                        "application/json": components["schemas"]["CommentDto"];
+                        "text/json": components["schemas"]["CommentDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Deletes a comment (its author or a project manager); the comment stays in the thread without its text. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    commentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{findingId}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Changes a finding's review (Engineer): status, assignee (an engineer or project manager of the team), flag, and
+         *     an optional note that is added as a comment. The review survives re-analysis as long as the rule finds the same time range.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    findingId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateFindingReviewRequest"];
+                    "text/json": components["schemas"]["UpdateFindingReviewRequest"];
+                    "application/*+json": components["schemas"]["UpdateFindingReviewRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FindingReviewDto"];
+                        "application/json": components["schemas"]["FindingReviewDto"];
+                        "text/json": components["schemas"]["FindingReviewDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/findings/{findingId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who changed the finding's review and its comments, and when; newest first. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    findingId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AuditEntryDto"][];
+                        "application/json": components["schemas"]["AuditEntryDto"][];
+                        "text/json": components["schemas"]["AuditEntryDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{teamId}/finding-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The team's reviewed findings, most recently changed first (filter by assignee, status, flag). */
+        get: {
+            parameters: {
+                query?: {
+                    AssigneeId?: string;
+                    Status?: components["schemas"]["FindingReviewStatus"];
+                    Flagged?: boolean;
+                    OpenOnly?: boolean;
+                    Page?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path: {
+                    teamId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagedResultOfReviewListItemDto"];
+                        "application/json": components["schemas"]["PagedResultOfReviewListItemDto"];
+                        "text/json": components["schemas"]["PagedResultOfReviewListItemDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What happened to a flight (uploads, analyses, edits, tags, comments, reviews, exports), newest first. */
+        get: {
+            parameters: {
+                query?: {
+                    Action?: string;
+                    EntityType?: string;
+                    EntityId?: string;
+                    FlightId?: string;
+                    ActorId?: string;
+                    From?: string;
+                    To?: string;
+                    Page?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "application/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "text/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{teamId}/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The team's audit trail (project manager). `action` matches exactly, or as a prefix when it ends with a dot
+         *     (`finding.`).
+         */
+        get: {
+            parameters: {
+                query?: {
+                    Action?: string;
+                    EntityType?: string;
+                    EntityId?: string;
+                    FlightId?: string;
+                    ActorId?: string;
+                    From?: string;
+                    To?: string;
+                    Page?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path: {
+                    teamId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "application/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "text/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Action?: string;
+                    EntityType?: string;
+                    EntityId?: string;
+                    FlightId?: string;
+                    ActorId?: string;
+                    From?: string;
+                    To?: string;
+                    Page?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "application/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                        "text/json": components["schemas"]["PagedResultOfAuditEntryDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compares 2 to 6 flights (`ids` repeated): durations, findings and rule results, statistics of normalized
+         *     signals, battery, vibration, flight modes and the latest AI report; with notes on what is not directly comparable.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    ids?: string[];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlightComparisonDto"];
+                        "application/json": components["schemas"]["FlightComparisonDto"];
+                        "text/json": components["schemas"]["FlightComparisonDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/compare/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The comparison as a CSV (one column per flight) or JSON file. */
+        get: {
+            parameters: {
+                query?: {
+                    ids?: string[];
+                    format?: components["schemas"]["ExportFormat"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": string;
+                        "application/json": string;
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/export/report.json": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The flight as one JSON report: summary, analysis with findings and reviews, events, parameter changes, AI report, comments. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/export/findings.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Findings of the latest analysis with review state, as CSV. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/export/events.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** All events of the flight as CSV. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": string;
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/csv": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -2238,6 +3375,7 @@ export interface paths {
                     From?: string;
                     To?: string;
                     Search?: string;
+                    Tag?: string;
                     Sort?: components["schemas"]["FlightSort"];
                     Page?: number;
                     PageSize?: number;
@@ -2485,6 +3623,169 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/flights/{flightId}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replaces the flight's tags (Engineer). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    flightId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SetFlightTagsRequest"];
+                    "text/json": components["schemas"]["SetFlightTagsRequest"];
+                    "application/*+json": components["schemas"]["SetFlightTagsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FlightDto"];
+                        "application/json": components["schemas"]["FlightDto"];
+                        "text/json": components["schemas"]["FlightDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/{teamId}/flight-tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tags of the team's flights, most used first (at most 200). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    teamId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TagCountDto"][];
+                        "application/json": components["schemas"]["TagCountDto"][];
+                        "text/json": components["schemas"]["TagCountDto"][];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3859,6 +5160,15 @@ export interface components {
             missingData: string[];
             recommendedChecks: string[];
         };
+        AiReportRefDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            finishedAt: null | string;
+            model: string;
+            assessment: null | components["schemas"]["AiOverallAssessment"];
+            summary: null | string;
+        };
         AiReportValidationDto: {
             /** Format: int32 */
             items: number;
@@ -4026,8 +5336,44 @@ export interface components {
         };
         /** @enum {unknown} */
         AnalysisTrigger: "Automatic" | "Manual";
+        AuditEntryDto: {
+            /** Format: uuid */
+            id: string;
+            action: string;
+            entityType: string;
+            /** Format: uuid */
+            entityId: string;
+            /** Format: uuid */
+            flightId: null | string;
+            actor: components["schemas"]["UserRefDto"];
+            summary: null | string;
+            data: {
+                [key: string]: string;
+            };
+            correlationId: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
         /** @enum {unknown} */
         Autopilot: "Unknown" | "Px4" | "ArduPilot";
+        BatterySummaryDto: {
+            /** Format: double */
+            startVoltage: null | number;
+            /** Format: double */
+            endVoltage: null | number;
+            /** Format: double */
+            minVoltage: null | number;
+            /** Format: double */
+            meanCurrent: null | number;
+            /** Format: double */
+            maxCurrent: null | number;
+            /** Format: double */
+            startRemaining: null | number;
+            /** Format: double */
+            endRemaining: null | number;
+            /** Format: double */
+            usedPercent: null | number;
+        };
         ChangeTeamMemberRoleRequest: {
             role: components["schemas"]["TeamRole"];
         };
@@ -4035,6 +5381,97 @@ export interface components {
             code: string;
             /** Format: int32 */
             count: number;
+        };
+        CommentDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            flightId: string;
+            /** Format: uuid */
+            findingReviewId: null | string;
+            author: components["schemas"]["UserRefDto"];
+            body: null | string;
+            /** Format: int64 */
+            startUs: null | number;
+            /** Format: int64 */
+            endUs: null | number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            editedAt: null | string;
+            deleted: boolean;
+            canEdit: boolean;
+            canDelete: boolean;
+            /** Format: uint32 */
+            version: number;
+        };
+        ComparabilityNoteDto: {
+            code: string;
+            message: string;
+            flightIds: string[];
+        };
+        ComparedFlightDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            projectName: string;
+            aircraftName: null | string;
+            autopilot: components["schemas"]["Autopilot"];
+            firmwareVersion: null | string;
+            vehicleType: null | string;
+            hardware: null | string;
+            /** Format: date-time */
+            startedAt: null | string;
+            /** Format: double */
+            durationSeconds: null | number;
+            /** Format: double */
+            analyzedSeconds: null | number;
+            armingKnown: boolean;
+            /** Format: uuid */
+            analysisRunId: null | string;
+            engineVersion: null | string;
+            /** Format: int32 */
+            infoCount: null | number;
+            /** Format: int32 */
+            warningCount: null | number;
+            /** Format: int32 */
+            criticalCount: null | number;
+            findingsByCategory: {
+                [key: string]: number;
+            };
+            eventCounts: {
+                [key: string]: number;
+            };
+            modes: components["schemas"]["ModeShareDto"][];
+            battery: null | components["schemas"]["BatterySummaryDto"];
+            vibration: null | components["schemas"]["VibrationSummaryDto"];
+            latestAiReport: null | components["schemas"]["AiReportRefDto"];
+        };
+        ComparedRuleDto: {
+            ruleId: string;
+            values: (null | components["schemas"]["ComparedRuleResultDto"])[];
+        };
+        ComparedRuleResultDto: {
+            status: components["schemas"]["RuleResultStatus"];
+            /** Format: int32 */
+            findings: number;
+            highestSeverity: null | components["schemas"]["FindingSeverity"];
+        };
+        ComparedSignalDto: {
+            name: string;
+            unit: null | string;
+            comparable: boolean;
+            note: null | string;
+            values: (null | components["schemas"]["SignalStatsDto"])[];
+        };
+        CreateCommentRequest: {
+            body: string;
+            /** Format: int64 */
+            startUs?: null | number;
+            /** Format: int64 */
+            endUs?: null | number;
+            /** Format: uuid */
+            findingId?: null | string;
         };
         CreateProjectRequest: {
             name: string;
@@ -4100,6 +5537,11 @@ export interface components {
             /** Format: double */
             maxMs: null | number;
         };
+        EditCommentRequest: {
+            body: string;
+            /** Format: uint32 */
+            version: number;
+        };
         EntityTagHeaderValue: {
             tag?: components["schemas"]["StringSegment"];
             isWeak?: boolean;
@@ -4108,6 +5550,8 @@ export interface components {
         EventSeverity: "Emergency" | "Alert" | "Critical" | "Error" | "Warning" | "Notice" | "Info" | "Debug";
         /** @enum {unknown} */
         EvidenceKind: "Finding" | "Event" | "Signal" | "Parameter" | "Rule";
+        /** @enum {unknown} */
+        ExportFormat: "Json" | "Csv";
         FileStreamResult: {
             fileStream?: components["schemas"]["Stream"];
             contentType?: null | string;
@@ -4149,9 +5593,34 @@ export interface components {
             /** Format: int32 */
             occurrenceCount: number;
             limitations: null | string;
+            review?: null | components["schemas"]["FindingReviewDto"];
+        };
+        FindingReviewDto: {
+            /** Format: uuid */
+            id: string;
+            status: components["schemas"]["FindingReviewStatus"];
+            assignee: null | components["schemas"]["UserRefDto"];
+            flagged: boolean;
+            updatedBy: components["schemas"]["UserRefDto"];
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: int32 */
+            commentCount: number;
         };
         /** @enum {unknown} */
+        FindingReviewStatus: "Open" | "Investigating" | "Confirmed" | "Dismissed" | "Resolved";
+        /** @enum {unknown} */
         FindingSeverity: "Info" | "Warning" | "Critical";
+        FlightComparisonDto: {
+            version: string;
+            /** Format: date-time */
+            generatedAt: string;
+            flights: components["schemas"]["ComparedFlightDto"][];
+            signals: components["schemas"]["ComparedSignalDto"][];
+            rules: components["schemas"]["ComparedRuleDto"][];
+            notes: components["schemas"]["ComparabilityNoteDto"][];
+            limitations: string[];
+        };
         FlightDto: {
             /** Format: uuid */
             id: string;
@@ -4192,6 +5661,7 @@ export interface components {
             version: number;
             logFile: null | components["schemas"]["LogFileDto"];
             latestAnalysis: null | components["schemas"]["AnalysisSummaryDto"];
+            tags: string[];
         };
         FlightEventDto: {
             /** Format: int64 */
@@ -4235,6 +5705,7 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             latestAnalysis: null | components["schemas"]["AnalysisSummaryDto"];
+            tags: string[];
         };
         FlightParameterDto: {
             name: string;
@@ -4278,6 +5749,13 @@ export interface components {
             teamName: string;
             role: components["schemas"]["TeamRole"];
         };
+        ModeShareDto: {
+            mode: string;
+            /** Format: double */
+            seconds: number;
+            /** Format: double */
+            share: number;
+        };
         PagedResultOfAdminUserDto: {
             items: components["schemas"]["AdminUserDto"][];
             /** Format: int32 */
@@ -4291,6 +5769,17 @@ export interface components {
         };
         PagedResultOfAircraftDto: {
             items: components["schemas"]["AircraftDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResultOfAuditEntryDto: {
+            items: components["schemas"]["AuditEntryDto"][];
             /** Format: int32 */
             page: number;
             /** Format: int32 */
@@ -4335,6 +5824,17 @@ export interface components {
         };
         PagedResultOfProjectDto: {
             items: components["schemas"]["ProjectDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            totalCount: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagedResultOfReviewListItemDto: {
+            items: components["schemas"]["ReviewListItemDto"][];
             /** Format: int32 */
             page: number;
             /** Format: int32 */
@@ -4464,6 +5964,29 @@ export interface components {
             password: string;
             displayName: string;
         };
+        ReviewListItemDto: {
+            /** Format: uuid */
+            reviewId: string;
+            /** Format: uuid */
+            flightId: string;
+            flightName: string;
+            ruleId: string;
+            /** Format: int64 */
+            startUs: number;
+            /** Format: int64 */
+            endUs: number;
+            /** Format: int64 */
+            logStartUs: null | number;
+            status: components["schemas"]["FindingReviewStatus"];
+            assignee: null | components["schemas"]["UserRefDto"];
+            flagged: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: uuid */
+            findingId: null | string;
+            title: null | string;
+            severity: null | components["schemas"]["FindingSeverity"];
+        };
         RuleDescriptorDto: {
             id: string;
             /** Format: int32 */
@@ -4501,6 +6024,9 @@ export interface components {
             tags: null | string[];
             /** Format: uint32 */
             version?: null | number;
+        };
+        SetFlightTagsRequest: {
+            tags: string[];
         };
         SignalDataDto: {
             /** Format: uuid */
@@ -4545,7 +6071,7 @@ export interface components {
             samplesInRange: number;
             downsampled: boolean;
             timestampsUs: number[];
-            values: (null | number)[];
+            values: (null | (null | number))[];
         };
         SignalSourceDto: {
             message: string;
@@ -4554,6 +6080,24 @@ export interface components {
             fields: string;
             conversion: string;
             normalizationVersion: string;
+        };
+        SignalStatsDto: {
+            /** Format: int64 */
+            samples: number;
+            /** Format: double */
+            rateHz: number;
+            /** Format: double */
+            min: number;
+            /** Format: double */
+            max: number;
+            /** Format: double */
+            mean: number;
+            /** Format: double */
+            p5: number;
+            /** Format: double */
+            p50: number;
+            /** Format: double */
+            p95: number;
         };
         /** Format: binary */
         Stream: string;
@@ -4565,6 +6109,11 @@ export interface components {
             length?: number;
             value?: null | string;
             hasValue?: boolean;
+        };
+        TagCountDto: {
+            tag: string;
+            /** Format: int32 */
+            flights: number;
         };
         TeamDto: {
             /** Format: uuid */
@@ -4587,6 +6136,15 @@ export interface components {
         };
         /** @enum {unknown} */
         TeamRole: "Viewer" | "Engineer" | "ProjectManager";
+        UpdateFindingReviewRequest: {
+            status?: null | components["schemas"]["FindingReviewStatus"];
+            /** Format: uuid */
+            assigneeId?: null | string;
+            /** @default false */
+            unassign: boolean;
+            flagged?: null | boolean;
+            note?: null | string;
+        };
         UpdateFlightRequest: {
             name: string;
             notes: null | string;
@@ -4613,6 +6171,11 @@ export interface components {
             roles: string[];
             teams: components["schemas"]["MembershipDto"][];
         };
+        UserRefDto: {
+            /** Format: uuid */
+            id: string;
+            displayName: string;
+        };
         ValidationProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -4623,6 +6186,17 @@ export interface components {
             errors?: {
                 [key: string]: string[];
             };
+        };
+        VibrationSummaryDto: {
+            metric: string;
+            unit: null | string;
+            comparableWithin: components["schemas"]["Autopilot"];
+            /** Format: double */
+            mean: number;
+            /** Format: double */
+            p95: number;
+            /** Format: double */
+            max: number;
         };
     };
     responses: never;

@@ -92,6 +92,8 @@ jobs:
       - name: Build images
         run: |
           cp .env.example .env
+          # The browser tests sign up several users within a minute from one address.
+          echo AUTH_RATE_LIMIT_PER_MINUTE=60 >> .env
           docker compose build
 
       - name: Smoke test with Docker Compose (upload a log, wait for the worker)
