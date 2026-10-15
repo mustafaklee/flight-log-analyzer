@@ -38,7 +38,7 @@ test('an engineer tags, comments, reviews a finding, compares two flights and re
 
   // A second flight from another autopilot; the comparison says what is not directly comparable.
   await uploadAndWait(page, project, 'px4/sample.ulg');
-  await page.getByRole('link', { name: 'Uçuş geçmişi' }).click();
+  await page.goto('/flights');
   await page.getByLabel(/sitl-copter-4.6.3 karşılaştırmaya ekle/).check();
   await page.getByLabel(/sample karşılaştırmaya ekle/).check();
   await page.getByRole('button', { name: /Karşılaştır \(2\)/ }).click();
