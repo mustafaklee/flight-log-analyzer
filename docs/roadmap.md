@@ -73,7 +73,23 @@ Ertelenenler: Parquet ile ölçümlü karşılaştırma (Aşama 8), titreşim ve
 
 ## Aşama 4 — Asenkron işleme ve teknik analiz
 
-RabbitMQ + outbox, retry, DLQ, idempotency testleri; ilk kurallar (GPS fix kaybı, EKF uyarıları, titreşim, batarya, veri boşlukları, failsafe), bulgu birleştirme, işleme metrikleri.
+Hedef: Loglar kuyruk üzerinden işlenir ve analiz edilir; ilk kural tabanlı bulgular kanıtlarıyla (zaman aralığı, ölçülen değer, eşik ve kaynağı) üretilir.
+
+- [x] `FlightLog.Contracts`: sürümlü mesajlar (`process-log-file.v1`, `analyze-flight.v1`)
+- [x] Transactional outbox (domain olayı → EF interceptor → `OutboxMessages`), `OutboxPublisher` (SKIP LOCKED, publisher confirm)
+- [x] RabbitMQ topolojisi, DLQ, tüketici (sonuç yazıldıktan sonra ack); veritabanı taşıması yedek mod olarak korundu
+- [x] Idempotent iş alma (compare-and-set); tekrar gelen mesajlar etkisiz (testli)
+- [x] Geçici hata sınıflandırması, en fazla 3 otomatik deneme (üstel bekleme), tükenince DLQ ve `Failed`
+- [x] Bakım: takılı işleri kurtarma, kaybolan mesajları yeniden duyurma, outbox temizliği
+- [x] `AnalysisRun`, `AnalysisRuleResult`, `AnalysisFinding` modeli ve migration; işleme sonrası otomatik analiz, elle yeniden analiz
+- [x] Kural motoru `rules-1`: 13 kural (GPS fix kaybı ve kalite, EKF innovation ve mesajları, titreşim ve clipping, batarya voltajı ve kapasitesi, failsafe, hatalar, mod geçişleri, uçuşta parametre değişikliği, veri boşlukları); uygulanamayan kural gerekçesiyle raporlanır
+- [x] Bulgu birleştirme (örtüşen aralıklar, tekrar sayısı), güven ve veri kapsamı
+- [x] API: analiz run'ları, bulgular (filtre, sayfalama), kural listesi, yönetici işleme istatistikleri; uçuş listesinde son analiz özeti
+- [x] İşleme metrikleri (`FlightLog.Processing` meter)
+- [x] Testler: kural unit testleri, gerçek loglarla analiz, gerçek RabbitMQ ile uçtan uca, DLQ ve tekrar teslim, geçici hata denemesi
+- [x] Compose'a RabbitMQ; smoke test analiz sonucunu da kontrol ediyor
+
+Ertelenenler: IMU tutarsızlığı, sensörler arası tutarsızlık, gecikme ve akım anomalisi kuralları (belgelenmiş eşik ve gerçek uçuş verisiyle doğrulama gerekiyor); bulgu kanıtı (`AnalysisEvidence`) ve inceleme durumu (Aşama 7, bulgu iş akışıyla birlikte); metriklerin OpenTelemetry ile dışa aktarımı (Aşama 8); PX4 titreşim metriği için eşik (belgelenmiş bir sınır yok).
 
 ## Aşama 5 — Arayüz
 

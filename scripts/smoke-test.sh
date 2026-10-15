@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # End-to-end check against a running Docker Compose stack: upload a real PX4 log and wait until the worker has
-# processed it. Usage: scripts/smoke-test.sh [base-url]   (needs curl and jq; self-registration must be enabled)
+# processed and analyzed it. Usage: scripts/smoke-test.sh [base-url]   (needs curl and jq; self-registration must be enabled)
 set -euo pipefail
 
 BASE=${1:-http://127.0.0.1:8080}
@@ -24,7 +24,7 @@ echo "Uploaded $LOG as log file $FILE"
 for _ in $(seq 1 60); do
   STATUS=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/log-files/$FILE" | jq -r .status)
   case "$STATUS" in
-    Processed) break ;;
+    Completed) break ;;
     Failed|Cancelled)
       curl -sS "${AUTH[@]}" "$BASE/api/v1/log-files/$FILE/jobs" | jq .
       echo "Processing ended as $STATUS" >&2
@@ -33,8 +33,8 @@ for _ in $(seq 1 60); do
   sleep 2
 done
 
-if [ "$STATUS" != "Processed" ]; then
-  echo "Log was not processed in time (status: $STATUS)" >&2
+if [ "$STATUS" != "Completed" ]; then
+  echo "Log was not processed and analyzed in time (status: $STATUS)" >&2
   exit 1
 fi
 
@@ -43,3 +43,11 @@ POINTS=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/$FLIGHT/si
 FIRMWARE=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/$FLIGHT" | jq -r .firmwareVersion)
 echo "Processed: firmware '$FIRMWARE', $SIGNALS signals, attitude.roll returned $POINTS points"
 [ "$SIGNALS" -gt 0 ] && [ "$POINTS" -gt 0 ]
+
+RUN=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/flights/$FLIGHT/analysis-runs" | jq -r '.[0].id')
+DETAILS=$(curl --fail-with-body -sS "${AUTH[@]}" "$BASE/api/v1/analysis-runs/$RUN")
+RUN_STATUS=$(echo "$DETAILS" | jq -r .status)
+RULES=$(echo "$DETAILS" | jq '.rules | length')
+FINDINGS=$(echo "$DETAILS" | jq .findingCount)
+echo "Analysis $RUN_STATUS: $RULES rules evaluated, $FINDINGS findings"
+[ "$RUN_STATUS" = "Succeeded" ] && [ "$RULES" -gt 0 ]

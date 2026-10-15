@@ -1,3 +1,5 @@
+using FlightLog.Application.Messaging;
+using FlightLog.Domain.Analysis;
 using FlightLog.Domain.Fleet;
 using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
@@ -38,6 +40,14 @@ public interface IApplicationDbContext
     DbSet<FlightEvent> FlightEvents { get; }
 
     DbSet<FlightParameter> FlightParameters { get; }
+
+    DbSet<AnalysisRun> AnalysisRuns { get; }
+
+    DbSet<AnalysisFinding> AnalysisFindings { get; }
+
+    DbSet<AnalysisRuleResult> AnalysisRuleResults { get; }
+
+    DbSet<OutboxMessage> OutboxMessages { get; }
 
     /// <summary>Transactions for multi-statement writes (bulk delete + insert of derived flight data).</summary>
     DatabaseFacade Database { get; }

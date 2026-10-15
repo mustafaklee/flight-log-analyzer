@@ -1,3 +1,4 @@
+using FlightLog.Application.Analysis;
 using FlightLog.Domain.Common;
 using FlightLog.Domain.Flights;
 
@@ -45,7 +46,8 @@ public sealed record FlightListItemDto(
     Guid? LogFileId,
     string? FileName,
     long? FileSizeBytes,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt,
+    AnalysisSummaryDto? LatestAnalysis);
 
 /// <summary>
 /// A flight. Signal and event times are microseconds on the log's own clock; <c>LogStartTimestampUs</c> is where the
@@ -74,7 +76,8 @@ public sealed record FlightDto(
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     uint Version,
-    LogFileDto? LogFile);
+    LogFileDto? LogFile,
+    AnalysisSummaryDto? LatestAnalysis);
 
 public sealed record UpdateFlightRequest(string Name, string? Notes, Guid? AircraftId, uint Version);
 

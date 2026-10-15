@@ -31,3 +31,21 @@ internal static class JsonDictionary
                 v => v.Count,
                 v => new Dictionary<string, string>(v, StringComparer.Ordinal)));
 }
+
+/// <summary>Stores a value as jsonb through System.Text.Json; for small, immutable values (lists, maps).</summary>
+internal static class JsonValue
+{
+    private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.General);
+
+    public static PropertyBuilder<TValue> AsJsonb<TValue, TStored>(this PropertyBuilder<TValue> property)
+        where TStored : TValue
+        where TValue : class =>
+        property.HasColumnType("jsonb").IsRequired().HasConversion(
+            new ValueConverter<TValue, string>(
+                v => JsonSerializer.Serialize(v, Options),
+                v => JsonSerializer.Deserialize<TStored>(v, Options)!),
+            new ValueComparer<TValue>(
+                (a, b) => JsonSerializer.Serialize(a, Options) == JsonSerializer.Serialize(b, Options),
+                v => JsonSerializer.Serialize(v, Options).GetHashCode(StringComparison.Ordinal),
+                v => JsonSerializer.Deserialize<TStored>(JsonSerializer.Serialize(v, Options), Options)!));
+}

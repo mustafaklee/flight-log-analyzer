@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Message contracts between the API and the worker. No dependencies, so that any consumer can reference it. -->
+</Project>

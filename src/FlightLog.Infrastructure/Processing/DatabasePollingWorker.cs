@@ -6,14 +6,15 @@ using Microsoft.Extensions.Options;
 namespace FlightLog.Infrastructure.Processing;
 
 /// <summary>
-/// Polls the database for queued log files and processes them one at a time. Several workers (processes) can run
-/// side by side: claiming a file is a compare-and-set on its row version. RabbitMQ replaces polling in stage 4.
+/// Database transport (<c>Messaging:Transport = Database</c>): polls PostgreSQL for queued files and analysis
+/// runs and executes them one at a time. Several workers can run side by side: claiming is a compare-and-set on
+/// the row version. With RabbitMQ, <see cref="Messaging.RabbitMqWorker"/> is used instead.
 /// </summary>
-internal sealed partial class LogProcessingWorker(
-    LogProcessingRunner runner,
+internal sealed partial class DatabasePollingWorker(
+    WorkRunner runner,
     IOptions<ProcessingOptions> options,
     TimeProvider clock,
-    ILogger<LogProcessingWorker> logger) : BackgroundService
+    ILogger<DatabasePollingWorker> logger) : BackgroundService
 {
     private readonly string _workerId = $"{Environment.MachineName}:{Environment.ProcessId}";
 
@@ -56,12 +57,12 @@ internal sealed partial class LogProcessingWorker(
         LogStopped(_workerId);
     }
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Log processing worker {WorkerId} started")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Database polling worker {WorkerId} started")]
     private partial void LogStarted(string workerId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Log processing worker {WorkerId} stopped")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Database polling worker {WorkerId} stopped")]
     private partial void LogStopped(string workerId);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "Log processing loop failed; retrying")]
+    [LoggerMessage(Level = LogLevel.Error, Message = "Polling loop failed; retrying")]
     private partial void LogLoopFailed(Exception exception);
 }

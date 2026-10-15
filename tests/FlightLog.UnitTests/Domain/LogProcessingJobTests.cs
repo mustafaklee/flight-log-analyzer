@@ -8,7 +8,7 @@ public sealed class LogProcessingJobTests
     private static readonly DateTimeOffset Now = new(2026, 10, 15, 8, 0, 0, TimeSpan.Zero);
 
     private static LogProcessingJob NewJob() =>
-        LogProcessingJob.Start(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 1, "host:1", "corr", Now);
+        LogProcessingJob.Start(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 1, "host:1", "corr", Now.AddSeconds(-3), Now);
 
     [Fact]
     public void A_new_job_runs_and_writes_under_its_own_prefix()
@@ -52,7 +52,7 @@ public sealed class LogProcessingJobTests
     [Fact]
     public void Attempts_start_at_one()
     {
-        var act = () => LogProcessingJob.Start(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 0, "w", "c", Now);
+        var act = () => LogProcessingJob.Start(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 0, "w", "c", Now, Now);
 
         act.Should().Throw<DomainRuleViolationException>();
     }

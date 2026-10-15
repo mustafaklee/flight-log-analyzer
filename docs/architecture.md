@@ -133,9 +133,11 @@ erDiagram
 | `FlightSignal` | Id, FlightId, SeriesId, Name, Kind, Message, Instance, Field, Column, SourceType, Unit, Multiplier, SourceMessage/Instance/Fields, Conversion, NormalizationVersion, SampleCount, InvalidCount, Min, Max, First/LastTimestampUs | unique (FlightId, Name) | 3 |
 | `FlightEvent` | Id, FlightId, TimestampUs, Kind (Message/ModeChange/Armed/Disarmed/Failsafe/Error/Event/Dropout), Severity?, Source, Text, Data (jsonb) | idx (FlightId, TimestampUs) | 3 |
 | `FlightParameter` | Id, FlightId, Name, Value, DefaultValue?, TimestampUs? (null = log başındaki değer) | idx (FlightId, Name) | 3 |
-| `AnalysisRun` | Id, FlightId, Kind (Rules/AI), EngineVersion, Model?, PromptVersion?, InputSummary (jsonb), Cost?, LatencyMs?, Status | idx FlightId | 4/6 |
-| `AnalysisFinding` | Id, RunId, RuleId, RuleVersion, Title, Description, StartUs, EndUs, Severity, Confidence, Measured (jsonb), Threshold (jsonb), Limitations, ReviewStatus, Version | idx (RunId), (FlightId, ReviewStatus) | 4 |
-| `AnalysisEvidence` | FindingId, SignalId?/EventId?, StartUs, EndUs, Value (jsonb) | — | 4/6 |
+| `AnalysisRun` | Id, TeamId, FlightId, LogFileId, Kind (Rules; AI Aşama 6'da), Trigger (Automatic/Manual), Status (Queued/Running/Succeeded/Failed/Cancelled), EngineVersion, RequestedBy?, Attempt, RetryCount, NextAttemptAt?, WorkerId, CorrelationId, CreatedAt, StartedAt, FinishedAt, DurationMs, bulgu ve kural sayıları, InputSummary (jsonb), FailureCode/Message, Version (xmin) | idx (FlightId, CreatedAt), (Status, CreatedAt), LogFileId | 4 |
+| `AnalysisRuleResult` | RunId, RuleId, RuleVersion, Status (Applied/NotApplicable/Failed), Reason, FindingCount, Signals (text[]), DurationMs | PK (RunId, RuleId) | 4 |
+| `AnalysisFinding` | Id, RunId, FlightId, RuleId, RuleVersion, Category, Title, Description, Severity (Info/Warning/Critical), Confidence (Low/Medium/High), StartUs, EndUs, Signals (text[]), Measured (jsonb), Threshold (jsonb), ThresholdSource, DataCoverage?, OccurrenceCount, Limitations? | idx (RunId, StartUs), FlightId | 4 |
+| `OutboxMessage` | Id, Type, AggregateId, Payload (jsonb), CorrelationId, CreatedAt, AvailableAt, PublishedAt?, PublishAttempts, LastError | kısmi idx (AvailableAt, Id) where PublishedAt is null; idx AggregateId, PublishedAt | 4 |
+| `AnalysisEvidence`, inceleme durumu (`ReviewStatus`) | FindingId, SignalId?/EventId?, StartUs, EndUs, Value (jsonb) | — | 7 (ertelendi) |
 | `Comment` | Id, FlightId, AuthorId, Body, StartUs?, EndUs?, CreatedAt, EditedAt | idx (FlightId, CreatedAt) | 7 |
 | `FindingAssignment` | FindingId, AssigneeId, AssignedBy, AssignedAt | — | 7 |
 | `Tag` / `FlightTag` | TeamId, Name / FlightId, TagId | unique (TeamId, Name) | 7 |
@@ -202,7 +204,8 @@ Sürümleme: URL segmenti (`/api/v1/...`). Kırıcı değişiklikte `v2` eklenir
 | Signals | `GET /api/v1/flights/{id}/signals?kind&search`, `GET /api/v1/flights/{id}/signals/data?names&fromUs&toUs&maxPoints` | 3 |
 | Events | `GET /api/v1/flights/{id}/events?kind&maxSeverity&fromUs&toUs&search&page&pageSize` | 3 |
 | Parameters | `GET /api/v1/flights/{id}/parameters?search&changedOnly` | 3 |
-| Analysis | `POST /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings` | 4/6 |
+| Analysis | `POST/GET /api/v1/flights/{id}/analysis-runs`, `GET /api/v1/analysis-runs/{id}`, `GET /api/v1/analysis-runs/{id}/findings?minSeverity&category&ruleId&page&pageSize`, `GET /api/v1/analysis-rules` | 4 (AI: 6) |
+| Processing stats | `GET /api/v1/admin/processing/stats?hours` (yalnızca Administrator) | 4 |
 | Findings | `PATCH /api/v1/findings/{id}` (durum), `POST /api/v1/findings/{id}/assignments` | 7 |
 | Comparisons | `POST /api/v1/flights/compare` | 7 |
 | Comments, Tags | `GET/POST /api/v1/flights/{id}/comments`, `PUT /api/v1/flights/{id}/tags` | 7 |
@@ -218,16 +221,37 @@ Ayrıntı: [ADR-0006](adr/0006-messaging-and-background-jobs.md).
 - Mesaj yayını transactional outbox ile yapılır: dosya kaydı ve outbox satırı aynı transaction'da yazılır.
 - Worker işi alırken `UPDATE ... WHERE status = 'Queued'` ile iyimser kilit alır; aynı mesaj iki kez gelirse ikinci işlem hiçbir şey yapmaz (idempotent).
 - Türetilmiş veri yazımı "uçuşa ait önceki çıktıları sil + yenilerini yaz" tek transaction'da yapılır; tekrar işlemede yinelenme olmaz.
-- Retry: sınırlı deneme ve artan bekleme; tükenince dead-letter queue + `Failed` durumu.
-- Hangfire yalnızca zamanlanmış bakım işleri için (yarım kalan işlerin kurtarılması, saklama temizliği); işleme kuyruğu değildir.
+- Retry: geçici hatalarda en fazla 3 otomatik deneme (30 s × 2^(n−1), en fazla 10 dk); tükenince dead-letter queue ve `Failed` (`processing.retries_exhausted`).
+- Periyodik bakım (takılı işlerin kurtarılması, kaybolan mesajların yeniden duyurulması, outbox temizliği) worker içindeki `MaintenanceWorker` ile yapılır; Hangfire kullanılmadı (ADR-0006 uygulama notları).
 
-**Aşama 3 uygulaması (RabbitMQ öncesi):** `FlightLog.Worker` servisi veritabanını yoklar (`Processing:PollInterval`, varsayılan 2 s):
+**Aşama 4 uygulaması:**
 
-1. En eski `Queued` dosyayı `Processing` yapar ve bir `LogProcessingJob` açar. Dosyanın satır sürümü (`xmin`) sayesinde bu bir compare-and-set'tir; birden çok worker aynı dosyayı alamaz.
-2. Ham dosyayı geçici dizine indirir, parser + yorumlayıcı + normalizasyon + blok yazıcı tek geçişte çalışır (`Processing:ParserTimeout`, varsayılan 15 dk).
-3. Bloklar `derived/{flightId}/{jobId}/…` altına yüklenir; ardından tek transaction'da uçuşun eski sinyal/olay/parametre satırları silinir, yenileri yazılır, uçuş bilgileri güncellenir, dosya `Processed` olur. Commit sonrası önceki işlerin blokları silinir.
-4. Hata: parser'ın kararlı kodu (`ulog.invalid_header`, `processing.no_data`, `parser.timeout`…) dosyaya ve işe yazılır; beklenmeyen hatada kullanıcıya yalnızca `processing.failed` ve korelasyon kimliği gösterilir, ayrıntı loglanır.
-5. Kullanıcı işlem sırasında iptal ederse (her 5 s'de kontrol) iş `Cancelled` biter, yazılan bloklar silinir. Worker düzgün kapanırken dosya `Queued` durumuna döner. 30 dakikadan uzun `Processing` kalan dosyalar (çöken worker) `processing.interrupted` koduyla `Failed` yapılır.
+```mermaid
+sequenceDiagram
+    participant API
+    participant DB as PostgreSQL
+    participant P as OutboxPublisher
+    participant MQ as RabbitMQ
+    participant W as Worker
+    API->>DB: dosya Queued + outbox satırı (tek transaction)
+    P->>DB: bekleyen satırlar (FOR UPDATE SKIP LOCKED)
+    P->>MQ: flightlog.process-log-file.v1 (publisher confirm)
+    P->>DB: PublishedAt
+    MQ->>W: teslim (prefetch 1)
+    W->>DB: Queued → Processing (compare-and-set)
+    W->>DB: sinyaller, olaylar, parametreler + dosya AnalysisPending + AnalysisRun + outbox satırı
+    W->>MQ: ack
+    MQ->>W: flightlog.analyze-flight.v1
+    W->>DB: bulgular, kural sonuçları, run Succeeded, dosya Completed
+    W->>MQ: ack
+```
+
+1. Worker işi alırken dosyanın satır sürümünü (`xmin`) koşul olarak kullanır (compare-and-set); birden çok worker aynı dosyayı alamaz, tekrar gelen mesaj hiçbir şey yapmaz.
+2. Ham dosya geçici dizine indirilir; parser, yorumlayıcı, normalizasyon ve blok yazıcı tek geçişte çalışır (`Processing:ParserTimeout`, 15 dk).
+3. Bloklar `derived/{flightId}/{jobId}/…` altına yüklenir; tek transaction'da uçuşun eski sinyal/olay/parametre satırları silinip yenileri yazılır, dosya `AnalysisPending` olur ve otomatik bir `AnalysisRun` kuyruğa alınır.
+4. Analiz işi run'ı `Queued → Running`, dosyayı `Analyzing` yapar; kurallar çalışır; bulgular, kural sonuçları, run `Succeeded` ve dosya `Completed` tek transaction'da yazılır. Daha yeni bir run varsa ya da dosya artık analiz beklemiyorsa run `analysis.superseded` ile biter.
+5. Hata: parser'ın kararlı kodu (`ulog.invalid_header`, `processing.no_data`, `parser.timeout`…) dosyaya ve işe yazılır, yeniden denenmez. Geçici altyapı hatası `processing.transient_failure` (analizde `analysis.transient_failure`) ile kaydedilir ve otomatik denenir. Beklenmeyen hatada kullanıcıya yalnızca kod ve korelasyon kimliği gösterilir. Analiz başarısız olursa dosya `Failed` olur ama işlenmiş veri (sinyaller, olaylar) okunabilir kalır; analiz yeniden istenebilir.
+6. Kullanıcı işlem sırasında iptal ederse (her 5 s'de kontrol) iş `Cancelled` biter, yazılan bloklar silinir. Worker düzgün kapanırken dosya `Queued` durumuna döner. 30 dakikadan uzun `Processing` (analizde 10 dakikadan uzun `Running`) kalan iş çöken worker sayılır ve yeniden denenir; denemeler tükenmişse `processing.interrupted` ile `Failed` olur.
 
 API geliştirme ortamında aynı döngüyü kendi içinde çalıştırabilir (`Processing:Enabled = true`, `appsettings.Development.json`); Docker Compose'da işleme yalnızca `worker` servisindedir.
 
@@ -251,11 +275,40 @@ stateDiagram-v2
     Analyzing --> Completed
     Analyzing --> Failed
     Failed --> Queued: yeniden dene
+    Failed --> AnalysisPending: yeniden analiz
     Cancelled --> Queued: yeniden dene
     Completed --> AnalysisPending: yeniden analiz
 ```
 
-Geçiş tablosu `ProcessingStatusTransitions` içindedir (`src/FlightLog.Domain/Flights/ProcessingStatus.cs`); tüm durum çiftleri unit testle doğrulanır. `Failed` yalnızca hata kodu ve mesajıyla (`Fail`) girilebilir. Aşama 2'de yükleme `Uploaded → Validating → Queued` adımlarını aynı istekte tamamlar; `Queued → Processing → Processed` Aşama 3'te worker tarafından yürütülür; analiz durumları Aşama 4'te kullanılacak.
+Geçiş tablosu `ProcessingStatusTransitions` içindedir (`src/FlightLog.Domain/Flights/ProcessingStatus.cs`); tüm durum çiftleri unit testle doğrulanır. `Failed` yalnızca hata kodu ve mesajıyla (`Fail`) girilebilir. Yükleme `Uploaded → Validating → Queued` adımlarını aynı istekte tamamlar. `Queued → Processing → Processed → AnalysisPending` işleme işinde, `AnalysisPending → Analyzing → Completed` analiz işinde yürütülür (`Processed` aynı transaction içinde geçilir). Analiz başarısız olan dosya (`Failed`, kod `analysis.*`) yeniden analiz için doğrudan `AnalysisPending` olabilir.
+
+### 8.1 Kural tabanlı teknik analiz
+
+Kod: `src/FlightLog.Application/Analysis`. Motor sürümü `rules-1`; her kuralın kendi kimliği ve sürümü vardır ve bulguya yazılır.
+
+- **Girdi:** işleme işinin ürettiği sinyaller (nesne depolamadaki bloklardan, yalnızca kuralın istediği sütunlar), olaylar ve parametreler. Analiz ham dosyayı yeniden okumaz.
+- **Analiz pencereleri:** kurallar aracın arm'lı olduğu aralıklara bakar. Log `Disarmed` ile başlıyorsa araç log başından beri arm'lı kabul edilir. Logda arm bilgisi yoksa bütün log analiz edilir, güven bir kademe düşer ve bulguya bu sınırlama yazılır.
+- **Kural sonucu:** `Applied`, `NotApplicable` (gerekçesiyle, ör. "parametre yok") veya `Failed`. Bir kuralın hata vermesi diğerlerini durdurmaz; geçici altyapı hatası ise bütün run'ı yeniden denemeye gönderir. Kural başına en fazla 200 bulgu yazılır.
+- **Bulgu:** başlık, açıklama, kategori, önem (Info/Warning/Critical), güven (Low/Medium/High), log saatiyle zaman aralığı (µs), kullanılan sinyaller, ölçülen değerler, uygulanan eşikler ve **eşiğin kaynağı** (araç parametresi, belgelenmiş değer veya kuralın sezgisel değeri), veri kapsamı, tekrar sayısı ve sınırlamalar.
+- **Eşikler:** araçta karşılığı olan eşik varsa o kullanılır (ör. `BATT_LOW_VOLT`, `BAT_LOW_THR`, `AHRS_GPS_MINSATS`, `EKF2_REQ_NSATS`). Yoksa belgelenmiş değer (ArduPilot titreşim sınırları), o da yoksa sezgisel değer kullanılır ve bu açıkça yazılır. Gerekli parametre yoksa kural uygulanmaz; eşik uydurulmaz.
+
+| Kural | Ne bulur | Önem |
+|---|---|---|
+| `gps.fix_loss` | 3D fix'e ulaştıktan sonra ≥ 1 s 3D fix kaybı | Warning; ≥ 10 s Critical |
+| `gps.quality` | ≥ 5 s az uydu veya yüksek HDOP (araç parametresi, yoksa 6 uydu / HDOP 2.0) | Warning |
+| `ekf.innovation` | ≥ 1 s innovation test oranı > 1 (ölçüm reddedildi); tüm EKF örnekleri birleştirilir | Warning |
+| `ekf.messages` | Otopilotun EKF mesajları, ArduPilot EKFCHECK/EKF failsafe hataları, lane değişimi, EKF reset olayları | Otopilotun verdiği önem |
+| `vibration.level` | ArduPilot VIBE > 30 m/s² (> 60 Critical), belgelenmiş sınırlar | Warning/Critical |
+| `vibration.clipping` | İvmeölçer clipping sayacının artması (PX4 ve ArduPilot) | Warning |
+| `battery.voltage` | Araçta ayarlı voltaj sınırının altında kalma (ArduPilot `BATT_LOW_VOLT`/`BATT_CRT_VOLT`/`BATT_LOW_TIMER`, PX4 `BAT_V_EMPTY` × hücre) | Warning/Critical |
+| `battery.remaining` | Kalan kapasitenin ayarlı seviyelerin altına inmesi (PX4 `BAT_LOW_THR`/`BAT_CRIT_THR`, ArduPilot `BATT_LOW_MAH`/`BATT_CRT_MAH`) | Warning/Critical |
+| `events.failsafe` | Failsafe tetiklenme ve temizlenme aralıkları | Critical |
+| `events.errors` | Alt sistem hataları ve error ya da daha ağır önemdeki log mesajları | Warning/Critical |
+| `modes.transitions` | Arm'lıyken dönüş/iniş modlarına geçiş; 10 s içinde ≥ 4 mod değişikliği | Info/Warning |
+| `parameters.changes` | Uçuşta değiştirilen parametreler (ArduPilot `STAT_*` sayaçları hariç) | Info |
+| `data.gaps` | Çekirdek sinyallerde olağan aralığın 10 katından (≥ 0,5 s) uzun boşluklar ve logger dropout'ları | Info; ≥ 2 s Warning |
+
+Kuralların tam açıklaması, gereken veriler ve uygulanamadığı durumlar `GET /api/v1/analysis-rules` ile okunur. Aynı girdi aynı bulguları üretir (entegrasyon testiyle doğrulandı).
 
 ## 9. Güvenlik özeti
 
@@ -268,5 +321,6 @@ Geçiş tablosu `ProcessingStatusTransitions` içindedir (`src/FlightLog.Domain/
 ## 10. Gözlemlenebilirlik
 
 - Serilog: JSON çıktısı, istek logları, korelasyon kimliği (`X-Correlation-Id`).
-- OpenTelemetry (Aşama 8): ASP.NET Core, HttpClient, EF Core, RabbitMQ izleri; parser süresi, bellek, kuyruk bekleme süresi metrikleri.
-- Sağlık: `/health/live` (süreç) ve `/health/ready` (PostgreSQL ve nesne depolama; sonraki aşamalarda RabbitMQ, Redis).
+- Metrikler (Aşama 4): `System.Diagnostics.Metrics` ile `FlightLog.Processing` meter'ı: işleme ve analiz sayıları (sonuca göre), süre, bellek, kuyruk bekleme süresi, otomatik denemeler, outbox yayınları. Dışa aktarma (OpenTelemetry exporter) Aşama 8'de; şimdilik `dotnet-counters` ile okunabilir. Yöneticiler için `GET /api/v1/admin/processing/stats` veritabanından özet verir: durum dağılımı, hata oranı ve kodları, süre ve kuyruk bekleme yüzdelikleri, bekleyen outbox ve kuyruk derinlikleri.
+- OpenTelemetry (Aşama 8): ASP.NET Core, HttpClient, EF Core, RabbitMQ izleri ve metriklerin dışa aktarımı.
+- Sağlık: `/health/live` (süreç) ve `/health/ready` (PostgreSQL, nesne depolama ve RabbitMQ taşıması seçiliyse RabbitMQ).

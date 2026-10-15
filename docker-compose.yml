@@ -1,5 +1,5 @@
 # Local development environment. Usage: cp .env.example .env && docker compose up --build
-# Services for later stages (RabbitMQ, Redis, web) are added when they are used.
+# Services for later stages (Redis, web) are added when they are used.
 
 name: flightlog
 
@@ -40,6 +40,25 @@ services:
       timeout: 5s
       retries: 20
 
+  # Work queue between API and workers (ADR-0006). Management UI on http://localhost:15672 (same credentials).
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?set RABBITMQ_USER in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in .env}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+
   api:
     build:
       context: .
@@ -49,6 +68,8 @@ services:
       postgres:
         condition: service_healthy
       storage:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
@@ -63,6 +84,10 @@ services:
       Storage__SecretKey: ${STORAGE_SECRET_KEY}
       Storage__CreateBucketIfMissing: "true"
       Uploads__MaxFileSizeBytes: ${UPLOAD_MAX_BYTES:-536870912}
+      Messaging__Transport: RabbitMq
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__UserName: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
       # Logs are processed by the worker service below, not inside the API.
       Processing__Enabled: "false"
     ports:
@@ -75,7 +100,8 @@ services:
       retries: 10
       start_period: 15s
 
-  # Parses queued logs into signals, events and parameters (polls the database; RabbitMQ arrives in stage 4).
+  # Parses queued logs into signals, events and parameters and runs the analysis rules (consumes RabbitMQ).
+  # Scale with: docker compose up --scale worker=3
   worker:
     build:
       context: .
@@ -92,7 +118,12 @@ services:
       Storage__Bucket: flightlog
       Storage__AccessKey: ${STORAGE_ACCESS_KEY}
       Storage__SecretKey: ${STORAGE_SECRET_KEY}
+      Messaging__Transport: RabbitMq
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__UserName: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
 
 volumes:
   postgres-data:
   storage-data:
+  rabbitmq-data:

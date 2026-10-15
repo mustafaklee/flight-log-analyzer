@@ -2,6 +2,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FlightLog.Domain\FlightLog.Domain.csproj" />
     <ProjectReference Include="..\FlightLog.LogParsing\FlightLog.LogParsing.csproj" />
+    <ProjectReference Include="..\FlightLog.Contracts\FlightLog.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
