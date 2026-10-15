@@ -29,9 +29,11 @@ public static class ProcessingStatusTransitions
         [ProcessingStatus.Processing] = [ProcessingStatus.Processed, ProcessingStatus.Failed, ProcessingStatus.Cancelled, ProcessingStatus.Queued],
         [ProcessingStatus.Processed] = [ProcessingStatus.AnalysisPending],
         [ProcessingStatus.AnalysisPending] = [ProcessingStatus.Analyzing, ProcessingStatus.Cancelled],
-        [ProcessingStatus.Analyzing] = [ProcessingStatus.Completed, ProcessingStatus.Failed],
+        // Back to AnalysisPending when the analysis is retried after a transient failure or a worker shutdown.
+        [ProcessingStatus.Analyzing] = [ProcessingStatus.Completed, ProcessingStatus.Failed, ProcessingStatus.AnalysisPending],
         [ProcessingStatus.Completed] = [ProcessingStatus.AnalysisPending],
-        [ProcessingStatus.Failed] = [ProcessingStatus.Queued],
+        // AnalysisPending: a new analysis after a failed one; the processed data is still valid (see RequestAnalysis).
+        [ProcessingStatus.Failed] = [ProcessingStatus.Queued, ProcessingStatus.AnalysisPending],
         [ProcessingStatus.Cancelled] = [ProcessingStatus.Queued],
     };
 

@@ -1,6 +1,8 @@
 using FlightLog.Application.Abstractions;
 using FlightLog.Application.Authorization;
 using FlightLog.Application.Common;
+using FlightLog.Application.Analysis;
+using FlightLog.Domain.Analysis;
 using FlightLog.Domain.Flights;
 using FlightLog.Domain.Teams;
 using FluentValidation;
@@ -110,6 +112,10 @@ internal sealed class FlightService(
                 ProjectName = db.Projects.Where(p => p.Id == f.ProjectId).Select(p => p.Name).First(),
                 AircraftName = db.Aircraft.Where(a => a.Id == f.AircraftId).Select(a => a.Name).FirstOrDefault(),
                 File = db.FlightLogFiles.Where(l => l.FlightId == f.Id).OrderByDescending(l => l.UploadedAt).FirstOrDefault(),
+                Analysis = db.AnalysisRuns.Where(r => r.FlightId == f.Id && r.Status == AnalysisRunStatus.Succeeded)
+                    .OrderByDescending(r => r.FinishedAt)
+                    .Select(r => new { r.Id, r.FinishedAt, r.FindingCount, r.InfoCount, r.WarningCount, r.CriticalCount })
+                    .FirstOrDefault(),
             })
             .ToListAsync(cancellationToken);
 
@@ -117,7 +123,8 @@ internal sealed class FlightService(
                 r.Flight.Id, r.Flight.TeamId, r.Flight.ProjectId, r.ProjectName, r.Flight.AircraftId, r.AircraftName,
                 r.Flight.Name, r.Flight.Autopilot, r.Flight.FirmwareVersion, r.Flight.StartedAt, r.Flight.OccurredAt,
                 FlightMapping.ToSeconds(r.Flight.DurationUs), r.File?.Status, r.File?.Id, r.File?.OriginalFileName,
-                r.File?.SizeBytes, r.Flight.CreatedAt))
+                r.File?.SizeBytes, r.Flight.CreatedAt,
+                r.Analysis is null ? null : new AnalysisSummaryDto(r.Analysis.Id, r.Analysis.FinishedAt, r.Analysis.FindingCount, r.Analysis.InfoCount, r.Analysis.WarningCount, r.Analysis.CriticalCount)))
             .ToList();
 
         return new PagedResult<FlightListItemDto>(items, paging.SafePage, paging.SafePageSize, total);
@@ -204,7 +211,12 @@ internal sealed class FlightService(
             .Where(l => l.FlightId == flight.Id)
             .OrderByDescending(l => l.UploadedAt)
             .FirstOrDefaultAsync(cancellationToken);
-        return FlightMapping.ToDto(flight, projectName, aircraftName, file);
+        var analysis = await db.AnalysisRuns.AsNoTracking()
+            .Where(r => r.FlightId == flight.Id && r.Status == AnalysisRunStatus.Succeeded)
+            .OrderByDescending(r => r.FinishedAt)
+            .Select(r => new AnalysisSummaryDto(r.Id, r.FinishedAt, r.FindingCount, r.InfoCount, r.WarningCount, r.CriticalCount))
+            .FirstOrDefaultAsync(cancellationToken);
+        return FlightMapping.ToDto(flight, projectName, aircraftName, file, analysis);
     }
 
     private static ConflictException StaleVersion() =>

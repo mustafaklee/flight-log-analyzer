@@ -51,6 +51,7 @@ internal sealed class FlightLogFileConfiguration : IEntityTypeConfiguration<Flig
         builder.Property(l => l.FailureCode).HasMaxLength(100);
         builder.Property(l => l.FailureMessage).HasMaxLength(FlightLogFile.FailureMessageMaxLength);
         builder.Property(l => l.Version).IsRowVersion();
+        builder.Ignore(l => l.DomainEvents);
 
         // Duplicate detection is per team: the same content may belong to several teams.
         builder.HasIndex(l => new { l.TeamId, l.Sha256 }).IsUnique();

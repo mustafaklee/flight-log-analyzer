@@ -6,10 +6,15 @@ namespace FlightLog.Domain.Flights;
 /// The raw log file of a flight. The bytes live in object storage under <see cref="StorageKey"/>;
 /// this entity tracks identity (SHA-256), format and processing state.
 /// </summary>
-public sealed class FlightLogFile
+public sealed class FlightLogFile : IHasDomainEvents
 {
     public const int FileNameMaxLength = 255;
     public const int FailureMessageMaxLength = 1000;
+
+    /// <summary>Failure codes of the analysis step start with this; the processed data is intact after them.</summary>
+    public const string AnalysisFailurePrefix = "analysis.";
+
+    private readonly List<IDomainEvent> _domainEvents = [];
 
     private FlightLogFile()
     {
@@ -65,7 +70,17 @@ public sealed class FlightLogFile
 
     public string? FailureMessage { get; private set; }
 
+    /// <summary>Automatic retries after transient failures since the file was last queued by a user.</summary>
+    public int RetryCount { get; private set; }
+
+    /// <summary>A queued file waiting for an automatic retry is not picked up before this time.</summary>
+    public DateTimeOffset? NextAttemptAt { get; private set; }
+
     public uint Version { get; private set; }
+
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents;
+
+    public void ClearDomainEvents() => _domainEvents.Clear();
 
     public static FlightLogFile Create(Guid teamId, Guid flightId, string originalFileName, long sizeBytes, string sha256, LogFormat format, string storageKey, Guid uploadedBy, DateTimeOffset now)
     {
@@ -111,7 +126,27 @@ public sealed class FlightLogFile
         {
             FailureCode = null;
             FailureMessage = null;
+            NextAttemptAt = null;
+            _domainEvents.Add(new LogFileQueued(Id, TeamId, null));
         }
+    }
+
+    /// <summary>
+    /// Puts a file whose processing failed for a transient reason (storage or database unavailable, worker
+    /// crash) back into the queue, to be picked up again not before <paramref name="notBefore"/>.
+    /// </summary>
+    public void ScheduleRetry(DateTimeOffset notBefore, DateTimeOffset now)
+    {
+        if (Status != ProcessingStatus.Processing)
+        {
+            throw new DomainRuleViolationException("log_file.not_processing", $"Only a file in processing can be retried automatically (current status: {Status}).");
+        }
+
+        TransitionTo(ProcessingStatus.Queued, now);
+        RetryCount++;
+        NextAttemptAt = notBefore;
+        _domainEvents.RemoveAll(e => e is LogFileQueued);
+        _domainEvents.Add(new LogFileQueued(Id, TeamId, notBefore));
     }
 
     public void Fail(string code, string message, DateTimeOffset now)
@@ -133,6 +168,25 @@ public sealed class FlightLogFile
         }
 
         TransitionTo(ProcessingStatus.Queued, now);
+        RetryCount = 0;
+    }
+
+    /// <summary>True when the file's processed data can be analyzed (again).</summary>
+    public bool CanRequestAnalysis =>
+        Status is ProcessingStatus.Processed or ProcessingStatus.Completed
+        || (Status == ProcessingStatus.Failed && FailureCode?.StartsWith(AnalysisFailurePrefix, StringComparison.Ordinal) == true);
+
+    /// <summary>Marks the file as waiting for an analysis run.</summary>
+    public void RequestAnalysis(DateTimeOffset now)
+    {
+        if (!CanRequestAnalysis)
+        {
+            throw new DomainRuleViolationException("log_file.not_analyzable", $"A file in status {Status} cannot be analyzed. Process it first.");
+        }
+
+        TransitionTo(ProcessingStatus.AnalysisPending, now);
+        FailureCode = null;
+        FailureMessage = null;
     }
 
     public void Cancel(DateTimeOffset now)

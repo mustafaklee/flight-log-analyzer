@@ -27,7 +27,7 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
         await ProcessQueueAsync();
 
         var flight = await (await client.GetAsync($"/api/v1/flights/{upload.Flight.Id}", Ct)).ReadAsync<FlightDetails>(HttpStatusCode.OK);
-        flight.LogFile!.Status.Should().Be("Processed");
+        flight.LogFile!.Status.Should().Be("Completed", "processing is followed by the automatic analysis");
         flight.FirmwareVersion.Should().Be("PX4 v1.11.2 (dev)");
         flight.VehicleType.Should().Be("Vtol");
         flight.Hardware.Should().Be("CUBEPILOT_CUBEORANGE");
@@ -100,7 +100,7 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
         await ProcessQueueAsync();
 
         var flight = await (await client.GetAsync($"/api/v1/flights/{upload.Flight.Id}", Ct)).ReadAsync<FlightDetails>(HttpStatusCode.OK);
-        flight.LogFile!.Status.Should().Be("Processed");
+        flight.LogFile!.Status.Should().Be("Completed", "processing is followed by the automatic analysis");
         flight.FirmwareVersion.Should().Be("ArduCopter V4.6.3 (92b0cd78)");
         flight.VehicleType.Should().Be("Copter");
         flight.StartedAt.Should().Be(new DateTimeOffset(2026, 10, 14, 23, 30, 35, TimeSpan.Zero).AddTicks(7_906_810).AddTicks(24_509_359 * 10));
@@ -179,7 +179,7 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
         (await client.PostAsync($"/api/v1/log-files/{upload.LogFile.Id}/retry", null, Ct)).StatusCode.Should().Be(HttpStatusCode.OK);
         await ProcessQueueAsync();
 
-        (await GetFileAsync(client, upload.LogFile.Id)).Status.Should().Be("Processed");
+        (await GetFileAsync(client, upload.LogFile.Id)).Status.Should().Be("Completed");
         var jobs = await (await client.GetAsync($"/api/v1/log-files/{upload.LogFile.Id}/jobs", Ct)).ReadAsync<Job[]>(HttpStatusCode.OK);
         jobs.Select(j => j.Outcome).Should().Equal("Succeeded", "Cancelled", "Cancelled");
         var flight = await (await client.GetAsync($"/api/v1/flights/{upload.Flight.Id}", Ct)).ReadAsync<FlightDetails>(HttpStatusCode.OK);
@@ -188,7 +188,7 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
     }
 
     [Fact]
-    public async Task Abandoned_processing_is_marked_failed()
+    public async Task Abandoned_processing_is_retried_and_failed_when_retries_are_used_up()
     {
         var client = await factory.CreateUserClientAsync();
         var (_, project) = await client.CreateTeamAndProjectAsync();
@@ -196,18 +196,41 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
         await ProcessQueueAsync(except: upload.LogFile.Id);
         await ClaimAsync(upload.LogFile.Id);
 
-        // The worker died an hour ago.
+        // The worker died an hour ago: the file is queued again for an automatic retry.
+        await RecoverAsAbandonedAsync(upload.LogFile.Id);
+        var file = await GetFileAsync(client, upload.LogFile.Id);
+        file.Status.Should().Be("Queued");
+        var jobs = await (await client.GetAsync($"/api/v1/log-files/{file.Id}/jobs", Ct)).ReadAsync<Job[]>(HttpStatusCode.OK);
+        jobs.Should().ContainSingle().Which.FailureCode.Should().Be("processing.interrupted");
         await using (var scope = factory.Services.CreateAsyncScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<FlightLogDbContext>();
-            await db.FlightLogFiles.Where(f => f.Id == upload.LogFile.Id)
-                .ExecuteUpdateAsync(s => s.SetProperty(f => f.StatusChangedAt, DateTimeOffset.UtcNow.AddHours(-1)), Ct);
-            (await scope.ServiceProvider.GetRequiredService<ILogProcessingService>().RecoverStaleAsync(Ct)).Should().BeGreaterThanOrEqualTo(1);
+            var stored = await scope.ServiceProvider.GetRequiredService<FlightLogDbContext>().FlightLogFiles.AsNoTracking().SingleAsync(f => f.Id == file.Id, Ct);
+            stored.RetryCount.Should().Be(1);
+            stored.NextAttemptAt.Should().BeAfter(DateTimeOffset.UtcNow, "the retry waits for its backoff delay");
         }
 
-        var file = await GetFileAsync(client, upload.LogFile.Id);
+        // Once the retries are used up the file fails for good.
+        await using (var scope = factory.Services.CreateAsyncScope())
+        {
+            await scope.ServiceProvider.GetRequiredService<FlightLogDbContext>().FlightLogFiles.Where(f => f.Id == file.Id)
+                .ExecuteUpdateAsync(s => s.SetProperty(f => f.RetryCount, 3).SetProperty(f => f.NextAttemptAt, (DateTimeOffset?)null), Ct);
+        }
+
+        await ProcessQueueAsync(except: file.Id);
+        await ClaimAsync(file.Id);
+        await RecoverAsAbandonedAsync(file.Id);
+        file = await GetFileAsync(client, file.Id);
         file.Status.Should().Be("Failed");
         file.FailureCode.Should().Be("processing.interrupted");
+    }
+
+    private async Task RecoverAsAbandonedAsync(Guid fileId)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<FlightLogDbContext>();
+        await db.FlightLogFiles.Where(f => f.Id == fileId)
+            .ExecuteUpdateAsync(s => s.SetProperty(f => f.StatusChangedAt, DateTimeOffset.UtcNow.AddHours(-1)), Ct);
+        (await scope.ServiceProvider.GetRequiredService<ILogProcessingService>().RecoverStaleAsync(Ct)).Should().BeGreaterThanOrEqualTo(1);
     }
 
     [Fact]
@@ -275,32 +298,7 @@ public sealed class LogProcessingTests(ApiFactory factory) : IClassFixture<ApiFa
         await (await client.GetAsync($"/api/v1/log-files/{id}", Ct)).ReadAsync<LogFile>(HttpStatusCode.OK);
 
     /// <summary>Runs the worker loop until the queue is empty, optionally leaving one file queued.</summary>
-    private async Task ProcessQueueAsync(Guid? except = null)
-    {
-        Guid? cancelled = null;
-        if (except is { } id)
-        {
-            cancelled = id;
-            await SetStatusAsync(id, ProcessingStatus.Cancelled);
-        }
-
-        var runner = factory.Services.GetRequiredService<LogProcessingRunner>();
-        for (var i = 0; i < 50 && await runner.RunOnceAsync("test-worker", Ct); i++)
-        {
-        }
-
-        if (cancelled is { } restore)
-        {
-            await SetStatusAsync(restore, ProcessingStatus.Queued);
-        }
-    }
-
-    private async Task SetStatusAsync(Guid fileId, ProcessingStatus status)
-    {
-        await using var scope = factory.Services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<FlightLogDbContext>();
-        await db.FlightLogFiles.Where(f => f.Id == fileId).ExecuteUpdateAsync(s => s.SetProperty(f => f.Status, status), Ct);
-    }
+    private Task ProcessQueueAsync(Guid? except = null) => factory.ProcessQueueAsync(except);
 
     private async Task<ClaimedJob> ClaimAsync(Guid fileId)
     {

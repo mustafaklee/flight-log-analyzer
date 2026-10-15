@@ -21,12 +21,19 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected virtual bool AllowSelfRegistration => true;
 
+    /// <summary>Most tests drive the worker steps themselves through the database transport; see RabbitMqTests.</summary>
+    protected virtual void ConfigureMessaging(IWebHostBuilder builder) => builder.UseSetting("Messaging:Transport", "Database");
+
+    /// <summary>Starts what a derived factory needs before the host is built (for example a message broker).</summary>
+    protected virtual Task PrepareAsync() => Task.CompletedTask;
+
     public async ValueTask InitializeAsync()
     {
         var database = PostgresServer.CreateDatabaseConnectionStringAsync();
         var storage = StorageServer.GetServiceUrlAsync();
         connectionString = await database;
         storageUrl = await storage;
+        await PrepareAsync();
 
         // Force the host to start so migrations run before the first test.
         _ = Server;
@@ -48,5 +55,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Storage:SecretKey", StorageServer.SecretKey);
         builder.UseSetting("Storage:CreateBucketIfMissing", "true");
         builder.UseSetting("Uploads:MaxFileSizeBytes", MaxUploadBytes.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        builder.UseSetting("Processing:Enabled", "false");
+        ConfigureMessaging(builder);
     }
 }

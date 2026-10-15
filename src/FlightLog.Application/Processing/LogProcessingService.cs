@@ -1,4 +1,5 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Domain.Analysis;
 using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
 using FlightLog.LogParsing;
@@ -20,19 +21,26 @@ public sealed record ClaimedJob(Guid JobId, Guid LogFileId, Guid FlightId, strin
 public interface ILogProcessingService
 {
     /// <summary>
-    /// Moves the oldest queued file to Processing and starts a job for it. Returns null when nothing is queued,
-    /// and a result without job when another worker claimed the same file first.
+    /// Moves the oldest queued file that is due to Processing and starts a job for it (database transport).
+    /// Returns null when nothing is queued, and a result without job when another worker claimed it first.
     /// </summary>
     Task<ClaimResult?> ClaimNextAsync(string workerId, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Parses the file, stores signal chunks and the catalog, and ends the job. <paramref name="cancellation"/>
-    /// fires when the user cancels the file or the worker shuts down; <paramref name="shutdown"/> tells which.
-    /// Never throws for problems of the file itself: they end as a failed job with a stable code.
+    /// Claims the given file (a message announced it). The result has no job when the file is not queued anymore:
+    /// already processed, cancelled, deleted or claimed by another worker. Redelivered messages end here.
     /// </summary>
-    Task ProcessAsync(ClaimedJob claim, CancellationToken cancellation, CancellationToken shutdown);
+    Task<ClaimResult> ClaimAsync(Guid logFileId, string workerId, CancellationToken cancellationToken);
 
-    /// <summary>Fails files that stayed in Processing longer than allowed (their worker died).</summary>
+    /// <summary>
+    /// Parses the file, stores signal chunks and the catalog, ends the job and queues the analysis.
+    /// <paramref name="cancellation"/> fires when the user cancels the file or the worker shuts down;
+    /// <paramref name="shutdown"/> tells which. Never throws for problems of the file itself: they end as a failed
+    /// job with a stable code. Transient failures are retried with a delay until the retries are used up.
+    /// </summary>
+    Task<WorkOutcome> ProcessAsync(ClaimedJob claim, CancellationToken cancellation, CancellationToken shutdown);
+
+    /// <summary>Retries (or fails, when the retries are used up) files left in Processing by a worker that died.</summary>
     Task<int> RecoverStaleAsync(CancellationToken cancellationToken);
 }
 
@@ -42,6 +50,8 @@ internal sealed partial class LogProcessingService(
     IApplicationDbContext db,
     IFileStorage storage,
     TimeProvider clock,
+    ITransientErrorClassifier errors,
+    ProcessingMetrics metrics,
     IOptions<ProcessingOptions> options,
     ILogger<LogProcessingService> logger) : ILogProcessingService
 {
@@ -49,25 +59,27 @@ internal sealed partial class LogProcessingService(
 
     public async Task<ClaimResult?> ClaimNextAsync(string workerId, CancellationToken cancellationToken)
     {
+        var now = clock.GetUtcNow();
         var candidate = await db.FlightLogFiles.AsNoTracking()
-            .Where(f => f.Status == ProcessingStatus.Queued)
+            .Where(f => f.Status == ProcessingStatus.Queued && (f.NextAttemptAt == null || f.NextAttemptAt <= now))
             .OrderBy(f => f.StatusChangedAt).ThenBy(f => f.Id)
             .Select(f => (Guid?)f.Id)
             .FirstOrDefaultAsync(cancellationToken);
-        if (candidate is not { } fileId)
-        {
-            return null;
-        }
+        return candidate is { } fileId ? await ClaimAsync(fileId, workerId, cancellationToken) : null;
+    }
 
-        var file = await db.FlightLogFiles.SingleAsync(f => f.Id == fileId, cancellationToken);
-        if (file.Status != ProcessingStatus.Queued)
+    public async Task<ClaimResult> ClaimAsync(Guid logFileId, string workerId, CancellationToken cancellationToken)
+    {
+        var file = await db.FlightLogFiles.SingleOrDefaultAsync(f => f.Id == logFileId, cancellationToken);
+        if (file is null || file.Status != ProcessingStatus.Queued)
         {
             return new ClaimResult(null);
         }
 
         var now = clock.GetUtcNow();
-        var attempt = await db.LogProcessingJobs.CountAsync(j => j.LogFileId == fileId, cancellationToken) + 1;
-        var job = LogProcessingJob.Start(file.TeamId, file.Id, file.FlightId, attempt, workerId, Guid.NewGuid().ToString("N"), now);
+        var queuedSince = file.NextAttemptAt is { } due && due > file.StatusChangedAt ? due : file.StatusChangedAt;
+        var attempt = await db.LogProcessingJobs.CountAsync(j => j.LogFileId == logFileId, cancellationToken) + 1;
+        var job = LogProcessingJob.Start(file.TeamId, file.Id, file.FlightId, attempt, workerId, Guid.NewGuid().ToString("N"), queuedSince, now);
         file.TransitionTo(ProcessingStatus.Processing, now);
         db.LogProcessingJobs.Add(job);
         try
@@ -81,54 +93,74 @@ internal sealed partial class LogProcessingService(
             return new ClaimResult(null);
         }
 
+        metrics.JobStarted(now - queuedSince);
         return new ClaimResult(new ClaimedJob(job.Id, file.Id, file.FlightId, job.CorrelationId));
     }
 
-    public async Task ProcessAsync(ClaimedJob claim, CancellationToken cancellation, CancellationToken shutdown)
+    public async Task<WorkOutcome> ProcessAsync(ClaimedJob claim, CancellationToken cancellation, CancellationToken shutdown)
     {
         ArgumentNullException.ThrowIfNull(claim);
         using var scope = logger.BeginScope(new Dictionary<string, object> { ["CorrelationId"] = claim.CorrelationId, ["LogFileId"] = claim.LogFileId });
         var allocatedAtStart = GC.GetTotalAllocatedBytes();
+        var started = clock.GetTimestamp();
         var tempRoot = string.IsNullOrWhiteSpace(options.Value.TempDirectory) ? Path.GetTempPath() : options.Value.TempDirectory;
         var workDirectory = Path.Combine(tempRoot, $"flightlog-job-{claim.JobId:N}");
         Directory.CreateDirectory(workDirectory);
         var job = await db.LogProcessingJobs.SingleAsync(j => j.Id == claim.JobId, CancellationToken.None);
+        var format = "unknown";
         LogStarted(claim.LogFileId, job.Attempt);
 
+        WorkOutcome outcome;
+        string? failureCode = null;
         try
         {
             var file = await db.FlightLogFiles.SingleAsync(f => f.Id == claim.LogFileId, cancellation);
+            format = file.Format.ToString();
             var flight = await db.Flights.SingleAsync(f => f.Id == claim.FlightId, cancellation);
             var result = await ParseAsync(file, workDirectory, cancellation);
             var series = await UploadChunksAsync(result, job, cancellation);
             await SaveResultsAsync(file, flight, job, result, series, allocatedAtStart, cancellation);
             LogSucceeded(claim.LogFileId, job.DurationMs, job.RecordCount, job.SignalCount, job.ChunkBytes);
+            outcome = WorkOutcome.Succeeded;
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
-            await EndWithoutResultAsync(claim, null, null, shutdown.IsCancellationRequested, allocatedAtStart);
+            outcome = await EndWithoutResultAsync(claim, shutdown.IsCancellationRequested ? End.Requeue : End.Cancel, null, null, allocatedAtStart);
         }
         catch (DbUpdateConcurrencyException)
         {
             // The file changed while the results were saved: the user cancelled it.
-            await EndWithoutResultAsync(claim, null, null, false, allocatedAtStart);
+            outcome = await EndWithoutResultAsync(claim, End.Cancel, null, null, allocatedAtStart);
         }
         catch (LogParseException ex)
         {
             LogParseFailed(ex, claim.LogFileId, ex.Code);
-            await EndWithoutResultAsync(claim, ex.Code, ex.Message, false, allocatedAtStart);
+            failureCode = ex.Code;
+            outcome = await EndWithoutResultAsync(claim, End.Fail, ex.Code, ex.Message, allocatedAtStart);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException && errors.IsTransient(ex))
+        {
+            LogTransientFailure(ex, claim.LogFileId);
+            failureCode = TransientFailureCode;
+            outcome = await EndWithoutResultAsync(
+                claim, End.Retry, TransientFailureCode,
+                $"Processing was interrupted by a temporary infrastructure problem (correlation id {claim.CorrelationId}).", allocatedAtStart);
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             LogUnexpectedFailure(ex, claim.LogFileId);
-            await EndWithoutResultAsync(
-                claim, "processing.failed",
-                $"The file could not be processed because of an internal error (correlation id {claim.CorrelationId}).", false, allocatedAtStart);
+            failureCode = "processing.failed";
+            outcome = await EndWithoutResultAsync(
+                claim, End.Fail, failureCode,
+                $"The file could not be processed because of an internal error (correlation id {claim.CorrelationId}).", allocatedAtStart);
         }
         finally
         {
             TryDeleteDirectory(workDirectory);
         }
+
+        metrics.JobEnded(outcome, format, failureCode, clock.GetElapsedTime(started), GC.GetTotalAllocatedBytes() - allocatedAtStart);
+        return outcome;
     }
 
     public async Task<int> RecoverStaleAsync(CancellationToken cancellationToken)
@@ -146,10 +178,17 @@ internal sealed partial class LogProcessingService(
         var ids = stale.Select(f => f.Id).ToList();
         var jobs = await db.LogProcessingJobs.Where(j => ids.Contains(j.LogFileId) && j.Outcome == ProcessingJobOutcome.Running).ToListAsync(cancellationToken);
         const string Code = "processing.interrupted";
-        const string Message = "Processing stopped unexpectedly. Retry the file.";
+        const string Message = "Processing stopped unexpectedly (the worker stopped responding).";
         foreach (var file in stale)
         {
-            file.Fail(Code, Message, now);
+            if (file.RetryCount < options.Value.MaxAutomaticRetries)
+            {
+                file.ScheduleRetry(now + options.Value.RetryDelay(file.RetryCount + 1), now);
+            }
+            else
+            {
+                file.Fail(Code, Message + " Retry the file.", now);
+            }
         }
 
         foreach (var job in jobs)
@@ -326,6 +365,10 @@ internal sealed partial class LogProcessingService(
                 },
                 now);
             file.TransitionTo(ProcessingStatus.Processed, now);
+
+            // Analysis follows in its own step, so that rules can be re-run without parsing the file again.
+            file.RequestAnalysis(now);
+            db.AnalysisRuns.Add(AnalysisRun.Queue(file.TeamId, flight.Id, file.Id, AnalysisTrigger.Automatic, null, now));
             job.Succeed(
                 new ProcessingStatistics
                 {
@@ -423,8 +466,18 @@ internal sealed partial class LogProcessingService(
         return signals;
     }
 
-    /// <summary>Ends a job that produced no result: user cancellation, worker shutdown or failure.</summary>
-    private async Task EndWithoutResultAsync(ClaimedJob claim, string? failureCode, string? failureMessage, bool shutdown, long allocatedAtStart)
+    private const string TransientFailureCode = "processing.transient_failure";
+
+    private enum End
+    {
+        Cancel,
+        Requeue,
+        Fail,
+        Retry,
+    }
+
+    /// <summary>Ends a job that produced no result: user cancellation, worker shutdown, failure or retry.</summary>
+    private async Task<WorkOutcome> EndWithoutResultAsync(ClaimedJob claim, End end, string? failureCode, string? failureMessage, long allocatedAtStart)
     {
         // Runs after the job token fired, so it must not use it.
         var token = CancellationToken.None;
@@ -433,21 +486,37 @@ internal sealed partial class LogProcessingService(
         var job = await db.LogProcessingJobs.SingleOrDefaultAsync(j => j.Id == claim.JobId, token);
         var now = clock.GetUtcNow();
         var allocated = GC.GetTotalAllocatedBytes() - allocatedAtStart;
+        var processing = file?.Status == ProcessingStatus.Processing;
+        var outcome = WorkOutcome.Cancelled;
 
         if (job is not null && job.Outcome == ProcessingJobOutcome.Running)
         {
-            if (failureCode is not null && file?.Status == ProcessingStatus.Processing)
+            switch (end)
             {
-                job.Fail(failureCode, failureMessage!, allocated, now);
-                file.Fail(failureCode, failureMessage!, now);
-            }
-            else
-            {
-                job.Cancel(allocated, now);
-                if (shutdown && file?.Status == ProcessingStatus.Processing)
-                {
-                    file.TransitionTo(ProcessingStatus.Queued, now);
-                }
+                case End.Fail when processing:
+                    job.Fail(failureCode!, failureMessage!, allocated, now);
+                    file!.Fail(failureCode!, failureMessage!, now);
+                    outcome = WorkOutcome.Failed;
+                    break;
+                case End.Retry when processing && file!.RetryCount < options.Value.MaxAutomaticRetries:
+                    job.Fail(failureCode!, failureMessage!, allocated, now);
+                    file.ScheduleRetry(now + options.Value.RetryDelay(file.RetryCount + 1), now);
+                    outcome = WorkOutcome.RetryScheduled;
+                    break;
+                case End.Retry when processing:
+                    job.Fail(failureCode!, failureMessage!, allocated, now);
+                    file!.Fail("processing.retries_exhausted", $"{failureMessage} Gave up after {file.RetryCount} automatic retries.", now);
+                    outcome = WorkOutcome.RetriesExhausted;
+                    break;
+                case End.Requeue when processing:
+                    job.Cancel(allocated, now);
+                    file!.TransitionTo(ProcessingStatus.Queued, now);
+                    outcome = WorkOutcome.Requeued;
+                    break;
+                default:
+                    // Cancelled by the user (or the file changed under us): the file status is already final.
+                    job.Cancel(allocated, now);
+                    break;
             }
 
             try
@@ -458,13 +527,15 @@ internal sealed partial class LogProcessingService(
             {
                 // The user changed the file at the same moment; the job outcome is recorded on the next recovery.
                 db.ChangeTracker.Clear();
+                outcome = WorkOutcome.Cancelled;
             }
 
-            LogEnded(claim.LogFileId, job.Outcome, failureCode);
+            LogEnded(claim.LogFileId, outcome, failureCode);
         }
 
         // Also when the flight (and with it the job) was deleted while it was processed.
         await TryDeletePrefixAsync(LogProcessingJob.StoragePrefixFor(claim.FlightId, claim.JobId));
+        return outcome;
     }
 
     private async Task TryDeletePrefixAsync(string prefix)
@@ -514,9 +585,12 @@ internal sealed partial class LogProcessingService(
     private partial void LogUnexpectedFailure(Exception exception, Guid logFileId);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Processing of log file {LogFileId} ended as {Outcome} ({Code})")]
-    private partial void LogEnded(Guid logFileId, ProcessingJobOutcome outcome, string? code);
+    private partial void LogEnded(Guid logFileId, WorkOutcome outcome, string? code);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Marked {Count} abandoned log files as failed")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Processing log file {LogFileId} hit a transient failure")]
+    private partial void LogTransientFailure(Exception exception, Guid logFileId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Recovered {Count} log files abandoned in processing")]
     private partial void LogRecovered(int count);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not clean up {Location}")]

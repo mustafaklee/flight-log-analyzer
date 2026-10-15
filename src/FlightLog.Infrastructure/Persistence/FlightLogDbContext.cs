@@ -1,4 +1,6 @@
 using FlightLog.Application.Abstractions;
+using FlightLog.Application.Messaging;
+using FlightLog.Domain.Analysis;
 using FlightLog.Domain.Fleet;
 using FlightLog.Domain.FlightData;
 using FlightLog.Domain.Flights;
@@ -38,6 +40,14 @@ public sealed class FlightLogDbContext(DbContextOptions<FlightLogDbContext> opti
     public DbSet<FlightEvent> FlightEvents => Set<FlightEvent>();
 
     public DbSet<FlightParameter> FlightParameters => Set<FlightParameter>();
+
+    public DbSet<AnalysisRun> AnalysisRuns => Set<AnalysisRun>();
+
+    public DbSet<AnalysisFinding> AnalysisFindings => Set<AnalysisFinding>();
+
+    public DbSet<AnalysisRuleResult> AnalysisRuleResults => Set<AnalysisRuleResult>();
+
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

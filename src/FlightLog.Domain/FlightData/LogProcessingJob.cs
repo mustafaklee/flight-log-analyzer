@@ -88,6 +88,9 @@ public sealed class LogProcessingJob
 
     public DateTimeOffset StartedAt { get; private set; }
 
+    /// <summary>How long the file waited in the queue before this attempt started.</summary>
+    public long QueueWaitMs { get; private set; }
+
     public DateTimeOffset? FinishedAt { get; private set; }
 
     public long? DurationMs { get; private set; }
@@ -131,7 +134,8 @@ public sealed class LogProcessingJob
 
     public string? FailureMessage { get; private set; }
 
-    public static LogProcessingJob Start(Guid teamId, Guid logFileId, Guid flightId, int attempt, string workerId, string correlationId, DateTimeOffset now)
+    public static LogProcessingJob Start(
+        Guid teamId, Guid logFileId, Guid flightId, int attempt, string workerId, string correlationId, DateTimeOffset queuedSince, DateTimeOffset now)
     {
         if (attempt < 1)
         {
@@ -151,6 +155,7 @@ public sealed class LogProcessingJob
             StoragePrefix = StoragePrefixFor(flightId, id),
             Outcome = ProcessingJobOutcome.Running,
             StartedAt = now,
+            QueueWaitMs = (long)Math.Max(0, (now - queuedSince).TotalMilliseconds),
         };
     }
 

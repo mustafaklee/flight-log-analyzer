@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/FlightLog.Api/FlightLog.Api.csproj" />
     <Project Path="src/FlightLog.Application/FlightLog.Application.csproj" />
+    <Project Path="src/FlightLog.Contracts/FlightLog.Contracts.csproj" />
     <Project Path="src/FlightLog.Domain/FlightLog.Domain.csproj" />
     <Project Path="src/FlightLog.Infrastructure/FlightLog.Infrastructure.csproj" />
     <Project Path="src/FlightLog.LogParsing/FlightLog.LogParsing.csproj" />
